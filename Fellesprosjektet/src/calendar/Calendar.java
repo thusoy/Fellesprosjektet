@@ -29,11 +29,11 @@ public class Calendar extends DBObject {
 	}
 	
 	public void getAppointments(Date start, Date end){
-//	implementer		
+		List<Room> = Room.all();
 	}
 	
 	public void addAppointment(Appointment app){
-		
+		appointments.add(app);
 	}
 
 }

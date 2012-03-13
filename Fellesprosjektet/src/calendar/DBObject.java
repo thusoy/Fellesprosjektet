@@ -8,11 +8,12 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.List;
 
 import no.ntnu.fp.net.co.ConnectionImpl;
 
 
-public class DBObject {
+public class DBObject<T> {
 	private String dbTableName;
 	private String db = "jdbc:mysql://mysql.stud.ntnu.no/tarjeikl_fp33";
 	private Connection con;
@@ -28,7 +29,7 @@ public class DBObject {
 		}
 	}
 	
-	public DBObject all() throws SQLException{
+	public static List<T> all() throws SQLException{
 		con = DriverManager.getConnection(db, "tarjeikl_fpuser", "bruker");
 		Statement stmt = con.createStatement();
 		String query = String.format("SELECT * FROM %s", dbTableName);
@@ -37,7 +38,7 @@ public class DBObject {
 			System.out.println(rs.getString(2));
 		}
 		con.close();
-		return this;
+		return null;
 	}
 	
 	public void save() {

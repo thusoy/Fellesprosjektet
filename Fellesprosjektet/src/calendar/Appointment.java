@@ -22,7 +22,7 @@ public class Appointment extends DBObject {
 	
 	protected enum Day{
 		MONDAY("mandag"), TUESDAY("tirsdag"), WEDNESDAY("onsdag"), 
-		THURSDAY("torsdag"), FRIDAY("fredag"), SATURDAY("l¿rdag"), SUNDAY("s¿ndag");
+		THURSDAY("torsdag"), FRIDAY("fredag"), SATURDAY("lørdag"), SUNDAY("søndag");
 		
 		String norwegianRepr;
 		
@@ -31,7 +31,7 @@ public class Appointment extends DBObject {
 		}
 	}
 	
-	public Appointment(Person owner, String title, Date startTime, Date endTime, boolean isPrivate, 
+	public Appointment(String title, Date startTime, Date endTime, boolean isPrivate, 
 			HashMap<Person, Boolean> participants) {
 		this.title = title;
 		this.startTime = startTime;

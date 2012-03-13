@@ -5,7 +5,7 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-public class Room extends DBObject{
+public class Room extends DBObject<Room>{
 	private String name;
 	private int capacity;
 	private LinkedHashMap<Date, Date> isOccupied;
