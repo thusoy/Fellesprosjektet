@@ -6,27 +6,47 @@ import java.util.List;
 
 import no.ntnu.fp.model.Person;
 
-public class Appointment {
+public class Appointment extends DBObject {
 	private int appId;
 	private String place;
+	private String title;
 	private String description;
 	private Date startTime;
 	private Date endTime;
-	private List<Date> daysAppearing;
+	private List<Day> daysAppearing;
 	private Date endOfRepeatDate;
 	private boolean isPrivate;
 	private Person creator;
 	private HashMap<Person, Boolean> participants;
 	private String room_name;
 	
-	public void inviteUser(Person user){
-//	implementer		
+	protected enum Day{
+		MONDAY("mandag"), TUESDAY("tirsdag"), WEDNESDAY("onsdag"), 
+		THURSDAY("torsdag"), FRIDAY("fredag"), SATURDAY("l¿rdag"), SUNDAY("s¿ndag");
+		
+		String norwegianRepr;
+		
+		Day(String norwegian){
+			this.norwegianRepr = norwegian;
+		}
 	}
+	
+	public Appointment(String title, Date startTime, Date endTime, boolean isPrivate, 
+			HashMap<Person, Boolean> participants) {
+		this.title = title;
+		this.startTime = startTime;
+		this.endTime = endTime;
+		this.isPrivate = isPrivate;
+		this.participants = participants;
+	}
+	
 	public void acceptInvite(Person user, Boolean answer){
-//	implementer		
+		participants.put(user, answer);
+		save();		
 	}
-	public void updateParticipants(HashMap<Person, Boolean> participtants){
-//	implementer		
+	public void updateParticipants(HashMap<Person, Boolean> participants){
+		this.participants = participants;
+		save();
 	}
 	
 	public int getAppId() {
@@ -77,14 +97,19 @@ public class Appointment {
 	public void setPrivate(boolean isPrivate) {
 		this.isPrivate = isPrivate;
 	}
+	/**
+	 * Server sender ut melding til alle deltakere om at appointment'en er slettet. 
+	 * Deretter blir appointment-objektet slettet.
+	 */
 	public void deleteAppointment() {
-//	implementer
+		delete();
 	}
-	public void addTimeAppearing(Date time){
-//	implementer		
+	public void updateDatesAppearing(List<Day> days){
+		this.daysAppearing = days;
+		save();
 	}
 	public void updateDescription(String description){
-//	implementer		
+		this.description = description;
 	}
 	public HashMap<Person, Boolean> getParticipants() {
 		return participants;

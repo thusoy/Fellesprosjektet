@@ -3,7 +3,7 @@ package calendar;
 import java.util.Date;
 import no.ntnu.fp.model.Person;
 
-public class Message {
+public class Message extends DBObject {
 	
 	private int msgId;
 	private Date dateSent;
