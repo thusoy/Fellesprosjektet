@@ -44,7 +44,7 @@ public class Person {
 	 * Constant used when calling 
 	 * {@link java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)}
 	 * on {@linkplain #addPropertyChangeListener(java.beans.PropertyChangeListener) registered
-	 * <code>PropertyChangeListener<code> objecs} when the person's name is changed.
+	 * <code>PropertyChangeListener<code> objects} when the person's name is changed.
 	 * 
 	 * @see #setName(String) the setName(String) method
 	 */
@@ -54,7 +54,7 @@ public class Person {
 	 * Constant used when calling 
 	 * {@link java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)}
 	 * on {@linkplain #addPropertyChangeListener(java.beans.PropertyChangeListener) registered
-	 * <code>PropertyChangeListener<code> objecs} when the person's email address is changed.
+	 * <code>PropertyChangeListener<code> objects} when the person's email address is changed.
 	 * 
 	 * @see #setEmail(String) the setEmail(String) method
 	 */
@@ -64,14 +64,14 @@ public class Person {
 	 * Constant used when calling 
 	 * {@link java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)}
 	 * on {@linkplain #addPropertyChangeListener(java.beans.PropertyChangeListener) registered
-	 * <code>PropertyChangeListener<code> objecs} when the person's date of birth is changed.
+	 * <code>PropertyChangeListener<code> objects} when the person's date of birth is changed.
 	 * 
 	 * @see #setEmail(String) the setDateOfBirth(java.util.Date) method
 	 */
 	public final static String DATEOFBIRTH_PROPERTY_NAME = "dateOfBirth";
 	
 	/**
-	 * Default constructor. Must be called to initialise the object's member variables.
+	 * Default constructor. Must be called to initialize the object's member variables.
 	 * The constructor sets the name and email of this person to empty
 	 * {@link java.lang.String}, while the date of birth is given today's date. The 
 	 * {@linkplain #getId() id field} is set to current time when the object is created.
