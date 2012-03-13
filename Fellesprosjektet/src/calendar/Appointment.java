@@ -3,6 +3,7 @@ package calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 import no.ntnu.fp.model.Person;
 
@@ -13,7 +14,7 @@ public class Appointment extends DBObject {
 	private String description;
 	private Date startTime;
 	private Date endTime;
-	private List<Day> daysAppearing;
+	private Set<Day> daysAppearing;
 	private Date endOfRepeatDate;
 	private boolean isPrivate;
 	private Person creator;
@@ -79,10 +80,10 @@ public class Appointment extends DBObject {
 	public void setEndTime(Date endTime) {
 		this.endTime = endTime;
 	}
-	public List<Date> getDaysAppearing() {
+	public Set<Day> getDaysAppearing() {
 		return daysAppearing;
 	}
-	public void setDaysAppearing(List<Date> daysAppearing) {
+	public void setDaysAppearing(Set<Day> daysAppearing) {
 		this.daysAppearing = daysAppearing;
 	}
 	public Date getEndOfRepeatDate() {
@@ -104,7 +105,7 @@ public class Appointment extends DBObject {
 	public void deleteAppointment() {
 		delete();
 	}
-	public void updateDatesAppearing(List<Day> days){
+	public void updateDaysAppearing(Set<Day> days){
 		this.daysAppearing = days;
 		save();
 	}
