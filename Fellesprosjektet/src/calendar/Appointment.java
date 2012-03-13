@@ -52,8 +52,8 @@ public class Appointment extends DBObject {
 	public int getAppId() {
 		return appId;
 	}
-	public void setAppId(int appId) {
-		this.appId = appId;
+	public String getTitle() {
+		return title;
 	}
 	public String getPlace() {
 		return place;
