@@ -1,11 +1,15 @@
 package calendar;
 
+import java.io.IOException;
+import java.net.ConnectException;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+
+import no.ntnu.fp.net.co.ConnectionImpl;
 
 
 public class DBObject {
@@ -24,7 +28,7 @@ public class DBObject {
 		}
 	}
 	
-	public DBObject getAll() throws SQLException{
+	public DBObject all() throws SQLException{
 		con = DriverManager.getConnection(db, "tarjeikl_fpuser", "bruker");
 		Statement stmt = con.createStatement();
 		String query = String.format("SELECT * FROM %s", dbTableName);
@@ -36,8 +40,28 @@ public class DBObject {
 		return this;
 	}
 	
-	public void save() throws SQLException{
-		createTablesIfNecessary();
+	public void save() {
+		sendObjectToServer(this);
+	}
+	
+	/**
+	 * Create xml of the object, and send it to the server.
+	 * @param obj
+	 */
+	private void sendObjectToServer(DBObject obj){
+		ConnectionImpl a1 = new ConnectionImpl(1337);
+		try {
+			a1.send(this.toxml());
+		} catch (ConnectException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private String toxml(){
+		// Generer xml av objektet
+		return "";
 	}
 
 	private void createTablesIfNecessary() throws SQLException {
@@ -49,9 +73,4 @@ public class DBObject {
 		}
 		con.close();
 	}
-	
-	protected void executeQuery(String query){
-		
-	}
-	
 }
