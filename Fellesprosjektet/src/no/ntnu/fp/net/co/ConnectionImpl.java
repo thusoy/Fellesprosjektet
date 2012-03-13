@@ -3,7 +3,6 @@
  */
 package no.ntnu.fp.net.co;
 
-import java.io.EOFException;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.net.InetAddress;
@@ -13,13 +12,12 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-
 import no.ntnu.fp.net.admin.Log;
 import no.ntnu.fp.net.cl.ClException;
 import no.ntnu.fp.net.cl.ClSocket;
 import no.ntnu.fp.net.cl.KtnDatagram;
 import no.ntnu.fp.net.cl.KtnDatagram.Flag;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
  * Implementation of the Connection-interface. <br>
@@ -46,7 +44,9 @@ public class ConnectionImpl extends AbstractConnection {
      *            - the local port to associate with this connection
      */
     public ConnectionImpl(int myPort) {
-        throw new NotImplementedException();
+    	super();
+    	this.myAddress = getIPv4Address();
+        this.myPort = myPort;
     }
 
     private String getIPv4Address() {
@@ -69,11 +69,33 @@ public class ConnectionImpl extends AbstractConnection {
      *             If there's an I/O error.
      * @throws java.net.SocketTimeoutException
      *             If timeout expires before connection is completed.
+     * @throws  
      * @see Connection#connect(InetAddress, int)
      */
     public void connect(InetAddress remoteAddress, int remotePort) throws IOException,
             SocketTimeoutException {
-        throw new NotImplementedException();
+    	ClSocket a2 = new ClSocket();
+    	this.remoteAddress = remoteAddress.toString();
+    	this.remotePort = remotePort;
+    	KtnDatagram datagram = constructInternalPacket(Flag.SYN);
+    	
+    	try {
+			a2.send(datagram);
+		} catch (ClException e) {
+			e.printStackTrace();
+		}
+    	this.state = State.SYN_SENT;
+    	
+    	KtnDatagram answer = receiveAck();
+    	
+    	KtnDatagram outgoing = constructInternalPacket(Flag.ACK);
+    	sendAck(outgoing, false);
+    	
+    	
+    	
+    	
+    	
+    	this.state = State.ESTABLISHED;
     }
 
     /**
@@ -83,9 +105,25 @@ public class ConnectionImpl extends AbstractConnection {
      * @see Connection#accept()
      */
     public Connection accept() throws IOException, SocketTimeoutException {
-        throw new NotImplementedException();
+    	this.state = State.LISTEN;
+    	KtnDatagram packet = receivePacket(true);
+    	System.out.println(packet == null);
+    	this.remoteAddress = packet.getSrc_addr();
+    	this.remotePort = packet.getSrc_port();
+//    	Log.writeToLog(packet, "Packet received!", "FroM!");
+    	KtnDatagram outgoingPacket = constructInternalPacket(Flag.SYN_ACK);
+    	outgoingPacket.setPayload("hellow!");
+    	System.out.println("The packet were going to send: " + outgoingPacket.getDest_addr() + outgoingPacket.getDest_port() + outgoingPacket.getSeq_nr());
+    	sendAck(outgoingPacket, true);
+    	KtnDatagram incoming = receiveAck();
+		if (isValid(incoming)){
+			return this;
+		} else {
+			// gjør noe fornuftig
+		}
+    	return this;
     }
-
+    	
     /**
      * Send a message from the application.
      * 
