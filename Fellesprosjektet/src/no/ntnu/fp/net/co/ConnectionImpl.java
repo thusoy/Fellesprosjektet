@@ -47,6 +47,7 @@ public class ConnectionImpl extends AbstractConnection {
     	super();
     	this.myAddress = getIPv4Address();
         this.myPort = myPort;
+        System.out.println("Ny forbindelse kjører nå på " + this.myAddress);
     }
 
     private String getIPv4Address() {
