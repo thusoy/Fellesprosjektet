@@ -31,7 +31,7 @@ public class Appointment extends DBObject {
 		}
 	}
 	
-	public Appointment(String title, Date startTime, Date endTime, boolean isPrivate, 
+	public Appointment(Person owner, String title, Date startTime, Date endTime, boolean isPrivate, 
 			HashMap<Person, Boolean> participants) {
 		this.title = title;
 		this.startTime = startTime;
@@ -125,9 +125,6 @@ public class Appointment extends DBObject {
 	}
 	public Person getCreator() {
 		return creator;
-	}
-	public void setCreator(Person creator) {
-		this.creator = creator;
 	}
 	
 }
