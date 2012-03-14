@@ -205,7 +205,7 @@ public class AppointmentHandler {
 				end, isPrivate, participants);
 		appointment.setPlace(place);
 		appointment.setDescription(des);
-		appointment.setDaysAppearing(daysAppearing);
+//		appointment.setDaysAppearing(daysAppearing);
 		appointment.setEndOfRepeatDate(endOfRe);
 		appointment.setRoom_name(roomName);		
 		
