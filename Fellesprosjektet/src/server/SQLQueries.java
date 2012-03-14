@@ -141,12 +141,13 @@ public class SQLQueries {
 //	Spørringer til klasse Calendar:
 
 	// lagrer en ny kalender i systemet:
-	String querySaveCalendar = 
-				"INSERT INTO Calendar”;
+	String querySaveCal = 
+			"INSERT INTO Calendar";
 
 	//queryGetAppointments = 
-				"SELECT appId, place, startTime, endTime, description, daysAppearing, endOfRepeatDate, 
-				roomName, isPrivate, creatorId FROM Appointment WHERE startTime==start && endTime==end";
+	String queryGetAppointments = 
+				"SELECT appId, place, startTime, endTime, description, daysAppearing, endOfRepeatDate," +  
+				"roomName, isPrivate, creatorId FROM Appointment WHERE startTime==start && endTime==end";
 
 
 //	Spørringer til klasse UserCalendars:
@@ -179,7 +180,7 @@ public class SQLQueries {
 	
 	// spørring for isAvailable()
 	String queryIsAvalable =
-			"SELECT name, capacity FROM Room"
+			"SELECT name, capacity FROM Room";
 
 
 //	Spørringer til klasse Message:
@@ -198,7 +199,7 @@ public class SQLQueries {
 
 	// Opprette en ny melding
 	String querySaveMessage = 
-				"INSERT INTO Message VALUES(%i, Date, %s, %s)”;
+				"INSERT INTO Message VALUES(%i, Date, %s, %s)";
 
 	// Hente ut innholdet meldingstittel
 	String queryGetTitle = 
