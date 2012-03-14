@@ -6,8 +6,10 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Execute {
@@ -102,6 +104,24 @@ public class Execute {
 		return rs.getInt(1);	
 	}
 	
+	/**
+	 * A wrapper for the database calls. Returns all the ints returned by the query as 
+	 * a List<String>.
+	 * @param query
+	 * @return
+	 * @throws ClassNotFoundException
+	 * @throws IOException
+	 * @throws SQLException
+	 */
+	public static List<String> executeGetStringList(String query) throws ClassNotFoundException, IOException, SQLException{
+		Statement stmt = getStatement();
+		ResultSet rs = stmt.executeQuery(query);
+		List<String> output = new ArrayList<String>();
+		while(rs.next()){
+			output.add(rs.getString(1));
+		}
+		return output;
+	}
 	
 	/**
 	 * A wrapper for the database calls. Returns the first value in the first column of 'query' as
@@ -116,7 +136,7 @@ public class Execute {
 		Statement stmt = getStatement();
 		ResultSet rs = stmt.executeQuery(query);
 		rs.next();
-		return rs.getLong(1);	
+		return rs.getLong(1);
 	}
 	
 	/**
@@ -134,7 +154,6 @@ public class Execute {
 		rs.next();
 		return rs.getString(1);	
 	}
-	
 	
 	/**
 	 * A wrapper for the database calls. Returns a Map<Integer, Boolean> from the query. The query
