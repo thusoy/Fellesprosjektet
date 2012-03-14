@@ -26,7 +26,7 @@ public class Appointment extends DBObject<Appointment> implements Serializable {
 	private String room_name;
 	
 	public Appointment(String title, Date startTime, Date endTime, boolean isPrivate, 
-			HashMap<Person, Boolean> participants) {
+			Map<Person, Boolean> participants) {
 		this.title = title;
 		this.startTime = startTime;
 		this.endTime = endTime;
@@ -131,7 +131,7 @@ public class Appointment extends DBObject<Appointment> implements Serializable {
 	public void updateDescription(String description){
 		this.description = description;
 	}
-	public HashMap<Person, Boolean> getParticipants() {
+	public Map<Person, Boolean> getParticipants() {
 		return participants;
 	}
 	public void setParticipants(HashMap<Person, Boolean> participants) {

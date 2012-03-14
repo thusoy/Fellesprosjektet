@@ -20,28 +20,25 @@ public class MessageHandler {
 			
 		Execute.executeUpdate(String.format(querySaveMessage, dateSent, content, title));
 	}
-	public String getTitleMessage(Message msgId, Person user) throws ClassNotFoundException, IOException, SQLException {
-		long id = msgId.getId();
+	public String getTitleMessage(long msgId, Person user) throws ClassNotFoundException, IOException, SQLException {
 		
 		String queryGetTitleMessage =
 				"SELECT title FROM Message WHERE msgId='%i'";
 		
-		return Execute.executeGetString(String.format(queryGetTitleMessage, id));
+		return Execute.executeGetString(String.format(queryGetTitleMessage, msgId));
 	}
-	public Date getDateSentMessage(Message msgId, Person user) throws ClassNotFoundException, IOException, SQLException {
-		long id = msgId.getId();
+	public Date getDateSentMessage(long msgId, Person user) throws ClassNotFoundException, IOException, SQLException {
 		
 		String queryGetDateSentMessage =
 				"SELECT dateSent FROM Message WHERE msgId='%i'";
 		
-		return Execute.executeGetDate(String.format(queryGetDateSentMessage, id));
+		return Execute.executeGetDate(String.format(queryGetDateSentMessage, msgId));
 	}
-	public static String getContentMessage(Message msgId, Person user) throws ClassNotFoundException, IOException, SQLException {
-		long id = msgId.getId();
+	public static String getContentMessage(long msgId, Person user) throws ClassNotFoundException, IOException, SQLException {
 		
 		String queryGetContentMessage =
 				"SELECT content FROM Message WHERE msgId='%i'";
 		
-		return Execute.executeGetString(String.format(queryGetContentMessage, id));
+		return Execute.executeGetString(String.format(queryGetContentMessage, msgId));
 	}
 }

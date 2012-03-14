@@ -17,8 +17,8 @@ public class Person {
 	/**
 	 * This member variable holds the person's name.
 	 */
-	private String name;
-	
+	private String firstname;
+	private String lastname;
 	/**
 	 * This member variable holds the person's email address.
 	 */
@@ -27,12 +27,14 @@ public class Person {
 	/**
 	 * This member variable holds the person's date of birth.
 	 */
-	private Date dateOfBirth;
+	//private Date dateOfBirth;
 	
 	/**
 	 * This member variable holds a unique identifier for this object.
 	 */
 	private long id;
+	
+	private String department;
 	
 	/**
 	 * This member variable provides functionality for notifying of changes to
@@ -48,8 +50,8 @@ public class Person {
 	 * 
 	 * @see #setName(String) the setName(String) method
 	 */
-	public final static String NAME_PROPERTY_NAME = "name";
-
+	public final static String FIRSTNAME_PROPERTY_NAME = "fname";
+	public final static String LASTNAME_PROPERTY_NAME = "lname";
 	/**
 	 * Constant used when calling 
 	 * {@link java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)}
@@ -68,8 +70,9 @@ public class Person {
 	 * 
 	 * @see #setEmail(String) the setDateOfBirth(java.util.Date) method
 	 */
-	public final static String DATEOFBIRTH_PROPERTY_NAME = "dateOfBirth";
+	//public final static String DATEOFBIRTH_PROPERTY_NAME = "dateOfBirth";
 	
+	public final static String DEPARTMENT_PROPERTY_NAME = "department";
 	/**
 	 * Default constructor. Must be called to initialize the object's member variables.
 	 * The constructor sets the name and email of this person to empty
@@ -77,9 +80,11 @@ public class Person {
 	 * {@linkplain #getId() id field} is set to current time when the object is created.
 	 */
 	public Person() {
-		name = "";
+		firstname = "";
+		lastname = "";
 		email = "";
-		dateOfBirth = new Date();
+		department = "";
+//		dateOfBirth = new Date();
 		id = System.currentTimeMillis();
 		propChangeSupp = new PropertyChangeSupport(this);
 	}
@@ -92,11 +97,13 @@ public class Person {
 	 * @param email The person's e-mail address
 	 * @param dateOfBirth The person's date of birth.
 	 */
-	public Person(String name, String email, Date dateOfBirth) {
+	public Person(String firstname, String lastname, String email, String department) {
 		this();
-		this.name = name;
+		this.firstname = firstname;
+		this.lastname = lastname;
 		this.email = email;
-		this.dateOfBirth = dateOfBirth;
+//		this.dateOfBirth = dateOfBirth;
+		this.department = department;
 	}
 	
 	/**
@@ -125,10 +132,16 @@ public class Person {
 	 * @see java.beans.PropertyChangeListener <a href="http://java.sun.com/j2se/1.4.2/docs/api/java/beans/PropertyChangeListener.html">java.beans.PropertyChangeListener</a>
 	 * @see java.beans.PropertyChangeEvent <a href="http://java.sun.com/j2se/1.4.2/docs/api/java/beans/PropertyChangeEvent.html">java.beans.PropertyChangeEvent</a>
 	 */
-	public void setName(String name) {
-		String oldName = this.name;
-		this.name = name;
-		PropertyChangeEvent event = new PropertyChangeEvent(this, NAME_PROPERTY_NAME, oldName, name);
+	public void setFirstname(String firstname) {
+		String oldName = this.firstname;
+		this.firstname = firstname;
+		PropertyChangeEvent event = new PropertyChangeEvent(this, FIRSTNAME_PROPERTY_NAME, oldName, firstname);
+		propChangeSupp.firePropertyChange(event);
+	}
+	public void setLastname(String lastname) {
+		String oldName = this.lastname;
+		this.lastname = lastname;
+		PropertyChangeEvent event = new PropertyChangeEvent(this, LASTNAME_PROPERTY_NAME, oldName, lastname);
 		propChangeSupp.firePropertyChange(event);
 	}
 	
@@ -192,20 +205,28 @@ public class Person {
 	 * @see java.beans.PropertyChangeListener <a href="http://java.sun.com/j2se/1.4.2/docs/api/java/beans/PropertyChangeListener.html">java.beans.PropertyChangeListener</a>
 	 * @see java.beans.PropertyChangeEvent <a href="http://java.sun.com/j2se/1.4.2/docs/api/java/beans/PropertyChangeEvent.html">java.beans.PropertyChangeEvent</a>
 	 */	
-	public void setDateOfBirth(Date dateOfBirth) {
-		Date oldDateOfBirth = this.dateOfBirth;
-		this.dateOfBirth = dateOfBirth;
-		PropertyChangeEvent event = new PropertyChangeEvent(this, DATEOFBIRTH_PROPERTY_NAME, oldDateOfBirth, this.dateOfBirth);
+//	public void setDateOfBirth(Date dateOfBirth) {
+//		Date oldDateOfBirth = this.dateOfBirth;
+//		this.dateOfBirth = dateOfBirth;
+//		PropertyChangeEvent event = new PropertyChangeEvent(this, DATEOFBIRTH_PROPERTY_NAME, oldDateOfBirth, this.dateOfBirth);
+//		propChangeSupp.firePropertyChange(event);
+//	}
+	public void setDepartment(String department) {
+		String oldDepartment = this.department;
+		this.department = department;
+		PropertyChangeEvent event = new PropertyChangeEvent(this, DEPARTMENT_PROPERTY_NAME, oldDepartment, this.department);
 		propChangeSupp.firePropertyChange(event);
 	}
-	
 	/**
 	 * Returns the person's name.
 	 * 
 	 * @return The person's name.
 	 */
-	public String getName() {
-		return name;
+	public String getFirstname() {
+		return firstname;
+	}
+	public String getLastname() {
+		return lastname;
 	}
 
 	/**
@@ -222,9 +243,9 @@ public class Person {
 	 * 
 	 * @return The person's date of birth.
 	 */
-	public Date getDateOfBirth() {
-		return dateOfBirth;
-	}
+//	public Date getDateOfBirth() {
+//		return dateOfBirth;
+//	}
 	
 	/**
 	 * Returns this object's unique identification.
@@ -234,7 +255,10 @@ public class Person {
 	public long getId() {
 		return id;
 	}
-
+	
+	public String getDepartment() {
+		return department;
+	}
 	/**
 	 * Add a {@link java.beans.PropertyChangeListener} to the listener list.
 	 * 
@@ -265,12 +289,12 @@ public class Person {
 		
 		Person aPerson = (Person)obj;
 		
-		if (aPerson.getName().compareTo(getName()) != 0) 
+		if (aPerson.getFirstname().compareTo(getFirstname()) != 0) 
 			return false;
 		if (aPerson.getEmail().compareTo(getEmail()) != 0)
 			return false;
-		if (aPerson.getDateOfBirth().compareTo(getDateOfBirth()) != 0)
-			return false;
+//		if (aPerson.getDateOfBirth().compareTo(getDateOfBirth()) != 0)
+//			return false;
 		
 		return true;
 	}
@@ -279,9 +303,9 @@ public class Person {
 	 * {@inheritDoc}
 	 */
 	public String toString() {
-		String s = "Name: " + getName() + "; ";
+		String s = "Name: " + getFirstname() + "; ";
 		s += "Email: " + getEmail() + "; ";
-		s += "Date of birth: " + getDateOfBirth().toString();
+//		s += "Date of birth: " + getDateOfBirth().toString();
 		return s;
 	}
 }
