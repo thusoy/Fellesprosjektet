@@ -62,16 +62,8 @@ public class AppointmentHandler {
 				" isPrivate='%b'" +
 				" creatorId='%i'" +
 				" WHERE appId='%i'";		
-		executeUpdate(String.format(queryUpdateAppointment, place, title, start, end, des, 
+		Execute.executeUpdate(String.format(queryUpdateAppointment, place, title, start, end, des, 
 				dayAppearing, endOfRe, roomName, isPrivate, creatorId));
-	}
-	public Appointment getAppointment(Appointment app) {
-		long id = app.getAppId();
-		
-		String queryGetAppointment =
-				"SELECT * FROM Appointment WHERE appId='%i'";
-		
-		return executeGet(String.format(queryGetAppointment, id));
 	}
 	public String getTitleAppointment(Appointment app) {
 		long id = app.getAppId();
@@ -79,7 +71,7 @@ public class AppointmentHandler {
 		String queryGetTitleAppointment =
 				"SELECT title FROM Appointment WHERE appId='%i'";
 		
-		return executeGet(String.format(queryGetTitleAppointment, id));
+		return Execute.executeGetString(String.format(queryGetTitleAppointment, id));
 	}
 	public String getPlace(Appointment app) {
 		long id = app.getAppId();
@@ -87,7 +79,7 @@ public class AppointmentHandler {
 		String queryGetPlaceAppointment =
 				"SELECT place FROM Appointment WHERE appId='%i'";
 		
-		return executeGet(String.format(queryGetPlaceAppointment, id));
+		return Execute.executeGetString(String.format(queryGetPlaceAppointment, id));
 	}
 	public String getRoom(Appointment app) {
 		long id = app.getAppId();
@@ -95,7 +87,7 @@ public class AppointmentHandler {
 		String queryGetRoomAppointment =
 				"SELECT roomName FROM Appointment WHERE appId='%i'";
 		
-		return executeGet(String.format(queryGetRoomAppointment, id));
+		return Execute.executeGet(String.format(queryGetRoomAppointment, id));
 	}
 	public Date getStart(Appointment app) {
 		long id = app.getAppId();
@@ -103,7 +95,7 @@ public class AppointmentHandler {
 		String queryGetStartAppointment =
 				"SELECT startTime FROM Appointment WHERE appId='%i'";
 		
-		return executeGet(String.format(queryGetStartAppointment, id));
+		return Execute.executeGetDate(String.format(queryGetStartAppointment, id));
 	}
 	public Date getEnd(Appointment app) {
 		long id = app.getAppId();
@@ -111,7 +103,7 @@ public class AppointmentHandler {
 		String queryGetEndAppointment =
 				"SELECT endTime FROM Appointment WHERE appId='%i'";
 		
-		return executeGet(String.format(queryGetEndAppointment, id));
+		return Execute.executeGetDate(String.format(queryGetEndAppointment, id));
 	}
 	public void deleteAppointment(Appointment app) {
 		long id = app.getAppId();
@@ -130,7 +122,7 @@ public class AppointmentHandler {
 				" hasAccepted='%b'" +
 				" WHERE userId='%i' AND msgId='%i'";
 		
-		executeUpdate(String.format(queryUpdateUserAppointment, bool, personId, appId));
+		Execute.executeUpdate(String.format(queryUpdateUserAppointment, bool, personId, appId));
 	}
 	public HashMap getParticipants(Appointment app) {
 		long id = app.getAppId();
@@ -139,7 +131,7 @@ public class AppointmentHandler {
 				"SELECT userId, hasAccepted FROM UserAppointment" +
 				" WHERE appId='%i'";
 		
-		executeGetHashMap(String.format(queryGetParticipants, id));
+		Execute.executeGetHashMap(String.format(queryGetParticipants, id));
 	}
 	public void addUserToAppointment(Appointment app) {
 		long id = app.getAppId();
@@ -147,7 +139,7 @@ public class AppointmentHandler {
 		String queryAddUserToAppointment =
 				"INSERT INTO UserAppointment VALUES(%i, %i, %b)";
 		
-		executeUpdate(String.format(queryAddUserToAppointment, id));
+		Execute.executeUpdate(String.format(queryAddUserToAppointment, id));
 	}
 	public void deleteUserFromAppointment(Appointment app) {
 		long id = app.getAppId();
@@ -155,7 +147,7 @@ public class AppointmentHandler {
 		String queryDeleteUserFromAppointment = 
 				"DELETE FROM UserAppoinment WHERE userId='%i' AND msgId='%i'";
 		
-		executeUpdate(String.format(queryDeleteUserFromAppointment, id));
+		Execute.executeUpdate(String.format(queryDeleteUserFromAppointment, id));
 	}
 	
 
