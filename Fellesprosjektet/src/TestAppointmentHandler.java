@@ -14,7 +14,7 @@ public class TestAppointmentHandler {
 		Appointment app = new Appointment("Handletur", start, end, false, null);
 		app.setDescription("gå i butikken og handle sjokolade mm");
 		AppointmentHandler.createAppointment(app);
-		
+		System.out.println("Hei");
 		
 	}
 }
