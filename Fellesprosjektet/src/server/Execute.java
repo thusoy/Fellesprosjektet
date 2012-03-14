@@ -7,6 +7,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Execute {
 	private static final String driver = "com.mysql.jdbc.Driver";
@@ -24,7 +26,7 @@ public class Execute {
 		int tries = 3;
 		while(tries > 0){
 			try {
-				conn = DriverManager.getConnection(database);
+				conn = DriverManager.getConnection(database, "tarjeikl_fpuser", "bruker");
 				Statement stmt = conn.createStatement();
 				return stmt;
 			} catch (SQLException e) {
@@ -114,5 +116,25 @@ public class Execute {
 		ResultSet rs = stmt.executeQuery(query);
 		rs.next();
 		return rs.getString(1);	
+	}
+	
+	
+	/**
+	 * A wrapper for the database calls. Returns a Map<Integer, Boolean> from the query. The query
+	 * must return an int in the first column, and a boolean in the second.
+	 * @param query
+	 * @return
+	 * @throws ClassNotFoundException
+	 * @throws IOException
+	 * @throws SQLException
+	 */
+	public static Map<Integer, Boolean> executeGetHashMap(String query) throws ClassNotFoundException, IOException, SQLException{
+		Statement stmt = getStatement();
+		ResultSet rs = stmt.executeQuery(query);
+		Map<Integer, Boolean> output = new HashMap<Integer, Boolean>();
+		while(rs.next()){
+			output.put(rs.getInt(1), rs.getBoolean(2));	
+		}
+		return output;
 	}
 }
