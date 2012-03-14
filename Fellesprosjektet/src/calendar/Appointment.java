@@ -1,5 +1,6 @@
 package calendar;
 
+import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -8,7 +9,8 @@ import java.util.Set;
 
 import no.ntnu.fp.model.Person;
 
-public class Appointment extends DBObject<Appointment> {
+public class Appointment extends DBObject<Appointment> implements Serializable {
+	private static final long serialVersionUID = -5442910434292395380L;
 	private int appId;
 	private String place;
 	private String title;
@@ -19,7 +21,7 @@ public class Appointment extends DBObject<Appointment> {
 	private Date endOfRepeatDate;
 	private boolean isPrivate;
 	private Person creator;
-	private HashMap<Person, Boolean> participants;
+	private Map<Person, Boolean> participants;
 	private String room_name;
 	
 	public Appointment(String title, Date startTime, Date endTime, boolean isPrivate, 
@@ -31,6 +33,20 @@ public class Appointment extends DBObject<Appointment> {
 		this.participants = participants;
 	}
 	
+	public Appointment(){
+		
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof Appointment){
+			Appointment a2 = (Appointment) obj;
+			return appId == a2.appId;
+		} else {
+			return false;
+		}
+	}
+
 	public void acceptInvite(Person user, Boolean answer){
 		participants.put(user, answer);
 		save();		
@@ -40,6 +56,18 @@ public class Appointment extends DBObject<Appointment> {
 		save();
 	}
 	
+	public void setAppId(int appId) {
+		this.appId = appId;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+	public void setCreator(Person creator) {
+		this.creator = creator;
+	}
+
 	public int getAppId() {
 		return appId;
 	}
