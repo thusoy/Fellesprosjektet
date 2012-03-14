@@ -9,7 +9,7 @@ public class SQLQueries {
 	 * RETURN content
 	 */
 	
-	//Appointment spørringer
+//	Appointment spørringer
 	/**
 	 * Query for Œ legge tl en appointment
 	 * brukes til funksjonen save()
@@ -118,7 +118,6 @@ public class SQLQueries {
 	String queryDeletePerson =
 				"DELETE FROM Person WHERE userId='%i'";
 
-				
 	// hente userId
 	String queryGetuserId = 
 				"SELECT userId FROM Person WHERE userId='%i'";
@@ -135,18 +134,9 @@ public class SQLQueries {
 	String queryGetlastname = 
 				"SELECT lastname FROM Person WHERE userId ='%i'";
 
-	// hente lastname
-	String queryGetlastname = 
-				"SELECT lastname FROM Person WHERE userId ='%i'";
-
 	// hente department
 	String queryGetdepartment = 
 				"SELECT department FROM Person WHERE userId ='%i'";
-
-	// hente lastname
-	String queryGetlastname = 
-				"SELECT lastname FROM Person WHERE userId ='%i'";
-
 
 //	Spørringer til klasse Calendar:
 
@@ -155,12 +145,17 @@ public class SQLQueries {
 				"INSERT INTO Calendar”;
 
 	//queryGetAppointments = 
-				“Select * FROM Appointments WHERE startTime==start && endTime==end”;
+				"SELECT appId, place, startTime, endTime, description, daysAppearing, endOfRepeatDate, 
+				roomName, isPrivate, creatorId FROM Appointment WHERE startTime==start && endTime==end";
 
 
 //	Spørringer til klasse UserCalendars:
-
-	// 
+	String queryAddUserToCalendar =
+				"INSERT INTO UserCalendars VALUES(%i, %i)";
+	
+	String queryDeleteUserFromCalendar = 
+				"DELETE FROM UserCalendar WHERE userId='%i' AND calendarId='%i'";
+				
 
 //	Spørringer til klasse Room:
 
@@ -174,7 +169,6 @@ public class SQLQueries {
 				" name='%s'" +
 				" capacity='%s'";
 
-
 	// hente romnavn
 	String queryGetroomName = 
 				"SELECT name FROM Room WHERE name='%s'";
@@ -182,6 +176,10 @@ public class SQLQueries {
 	// hente romkapasitet
 	String queryGetroomCapacity = 
 				"SELECT capacity FROM Room WHERE name='%i'";
+	
+	// spørring for isAvailable()
+	String queryIsAvalable =
+			"SELECT name, capacity FROM Room"
 
 
 //	Spørringer til klasse Message:
