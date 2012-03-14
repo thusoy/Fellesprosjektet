@@ -102,6 +102,23 @@ public class Execute {
 		return rs.getInt(1);	
 	}
 	
+	
+	/**
+	 * A wrapper for the database calls. Returns the first value in the first column of 'query' as
+	 * a long.
+	 * @param query
+	 * @return
+	 * @throws ClassNotFoundException
+	 * @throws IOException
+	 * @throws SQLException
+	 */
+	public static long executeGetLong(String query) throws ClassNotFoundException, IOException, SQLException{
+		Statement stmt = getStatement();
+		ResultSet rs = stmt.executeQuery(query);
+		rs.next();
+		return rs.getLong(1);	
+	}
+	
 	/**
 	 * A wrapper for the database calls. Returns the first value in the first column of 'query' as
 	 * a String.
