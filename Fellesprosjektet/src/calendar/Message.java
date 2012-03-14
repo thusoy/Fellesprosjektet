@@ -17,8 +17,6 @@ public class Message extends DBObject {
 	}
 	
 	public String showMessage(Person user){
-		String query = "UPDATE UserMessages SET hasBeenRead='true' WHERE userId='%s' AND msgId='%s'";
-		executeQuery(String.format(query, user.getId(), this.msgId));
-		return content;
+		return getMsg(this, user);
 	}
 }
