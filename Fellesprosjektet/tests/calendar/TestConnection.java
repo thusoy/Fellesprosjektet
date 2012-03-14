@@ -1,4 +1,4 @@
-package test;
+package calendar;
 
 import java.io.IOException;
 import java.net.InetAddress;
