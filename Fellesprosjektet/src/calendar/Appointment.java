@@ -1,13 +1,14 @@
 package calendar;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Set;
 
 import no.ntnu.fp.model.Person;
 
-public class Appointment extends DBObject {
+public class Appointment extends DBObject<Appointment> {
 	private int appId;
 	private String place;
 	private String title;
@@ -20,17 +21,6 @@ public class Appointment extends DBObject {
 	private Person creator;
 	private HashMap<Person, Boolean> participants;
 	private String room_name;
-	
-	protected enum Day{
-		MONDAY("mandag"), TUESDAY("tirsdag"), WEDNESDAY("onsdag"), 
-		THURSDAY("torsdag"), FRIDAY("fredag"), SATURDAY("lørdag"), SUNDAY("søndag");
-		
-		String norwegianRepr;
-		
-		Day(String norwegian){
-			this.norwegianRepr = norwegian;
-		}
-	}
 	
 	public Appointment(String title, Date startTime, Date endTime, boolean isPrivate, 
 			HashMap<Person, Boolean> participants) {
@@ -126,6 +116,13 @@ public class Appointment extends DBObject {
 	}
 	public Person getCreator() {
 		return creator;
+	}
+	
+	public String toString(){
+		String base = "%s (%s)";
+		DateFormat formatter = new SimpleDateFormat("dd.MM HH:mm");
+		String startdate = formatter.format(startTime);
+		return String.format(base, title, startdate);
 	}
 	
 }
