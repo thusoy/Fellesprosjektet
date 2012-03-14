@@ -30,14 +30,14 @@ public class DBObject<T> {
 	}
 	
 	public static List<T> all() throws SQLException{
-		con = DriverManager.getConnection(db, "tarjeikl_fpuser", "bruker");
-		Statement stmt = con.createStatement();
-		String query = String.format("SELECT * FROM %s", dbTableName);
-		ResultSet rs = stmt.executeQuery(query);
-		while(rs.next()){
-			System.out.println(rs.getString(2));
-		}
-		con.close();
+//		con = DriverManager.getConnection(db, "tarjeikl_fpuser", "bruker");
+//		Statement stmt = con.createStatement();
+//		String query = String.format("SELECT * FROM %s", dbTableName);
+//		ResultSet rs = stmt.executeQuery(query);
+//		while(rs.next()){
+//			System.out.println(rs.getString(2));
+//		}
+//		con.close();
 		return null;
 	}
 	
