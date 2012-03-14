@@ -1,5 +1,6 @@
 package calendar;
 
+import server.AwesomeXml;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.sql.Connection;
@@ -7,7 +8,6 @@ import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.List;
 
 import no.ntnu.fp.net.co.ConnectionImpl;
@@ -18,6 +18,7 @@ public class DBObject<T> {
 	private String db = "jdbc:mysql://mysql.stud.ntnu.no/tarjeikl_fp33";
 	private Connection con;
 	private String id = "hei og hopp";
+	public static final int PORT = 1337; 
 	
 	public DBObject(){
 		String className = this.getClass().getName();
@@ -28,8 +29,13 @@ public class DBObject<T> {
 			e.printStackTrace();
 		}
 	}
+
+	public DBObject(String dbTableName){
+		this();
+		this.dbTableName = dbTableName;
+	}
 	
-	public static List<T> all() throws SQLException{
+	public List<T> all() throws SQLException{
 //		con = DriverManager.getConnection(db, "tarjeikl_fpuser", "bruker");
 //		Statement stmt = con.createStatement();
 //		String query = String.format("SELECT * FROM %s", dbTableName);
@@ -42,17 +48,18 @@ public class DBObject<T> {
 	}
 	
 	public void save() {
-		sendObjectToServer(this);
+		sendObjectToServer();
 	}
 	
 	/**
 	 * Create xml of the object, and send it to the server.
 	 * @param obj
 	 */
-	private void sendObjectToServer(DBObject obj){
-		ConnectionImpl a1 = new ConnectionImpl(1337);
+	private void sendObjectToServer(){
+		String xmldata = AwesomeXml.ObjectToXml(this);
+		ConnectionImpl a1 = new ConnectionImpl(PORT);
 		try {
-			a1.send(this.toxml());
+			a1.send(xmldata);
 		} catch (ConnectException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -60,11 +67,6 @@ public class DBObject<T> {
 		}
 	}
 	
-	private String toxml(){
-		// Generer xml av objektet
-		return "";
-	}
-
 	private void createTablesIfNecessary() throws SQLException {
 		con = DriverManager.getConnection(db, "tarjeikl_fpuser", "bruker");
 		DatabaseMetaData metadata = con.getMetaData();
