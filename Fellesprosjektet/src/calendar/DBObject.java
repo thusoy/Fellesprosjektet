@@ -9,6 +9,9 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.NoSuchElementException;
+
+import javax.naming.directory.NoSuchAttributeException;
 
 import no.ntnu.fp.net.co.ConnectionImpl;
 
@@ -17,7 +20,7 @@ public class DBObject<T> {
 	private String dbTableName;
 	private String db = "jdbc:mysql://mysql.stud.ntnu.no/tarjeikl_fp33";
 	private Connection con;
-	private String id = "hei og hopp";
+	private Long id;
 	public static final int PORT = 1337; 
 	
 	public DBObject(){
@@ -35,6 +38,11 @@ public class DBObject<T> {
 		this.dbTableName = dbTableName;
 	}
 	
+	/**
+	 * Genererer et 
+	 * @return
+	 * @throws SQLException
+	 */
 	public List<T> all() throws SQLException{
 //		con = DriverManager.getConnection(db, "tarjeikl_fpuser", "bruker");
 //		Statement stmt = con.createStatement();
@@ -47,15 +55,29 @@ public class DBObject<T> {
 		return null;
 	}
 	
+	/**
+	 * Returnerer id-en til objektet.
+	 * Et databaseobjekts id vil ikke være satt før det er lagret for første gang 
+	 * med save()-metoden. 
+	 * @return
+	 */
+	public long getId(){
+		if (id == null){
+			throw new IllegalStateException("Must call save() to recieve an id!");
+		}
+		return id;
+	}
+	
 	public void save() {
-		sendObjectToServer();
+		long dbId = sendObjectToServerAndGetId();
+		this.id = dbId;
 	}
 	
 	/**
 	 * Create xml of the object, and send it to the server.
 	 * @param obj
 	 */
-	private void sendObjectToServer(){
+	private long sendObjectToServerAndGetId(){
 		String xmldata = AwesomeXml.ObjectToXml(this);
 		ConnectionImpl a1 = new ConnectionImpl(PORT);
 		try {
