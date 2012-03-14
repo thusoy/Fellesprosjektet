@@ -1,20 +1,24 @@
 package server;
 
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Date;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Set;
 
 import no.ntnu.fp.model.Person;
 
 import calendar.Appointment;
 import calendar.Day;
+import calendar.Message;
 
 import server.Execute;
 
 public class AppointmentHandler {
 	
-	public void createAppointment(Appointment app) {
+	public void createAppointment(Appointment app) throws ClassNotFoundException, IOException, SQLException {
 		String place = app.getPlace();
 		String title = app.getTitle();
 		Date start = app.getStartTime();
@@ -28,14 +32,14 @@ public class AppointmentHandler {
 		long creatorId = app.getCreator().getId();
 		HashMap<Person, Boolean> participants = app.getParticipants();
 		
-		String querySaveAppointment = 
+		String query = 
 				"INSERT INTO Appointment VALUES(%s, %s, %s, " +
-				"Date, Date, %s, Date,'%s' ,%b, %i)";
+				"%s, %s, %s, %s, %s,%b, %i)";
 			
-		Execute.executeUpdate(String.format(querySaveAppointment, place, title, start, end, des, 
+		Execute.executeUpdate(String.format(query, place, title, start, end, des, 
 				dayAppearing, endOfRe, roomName, isPrivate, creatorId));
 	}
-	public void updateAppointment(Appointment app) {
+	public void updateAppointment(Appointment app) throws ClassNotFoundException, IOException, SQLException {
 		String place = app.getPlace();
 		String title = app.getTitle();
 		Date start = app.getStartTime();
@@ -49,91 +53,139 @@ public class AppointmentHandler {
 		long creatorId = app.getCreator().getId();
 		HashMap<Person, Boolean> participants = app.getParticipants();
 		
-		String queryUpdateAppointment =
+		String query =
 				"UPDATE Appointment SET" +
 				" place='%s'" +
 				" title='%s'" +
 				" description='%s'" +
-				" startTime='date'" +
-				" endTime='date'" +
-				" daysAppearing='set'" +
-				" endOfRepeatDate='date'" +
+				" startTime='%s'" +
+				" endTime='%s'" +
+				" daysAppearing='%s'" +
+				" endOfRepeatDate='%s'" +
 				" roomName='%s'" +
 				" isPrivate='%b'" +
 				" creatorId='%i'" +
 				" WHERE appId='%i'";		
-		Execute.executeUpdate(String.format(queryUpdateAppointment, place, title, start, end, des, 
+		Execute.executeUpdate(String.format(query, place, title, start, end, des, 
 				dayAppearing, endOfRe, roomName, isPrivate, creatorId));
 	}
-	public String getTitleAppointment(Appointment app) {
+	public String getTitleAppointment(Appointment app) throws ClassNotFoundException, IOException, SQLException {
 		long id = app.getAppId();
 		
-		String queryGetTitleAppointment =
+		String query =
 				"SELECT title FROM Appointment WHERE appId='%i'";
 		
-		return Execute.executeGetString(String.format(queryGetTitleAppointment, id));
+		return Execute.executeGetString(String.format(query, id));
 	}
-	public String getPlace(Appointment app) {
+	public String getPlace(Appointment app) throws ClassNotFoundException, IOException, SQLException {
 		long id = app.getAppId();
 		
-		String queryGetPlaceAppointment =
+		String query =
 				"SELECT place FROM Appointment WHERE appId='%i'";
 		
-		return Execute.executeGetString(String.format(queryGetPlaceAppointment, id));
+		return Execute.executeGetString(String.format(query, id));
 	}
-	public String getRoom(Appointment app) {
+	public String getRoom(Appointment app) throws ClassNotFoundException, IOException, SQLException {
 		long id = app.getAppId();
 		
-		String queryGetRoomAppointment =
+		String query =
 				"SELECT roomName FROM Appointment WHERE appId='%i'";
 		
-		return Execute.executeGet(String.format(queryGetRoomAppointment, id));
+		return Execute.executeGetString(String.format(query, id));
 	}
-	public Date getStart(Appointment app) {
+	public Date getStart(Appointment app) throws ClassNotFoundException, IOException, SQLException {
 		long id = app.getAppId();
 		
-		String queryGetStartAppointment =
+		String query =
 				"SELECT startTime FROM Appointment WHERE appId='%i'";
 		
-		return Execute.executeGetDate(String.format(queryGetStartAppointment, id));
+		return Execute.executeGetDate(String.format(query, id));
 	}
-	public Date getEnd(Appointment app) {
+	public Date getEnd(Appointment app) throws ClassNotFoundException, IOException, SQLException {
 		long id = app.getAppId();
 		
-		String queryGetEndAppointment =
+		String query =
 				"SELECT endTime FROM Appointment WHERE appId='%i'";
 		
-		return Execute.executeGetDate(String.format(queryGetEndAppointment, id));
+		return Execute.executeGetDate(String.format(query, id));
 	}
-	public void deleteAppointment(Appointment app) {
+	public String getDescription(Appointment app) throws ClassNotFoundException, IOException, SQLException {
 		long id = app.getAppId();
-		sendMessageToAllParticipants(app);
-		String queryDeleteAppointment =
+		
+		String query =
+				"SELECT description FROM Appointment WHERE appId='%i'";
+		
+		return Execute.executeGetString(String.format(query, id));
+	}
+	public String getDaysAppearing(Appointment app) throws ClassNotFoundException, IOException, SQLException {
+		long id = app.getAppId();
+		
+		String query =
+				"SELECT daysAppearing FROM Appointment WHERE appId='%i'";
+		
+		return Execute.executeGetString(String.format(query, id));
+	}
+	public Date getEndOfRepeatDate(Appointment app) throws ClassNotFoundException, IOException, SQLException {
+		long id = app.getAppId();
+		
+		String query =
+				"SELECT endOfRepeatDate FROM Appointment WHERE appId='%i'";
+		
+		return Execute.executeGetDate(String.format(query, id));
+	}
+	public String getRoomName(Appointment app) throws ClassNotFoundException, IOException, SQLException {
+		long id = app.getAppId();
+		
+		String query =
+				"SELECT roomName FROM Appointment WHERE appId='%i'";
+		
+		return Execute.executeGetString(String.format(query, id));
+	}
+	public boolean getIsPrivate(Appointment app) throws ClassNotFoundException, IOException, SQLException {
+		long id = app.getAppId();
+		
+		String query =
+				"SELECT isPrivate FROM Appointment WHERE appId='%i'";
+		
+		return Execute.executeGetBoolean(String.format(query, id));
+	}
+	public int getCreatorId(Appointment app) throws ClassNotFoundException, IOException, SQLException {
+		long id = app.getAppId();
+		
+		String query =
+				"SELECT creatorId FROM Appointment WHERE appId='%i'";
+		
+		return Execute.executeGetInt(String.format(query, id));
+	}
+	public void deleteAppointment(Appointment app) throws ClassNotFoundException, IOException, SQLException {
+		long id = app.getAppId();
+		sendMessageToAllParticipants(app, "Tittel", "Innhold");
+		String query =
 				"DELETE FROM Appointment WHERE appId='%i'";
 		
-		executeUpdate(String.format(queryGetEndAppointment, id));
+		Execute.executeUpdate(String.format(query, id));
 	}
-	public void updateUserAppointment(Appointment app, Person person, Boolean bool) {
+	public void updateUserAppointment(Appointment app, Person person, Boolean bool) throws ClassNotFoundException, IOException, SQLException {
 		long appId = app.getAppId();
 		long personId = person.getId();
 		
-		String queryUpdateUserAppointment = 
+		String query = 
 				"UPDATE UserAppointment SET" +
 				" hasAccepted='%b'" +
 				" WHERE userId='%i' AND msgId='%i'";
 		
-		Execute.executeUpdate(String.format(queryUpdateUserAppointment, bool, personId, appId));
+		Execute.executeUpdate(String.format(query, bool, personId, appId));
 	}
 	public HashMap getParticipants(Appointment app) {
 		long id = app.getAppId();
 		
-		String queryGetParticipants =
+		String query =
 				"SELECT userId, hasAccepted FROM UserAppointment" +
 				" WHERE appId='%i'";
 		
-		Execute.executeGetHashMap(String.format(queryGetParticipants, id));
+		Execute.executeGetHashMap(String.format(query, id));
 	}
-	public void addUserToAppointment(Appointment app) {
+	public void addUserToAppointment(Appointment app) throws ClassNotFoundException, IOException, SQLException {
 		long id = app.getAppId();
 		
 		String queryAddUserToAppointment =
@@ -141,13 +193,28 @@ public class AppointmentHandler {
 		
 		Execute.executeUpdate(String.format(queryAddUserToAppointment, id));
 	}
-	public void deleteUserFromAppointment(Appointment app) {
+	public void deleteUserFromAppointment(Appointment app) throws ClassNotFoundException, IOException, SQLException {
 		long id = app.getAppId();
 		
-		String queryDeleteUserFromAppointment = 
+		String query = 
 				"DELETE FROM UserAppoinment WHERE userId='%i' AND msgId='%i'";
 		
-		Execute.executeUpdate(String.format(queryDeleteUserFromAppointment, id));
+		Execute.executeUpdate(String.format(query, id));
+	}
+	
+	private void sendMessageToAllParticipants(Appointment app, String title,
+			String content) throws ClassNotFoundException, IOException, SQLException {
+		Set<Person> participants = app.getParticipants().keySet();
+		Date dateSent = new Date(System.currentTimeMillis());
+		Message msg = new Message(title, content, dateSent);
+		msg.save(); //lagrer objectet i databasen
+		long msgId = msg.getId();
+		String query = 
+				"INSERT INTO UserMessage VALUES(%i, %i, %b)";
+		for (Person user: participants) {
+			long userId = user.getId();
+			Execute.executeUpdate(String.format(query, userId, msgId, false));
+		}		
 	}
 	
 

@@ -5,7 +5,7 @@ import no.ntnu.fp.model.Person;
 
 public class Message extends DBObject {
 	
-	private int msgId;
+	private long msgId;
 	private Date dateSent;
 	private String content;
 	private String title;
@@ -18,5 +18,9 @@ public class Message extends DBObject {
 	
 	public String showMessage(Person user){
 		return getMsg(this, user);
+	}
+	
+	public long getId() {
+		return msgId;
 	}
 }
