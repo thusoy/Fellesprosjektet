@@ -21,21 +21,22 @@ import server.PersonHandler;
 public class AppointmentHandler {
 	
 	public static void createAppointment(Appointment app) throws ClassNotFoundException, IOException, SQLException {
+	
 		String place = app.getPlace();
 		String title = app.getTitle();
 		Date start = app.getStartTime();
 		Date end = app.getEndTime();
 		String des = app.getDescription();
-		String rawText = app.getDaysAppearing().toString();
-		String daysAppearing = rawText.substring(1, rawText.length()-1);
+		String rawText = app.getDaysAppearing() != null ? app.getDaysAppearing().toString() : null;
+		String daysAppearing = rawText != null ? rawText.substring(1, rawText.length()-1) : null;
 		Date endOfRe = app.getEndOfRepeatDate();
 		String roomName = app.getRoom_name();
 		boolean isPrivate = app.isPrivate();
-		long creatorId = app.getCreator().getId();
+		long creatorId = app.getCreator() != null ? app.getCreator().getId() : 0;
 		
 		String query = 
-				"INSERT INTO Appointment VALUES(%s, %s, %s, " +
-				"%s, %s, %s, %s, %s,%b, %i)";
+				"INSERT INTO Appointment VALUES('%s', '%s', '%s', " +
+				"'%s', '%s', '%s', '%s', '%s', '%b', '%d')";
 			
 		Execute.executeUpdate(String.format(query, place, title, start, end, des, 
 				daysAppearing, endOfRe, roomName, isPrivate, creatorId));
@@ -46,12 +47,12 @@ public class AppointmentHandler {
 		Date start = app.getStartTime();
 		Date end = app.getEndTime();
 		String des = app.getDescription();
-		String rawText = app.getDaysAppearing().toString();
-		String daysAppearing = rawText.substring(1, rawText.length()-1);
+		String rawText = app.getDaysAppearing() != null ? app.getDaysAppearing().toString() : null;
+		String daysAppearing = rawText != null ? rawText.substring(1, rawText.length()-1) : null;
 		Date endOfRe = app.getEndOfRepeatDate();
 		String roomName = app.getRoom_name();
 		boolean isPrivate = app.isPrivate();
-		long creatorId = app.getCreator().getId();
+		long creatorId = app.getCreator() != null ? app.getCreator().getId() : 0;
 		
 		String query =
 				"UPDATE Appointment SET" +
@@ -132,7 +133,7 @@ public class AppointmentHandler {
 	}
 	public void deleteAppointment(long appId) throws ClassNotFoundException, IOException, SQLException {
 		Appointment app = getAppointment(appId);
-		sendMessageToAllParticipants(app, "Tittel", "Innhold");
+		sendMessageToAllParticipants(app, "Avtale slettet.", "Denne avtalen er blitt slettet");
 		String query =
 				"DELETE FROM Appointment WHERE appId='%i'";
 		

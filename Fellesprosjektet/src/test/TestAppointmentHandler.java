@@ -1,3 +1,4 @@
+package test;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Date;
@@ -13,8 +14,8 @@ public class TestAppointmentHandler {
 		Date end = new Date(System.currentTimeMillis()+2000);
 		Appointment app = new Appointment("Handletur", start, end, false, null);
 		app.setDescription("gå i butikken og handle sjokolade mm");
+		System.out.println(app.isPrivate());
 		AppointmentHandler.createAppointment(app);
-		
 		
 	}
 }
