@@ -1,5 +1,6 @@
 package server;
 
+import java.awt.SystemColor;
 import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -27,7 +28,7 @@ public class AppointmentHandler {
 		String roomName = app.getRoom_name();
 		boolean isPrivate = app.isPrivate();
 		long creatorId = app.getCreator() != null ? app.getCreator().getId() : 0;
-		long appId = 35;
+		long appId = System.currentTimeMillis();
 		app.setAppId(appId);
 		System.out.println(appId);
 		String query = 
@@ -272,7 +273,7 @@ public class AppointmentHandler {
 			participants.put(PersonHandler.getPerson(i), p.get(i));
 		}
 		Appointment appointment = new Appointment(title, start, 
-				end, isPrivate, participants);
+				end, isPrivate, participants, true);
 		appointment.setPlace(place);
 		appointment.setId(appId);
 		appointment.setDescription(des);

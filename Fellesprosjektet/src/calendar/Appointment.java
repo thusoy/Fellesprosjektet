@@ -29,13 +29,14 @@ public class Appointment extends DBObject<Appointment> implements Serializable {
 	private String room_name;
 	
 	public Appointment(String title, Date startTime, Date endTime, boolean isPrivate, 
-			Map<Person, Boolean> participants) throws IOException {
+			Map<Person, Boolean> participants, boolean recreation) throws IOException {
 		this.title = title;
 		this.startTime = startTime;
 		this.endTime = endTime;
 		this.isPrivate = isPrivate;
 		this.participants = participants;
-		AppointmentHandler.createAppointment(this);
+		if(!recreation)
+			AppointmentHandler.createAppointment(this);
 	}
 	
 	public Appointment(){
