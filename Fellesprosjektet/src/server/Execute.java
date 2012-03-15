@@ -23,8 +23,12 @@ public class Execute {
 	 * @throws ClassNotFoundException
 	 * @throws IOException
 	 */
-	private static Statement getStatement() throws ClassNotFoundException, IOException{
-		Class.forName(driver);
+	private static Statement getStatement() throws IOException{
+		try {
+			Class.forName(driver);
+		} catch (ClassNotFoundException e2) {
+			throw new RuntimeException("Fant ikke SQL-drivere!");
+		}
 		int tries = 3;
 		while(tries > 0){
 			try {
@@ -51,7 +55,7 @@ public class Execute {
 	 * @throws IOException
 	 * @throws SQLException
 	 */
-	public static void executeUpdate(String query) throws ClassNotFoundException, IOException, SQLException{
+	public static void executeUpdate(String query) throws IOException, SQLException{
 		Statement stmt = getStatement();
 		stmt.executeUpdate(query);
 	}
@@ -65,7 +69,7 @@ public class Execute {
 	 * @throws IOException
 	 * @throws SQLException
 	 */
-	public static Date executeGetDate(String query) throws ClassNotFoundException, IOException, SQLException{
+	public static Date executeGetDate(String query) throws IOException, SQLException{
 		Statement stmt = getStatement();
 		ResultSet rs = stmt.executeQuery(query);
 		rs.next();
@@ -81,7 +85,7 @@ public class Execute {
 	 * @throws IOException
 	 * @throws SQLException
 	 */
-	public static boolean executeGetBoolean(String query) throws ClassNotFoundException, IOException, SQLException{
+	public static boolean executeGetBoolean(String query) throws IOException, SQLException{
 		Statement stmt = getStatement();
 		ResultSet rs = stmt.executeQuery(query);
 		rs.next();
@@ -97,7 +101,7 @@ public class Execute {
 	 * @throws IOException
 	 * @throws SQLException
 	 */
-	public static int executeGetInt(String query) throws ClassNotFoundException, IOException, SQLException{
+	public static int executeGetInt(String query) throws IOException, SQLException{
 		Statement stmt = getStatement();
 		ResultSet rs = stmt.executeQuery(query);
 		rs.next();
@@ -113,7 +117,7 @@ public class Execute {
 	 * @throws IOException
 	 * @throws SQLException
 	 */
-	public static List<String> executeGetStringList(String query) throws ClassNotFoundException, IOException, SQLException{
+	public static List<String> executeGetStringList(String query) throws IOException, SQLException{
 		Statement stmt = getStatement();
 		ResultSet rs = stmt.executeQuery(query);
 		List<String> output = new ArrayList<String>();
@@ -132,7 +136,7 @@ public class Execute {
 	 * @throws IOException
 	 * @throws SQLException
 	 */
-	public static long executeGetLong(String query) throws ClassNotFoundException, IOException, SQLException{
+	public static long executeGetLong(String query) throws IOException, SQLException{
 		Statement stmt = getStatement();
 		ResultSet rs = stmt.executeQuery(query);
 		rs.next();
@@ -148,7 +152,7 @@ public class Execute {
 	 * @throws IOException
 	 * @throws SQLException
 	 */
-	public static String executeGetString(String query) throws ClassNotFoundException, IOException, SQLException{
+	public static String executeGetString(String query) throws IOException, SQLException{
 		Statement stmt = getStatement();
 		ResultSet rs = stmt.executeQuery(query);
 		rs.next();
@@ -164,7 +168,7 @@ public class Execute {
 	 * @throws IOException
 	 * @throws SQLException
 	 */
-	public static Map<Integer, Boolean> executeGetHashMap(String query) throws ClassNotFoundException, IOException, SQLException{
+	public static Map<Integer, Boolean> executeGetHashMap(String query) throws IOException, SQLException{
 		Statement stmt = getStatement();
 		ResultSet rs = stmt.executeQuery(query);
 		Map<Integer, Boolean> output = new HashMap<Integer, Boolean>();

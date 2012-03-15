@@ -20,7 +20,7 @@ import server.PersonHandler;
 
 public class AppointmentHandler {
 	
-	public static void createAppointment(Appointment app) throws ClassNotFoundException, IOException, SQLException {
+	public static void createAppointment(Appointment app) throws IOException {
 	
 		String place = app.getPlace();
 		String title = app.getTitle();
@@ -39,8 +39,12 @@ public class AppointmentHandler {
 				" , daysAppearing, endOfRepeatDate, roomName, isPrivate, creatorId) VALUES('%s', '%s', '%s', " +
 				"'%s', '%s', '%s', '%s', '%s', '%b', '%d')";
 			
-		Execute.executeUpdate(String.format(query, title, place, start, end, des, 
-				daysAppearing, endOfRe, roomName, isPrivate, creatorId));
+		try {
+			Execute.executeUpdate(String.format(query, title, place, start, end, des, 
+					daysAppearing, endOfRe, roomName, isPrivate, creatorId));
+		} catch (SQLException e) {
+			throw new RuntimeException("Feil i SQL!");
+		}
 	}
 	public static void updateAppointment(Appointment app) throws ClassNotFoundException, IOException, SQLException {
 		String place = app.getPlace();
@@ -71,76 +75,119 @@ public class AppointmentHandler {
 		Execute.executeUpdate(String.format(query, place, title, start, end, des, 
 				daysAppearing, endOfRe, roomName, isPrivate, creatorId));
 	}
-	public static String getTitleAppointment(long appId) throws ClassNotFoundException, IOException, SQLException {
+	public static String getTitleAppointment(long appId) throws IOException {
 		String query =
 				"SELECT title FROM Appointment WHERE appId='%d'";
 		
-		return Execute.executeGetString(String.format(query, appId));
+		try {
+			return Execute.executeGetString(String.format(query, appId));
+		} catch (SQLException e) {
+			throw new RuntimeException("Feil i SQL!");
+		}
 	}
-	public static String getPlace(long appId) throws ClassNotFoundException, IOException, SQLException {
+	public static String getPlace(long appId) throws IOException {
 		String query =
 				"SELECT place FROM Appointment WHERE appId='%d'";
-		
-		return Execute.executeGetString(String.format(query, appId));
+		try {
+			return Execute.executeGetString(String.format(query, appId));
+		} catch (SQLException e) {
+			throw new RuntimeException("Feil i SQL!");
+		}
 	}
 
-	public static Date getStart(long appId) throws ClassNotFoundException, IOException, SQLException {
+	public static Date getStart(long appId) throws IOException {
 		String query =
 				"SELECT startTime FROM Appointment WHERE appId='%d'";
 		
-		return Execute.executeGetDate(String.format(query, appId));
+		try {
+			return Execute.executeGetDate(String.format(query, appId));
+		} catch (SQLException e) {
+			throw new RuntimeException("Feil i SQL!");
+		}
 	}
-	public static Date getEnd(long appId) throws ClassNotFoundException, IOException, SQLException {
+	public static Date getEnd(long appId) throws IOException {
 		String query =
 				"SELECT endTime FROM Appointment WHERE appId='%d'";
 		
-		return Execute.executeGetDate(String.format(query, appId));
+		try {
+			return Execute.executeGetDate(String.format(query, appId));
+		} catch (SQLException e) {
+			throw new RuntimeException("Feil i SQL!");
+		}
 	}
-	public static String getDescription(long appId) throws ClassNotFoundException, IOException, SQLException {
+	public static String getDescription(long appId) throws IOException {
 		String query =
 				"SELECT description FROM Appointment WHERE appId='%d'";
 		
-		return Execute.executeGetString(String.format(query, appId));
+		try {
+			return Execute.executeGetString(String.format(query, appId));
+		} catch (SQLException e) {
+			throw new RuntimeException("Feil i SQL!");
+		}
 	}
-	public static String getDaysAppearing(long appId) throws ClassNotFoundException, IOException, SQLException {
+	public static String getDaysAppearing(long appId) throws IOException {
 		String query =
 				"SELECT daysAppearing FROM Appointment WHERE appId='%d'";
 		
-		return Execute.executeGetString(String.format(query, appId));
+		try {
+			return Execute.executeGetString(String.format(query, appId));
+		} catch (SQLException e) {
+			throw new RuntimeException("Feil i SQL!");
+		}
 	}
-	public static Date getEndOfRepeatDate(long appId) throws ClassNotFoundException, IOException, SQLException {
+	public static Date getEndOfRepeatDate(long appId) throws IOException {
 		String query =
 				"SELECT endOfRepeatDate FROM Appointment WHERE appId='%d'";
 		
-		return Execute.executeGetDate(String.format(query, appId));
+		try {
+			return Execute.executeGetDate(String.format(query, appId));
+		} catch (SQLException e) {
+			throw new RuntimeException("Feil i SQL!");
+		}
 	}
-	public static String getRoomName(long appId) throws ClassNotFoundException, IOException, SQLException {
+	public static String getRoomName(long appId) throws IOException {
 		String query =
 				"SELECT roomName FROM Appointment WHERE appId='%d'";
 		
-		return Execute.executeGetString(String.format(query, appId));
+		try {
+			return Execute.executeGetString(String.format(query, appId));
+		} catch (SQLException e) {
+			throw new RuntimeException("Feil i SQL!");
+		}
 	}
-	public static boolean getIsPrivate(long appId) throws ClassNotFoundException, IOException, SQLException {
+	public static boolean getIsPrivate(long appId) throws IOException {
 		String query =
 				"SELECT isPrivate FROM Appointment WHERE appId='%d'";
 		
-		return Execute.executeGetBoolean(String.format(query, appId));
+		try {
+			return Execute.executeGetBoolean(String.format(query, appId));
+		} catch (SQLException e) {
+			throw new RuntimeException("Feil i SQL!");
+		}
 	}
-	public static long getCreatorId(long appId) throws ClassNotFoundException, IOException, SQLException {
+	public static long getCreatorId(long appId) throws IOException {
 		String query =
 				"SELECT creatorId FROM Appointment WHERE appId='%d'";
 		
-		return Execute.executeGetLong(String.format(query, appId));
+		try {
+			return Execute.executeGetLong(String.format(query, appId));
+		} catch (SQLException e) {
+			throw new RuntimeException("Feil i SQL!");
+		}
 	}
-	public void deleteAppointment(long appId) throws ClassNotFoundException, IOException, SQLException {
+	public void deleteAppointment(long appId) throws IOException {
 		Appointment app = getAppointment(appId);
 		sendMessageToAllParticipants(app, "Avtale slettet.", "Denne avtalen er blitt slettet");
 		String query =
 				"DELETE FROM Appointment WHERE appId='%d'";
 		
-		Execute.executeUpdate(String.format(query, appId));
+		try {
+			Execute.executeUpdate(String.format(query, appId));
+		} catch (SQLException e) {
+			throw new RuntimeException("Feil i SQL!");
+		}
 	}
-	public static void updateUserAppointment(long appId, Person person, Boolean bool) throws ClassNotFoundException, IOException, SQLException {
+	public static void updateUserAppointment(long appId, Person person, Boolean bool) throws IOException {
 		long personId = person.getId();
 		
 		String query = 
@@ -148,30 +195,46 @@ public class AppointmentHandler {
 				" hasAccepted='%b'" +
 				" WHERE userId='%d' AND msgId='%d'";
 		
-		Execute.executeUpdate(String.format(query, bool, personId, appId));
+		try {
+			Execute.executeUpdate(String.format(query, bool, personId, appId));
+		} catch (SQLException e) {
+			throw new RuntimeException("Feil i SQL!");
+		}
 	}
-	public static Map<Integer, Boolean> getParticipants(long appId) throws ClassNotFoundException, IOException, SQLException {
+	public static Map<Integer, Boolean> getParticipants(long appId) throws IOException {
 		String query =
 				"SELECT userId, hasAccepted FROM UserAppointment" +
 				" WHERE appId='%d'";
 		
-		return Execute.executeGetHashMap(String.format(query, appId));
+		try {
+			return Execute.executeGetHashMap(String.format(query, appId));
+		} catch (SQLException e) {
+			throw new RuntimeException("Feil i SQL!");
+		}
 	}
-	public static void addUserToAppointment(long appId) throws ClassNotFoundException, IOException, SQLException {
+	public static void addUserToAppointment(long appId) throws IOException {
 		String queryAddUserToAppointment =
 				"INSERT INTO UserAppointment VALUES(%d, %d, %b)";
 		
-		Execute.executeUpdate(String.format(queryAddUserToAppointment, appId));
+		try {
+			Execute.executeUpdate(String.format(queryAddUserToAppointment, appId));
+		} catch (SQLException e) {
+			throw new RuntimeException("Feil i SQL!");
+		}
 	}
-	public static void deleteUserFromAppointment(long appId) throws ClassNotFoundException, IOException, SQLException {
+	public static void deleteUserFromAppointment(long appId) throws IOException {
 		String query = 
 				"DELETE FROM UserAppoinment WHERE userId='%d' AND msgId='%d'";
 		
-		Execute.executeUpdate(String.format(query, appId));
+		try {
+			Execute.executeUpdate(String.format(query, appId));
+		} catch (SQLException e) {
+			throw new RuntimeException("Feil i SQL!");
+		}
 	}
 	
 	private static void sendMessageToAllParticipants(Appointment app, String title,
-			String content) throws ClassNotFoundException, IOException, SQLException {
+			String content) throws IOException {
 		Set<Person> participants = app.getParticipants().keySet();
 		Date dateSent = new Date(System.currentTimeMillis());
 		Message msg = new Message(title, content, dateSent);
@@ -181,37 +244,44 @@ public class AppointmentHandler {
 				"INSERT INTO UserMessage VALUES(%d, %d, %b)";
 		for (Person user: participants) {
 			long userId = user.getId();
-			Execute.executeUpdate(String.format(query, userId, msgId, false));
+			try {
+				Execute.executeUpdate(String.format(query, userId, msgId, false));
+			} catch (SQLException e) {
+				throw new RuntimeException("Feil i SQL!");
+			}
 		}		
 	}
 	
-	public static Appointment getAppointment(long appId) throws ClassNotFoundException, IOException, SQLException {		
-		String place = getPlace(appId);
-		String title = getTitleAppointment(appId);
-		Date start = getStart(appId);
-		Date end = getEnd(appId);
-		String des = getDescription(appId);
-		String daysAppearing = getDaysAppearing(appId);
-		Date endOfRe = getEndOfRepeatDate(appId);
-		String roomName = getRoomName(appId);
-		boolean isPrivate = getIsPrivate(appId);
-		long creatorId = getCreatorId(appId);
-		Map<Integer, Boolean> p = getParticipants(appId);
-		Map<Person, Boolean> participants = null;
+	public static Appointment getAppointment(long appId) throws IOException {		
 		
-		for (Integer i: p.keySet()){
-			participants.put(PersonHandler.getPerson(i), p.get(i));
-		}
-		
-		Appointment appointment = new Appointment(title, start, 
-				end, isPrivate, participants);
-		appointment.setPlace(place);
-		appointment.setDescription(des);
+		try {
+			String place = getPlace(appId);
+			String title = getTitleAppointment(appId);
+			Date start = getStart(appId);
+			Date end = getEnd(appId);
+			String des = getDescription(appId);
+			String daysAppearing = getDaysAppearing(appId);
+			Date endOfRe = getEndOfRepeatDate(appId);
+			String roomName = getRoomName(appId);
+			boolean isPrivate = getIsPrivate(appId);
+			long creatorId = getCreatorId(appId);
+			Map<Integer, Boolean> p = getParticipants(appId);
+			Map<Person, Boolean> participants = null;
+			for (Integer i: p.keySet()){
+				participants.put(PersonHandler.getPerson(i), p.get(i));
+			}
+			Appointment appointment = new Appointment(title, start, 
+					end, isPrivate, participants);
+			appointment.setPlace(place);
+			appointment.setDescription(des);
 //		appointment.setDaysAppearing(daysAppearing);
-		appointment.setEndOfRepeatDate(endOfRe);
-		appointment.setRoom_name(roomName);		
-		
-		return appointment;
+			appointment.setEndOfRepeatDate(endOfRe);
+			appointment.setRoom_name(roomName);		
+			
+			return appointment;
+		} catch (SQLException e) {
+			throw new RuntimeException("Feil i SQL!");
+		}
 	}
 
 }
