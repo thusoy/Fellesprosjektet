@@ -6,7 +6,7 @@ import java.util.List;
 
 import no.ntnu.fp.model.Person;
 
-public class Calendar extends DBObject {
+public class Calendar extends DBObject<Calendar> {
 	private Person owner;
 	private List<Person> followers;
 	private List<Appointment> appointments;
