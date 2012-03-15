@@ -27,15 +27,15 @@ public class AppointmentHandler {
 		String roomName = app.getRoom_name();
 		boolean isPrivate = app.isPrivate();
 		long creatorId = app.getCreator() != null ? app.getCreator().getId() : 0;
-		long appId = System.currentTimeMillis();
+		long appId = 35;
 		app.setAppId(appId);
-		
+		System.out.println(appId);
 		String query = 
-				"INSERT INTO Appointment(title, place, startTime, endTime, description" +
-				" , daysAppearing, endOfRepeatDate, roomName, isPrivate, creatorId) VALUES('%s', '%s', ?, " +
+				"INSERT INTO Appointment(appId, title, place, startTime, endTime, description" +
+				" , daysAppearing, endOfRepeatDate, roomName, isPrivate, creatorId) VALUES(%d, '%s', '%s', ?, " +
 				"?, '%s', '%s', ?, '%s', %b, %d)";
 		try {
-			String formatted = String.format(query, title, place, des, 
+			String formatted = String.format(query, appId, title, place, des, 
 					daysAppearing, roomName, isPrivate, creatorId);
 			System.out.println(formatted);
 			PreparedStatement ps = Execute.getPreparedStatement(formatted);
@@ -90,6 +90,7 @@ public class AppointmentHandler {
 	public static String getPlace(long appId) throws IOException {
 		String query =
 				"SELECT place FROM Appointment WHERE appId=%d";
+		System.out.println(appId);
 		try {
 			return Execute.executeGetString(String.format(query, appId));
 		} catch (SQLException e) {
@@ -193,7 +194,7 @@ public class AppointmentHandler {
 		long personId = person.getId();
 		
 		String query = 
-				"UPDATE UserAppointment SET" +
+				"UPDATE UserAppointments SET" +
 				" hasAccepted='%b'" +
 				" WHERE userId=%d AND msgId=%d";
 		
@@ -205,7 +206,7 @@ public class AppointmentHandler {
 	}
 	public static Map<Integer, Boolean> getParticipants(long appId) throws IOException {
 		String query =
-				"SELECT userId, hasAccepted FROM UserAppointment" +
+				"SELECT userId, hasAccepted FROM UserAppointments" +
 				" WHERE appId=%d";
 		
 		try {
@@ -216,7 +217,7 @@ public class AppointmentHandler {
 	}
 	public static void addUserToAppointment(long appId) throws IOException {
 		String queryAddUserToAppointment =
-				"INSERT INTO UserAppointment VALUES(%d, %d, %b)";
+				"INSERT INTO UserAppointments VALUES(%d, %d, %b)";
 		
 		try {
 			Execute.executeUpdate(String.format(queryAddUserToAppointment, appId));
@@ -226,7 +227,7 @@ public class AppointmentHandler {
 	}
 	public static void deleteUserFromAppointment(long appId) throws IOException {
 		String query = 
-				"DELETE FROM UserAppoinment WHERE userId=%d AND msgId=%d";
+				"DELETE FROM UserAppoinments WHERE userId=%d AND msgId=%d";
 		
 		try {
 			Execute.executeUpdate(String.format(query, appId));
