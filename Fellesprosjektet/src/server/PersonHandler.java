@@ -7,27 +7,61 @@ import no.ntnu.fp.model.Person;
 
 public class PersonHandler {
 	
+	public static void createUser(Person person) throws ClassNotFoundException, IOException, SQLException{
+		String firstname = person.getFirstname();
+		String lastname = person.getLastname();
+		String email = person.getLastname();
+		String department = person.getDepartment();
+		
+		String query =
+				"INSERT INTO Person( email, firstname, lastname, department) " +
+				"VALUES('%s', '%s', '%s', '%s')";
+		
+		Execute.executeUpdate(String.format(query, email, firstname, lastname, department));
+		
+	}
+	public static void updateUser(Person person) throws ClassNotFoundException, IOException, SQLException {
+		String firstname = person.getFirstname();
+		String lastname = person.getLastname();
+		String email = person.getLastname();
+		String department = person.getDepartment();
+		
+		String query =
+				"UPDATE Person SET" +
+						" email='%s'" +
+						" firstname='%s'" +
+						" lastname='%s'" +
+						" department='%s'";
+		
+		Execute.executeUpdate(String.format(query, email, firstname, lastname, department));
+		
+	}
+	public static void deleteUser(long personId) throws ClassNotFoundException, IOException, SQLException{
+		String query =
+				"DELETE FROM Person WHERE userId='%d'";
+		Execute.executeUpdate(String.format(query, personId));
+	}
 	public static String getFirstname(long personId) throws ClassNotFoundException, IOException, SQLException {
 		String query =
-				"SELECT firstname FROM User WHERE userId='%i'";
+				"SELECT firstname FROM User WHERE userId='%d'";
 		
 		return Execute.executeGetString(String.format(query, personId));
 	}
 	public static String getLastname(long personId) throws ClassNotFoundException, IOException, SQLException {
 		String query =
-				"SELECT lastname FROM User WHERE userId='%i'";
+				"SELECT lastname FROM User WHERE userId='%d'";
 		
 		return Execute.executeGetString(String.format(query, personId));
 	}
 	public static String getEmail(long personId) throws ClassNotFoundException, IOException, SQLException {
 		String query =
-				"SELECT email FROM User WHERE userId='%i'";
+				"SELECT email FROM User WHERE userId='%d'";
 		
 		return Execute.executeGetString(String.format(query, personId));
 	}
 	public static String getDepartment(long personId) throws ClassNotFoundException, IOException, SQLException {
 		String query =
-				"SELECT department FROM User WHERE userId='%i'";
+				"SELECT department FROM User WHERE userId='%d'";
 		
 		return Execute.executeGetString(String.format(query, personId));
 	}
