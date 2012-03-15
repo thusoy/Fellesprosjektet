@@ -12,12 +12,13 @@ public class PersonHandler {
 		String lastname = person.getLastname();
 		String email = person.getLastname();
 		String department = person.getDepartment();
+		String passwordHash = person.getPasswordHash();
 		
 		String query =
-				"INSERT INTO Person( email, firstname, lastname, department) " +
-				"VALUES('%s', '%s', '%s', '%s')";
+				"INSERT INTO Person( email, firstname, lastname, department, passwordHash) " +
+				"VALUES('%s', '%s', '%s', '%s', '%s')";
 		
-		Execute.executeUpdate(String.format(query, email, firstname, lastname, department));
+		Execute.executeUpdate(String.format(query, email, firstname, lastname, department, passwordHash));
 		
 	}
 	public static void updateUser(Person person) throws ClassNotFoundException, IOException, SQLException {
@@ -25,15 +26,17 @@ public class PersonHandler {
 		String lastname = person.getLastname();
 		String email = person.getLastname();
 		String department = person.getDepartment();
+		String passwordHash = person.getPasswordHash();
 		
 		String query =
 				"UPDATE Person SET" +
 						" email='%s'" +
 						" firstname='%s'" +
 						" lastname='%s'" +
-						" department='%s'";
+						" department='%s'" +
+						" passwordHash='%s'";
 		
-		Execute.executeUpdate(String.format(query, email, firstname, lastname, department));
+		Execute.executeUpdate(String.format(query, email, firstname, lastname, department, passwordHash));
 		
 	}
 	public static void deleteUser(long personId) throws ClassNotFoundException, IOException, SQLException{
@@ -65,13 +68,20 @@ public class PersonHandler {
 		
 		return Execute.executeGetString(String.format(query, personId));
 	}
+	public static String getPasswordHash(long personId) throws ClassNotFoundException, IOException, SQLException {
+		String query =
+				"SELECT passwordHash FROM User WHERE userId='%d'";
+		
+		return Execute.executeGetString(String.format(query, personId));
+	}
 	public static Person getPerson(long personId) throws ClassNotFoundException, IOException, SQLException {
 		String firstname = getFirstname(personId);
 		String lastname = getLastname(personId);
 		String email = getEmail(personId);
 		String department = getDepartment(personId);
+		String passwordHash = getPasswordHash(personId);
 		
-		Person person = new Person(firstname, lastname, email, department);
+		Person person = new Person(firstname, lastname, email, department, passwordHash);
 		return person;
 	}
 }
