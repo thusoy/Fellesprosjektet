@@ -10,24 +10,24 @@ import calendar.Message;
 
 public class MessageHandler {
 	
-	public void createMessage(Message msg) throws ClassNotFoundException, IOException, SQLException {
+	public static void createMessage(Message msg) throws ClassNotFoundException, IOException, SQLException {
 		Date dateSent = msg.getDateSent();
 		String content = msg.getContent();
 		String title = msg.getTitle();
 		
 		String querySaveMessage = 
-				"INSERT INTO Message VALUES(%s, %s, %s)";
+				"INSERT INTO Message VALUES('%s', '%s', '%s')";
 			
 		Execute.executeUpdate(String.format(querySaveMessage, dateSent, content, title));
 	}
-	public String getTitleMessage(long msgId, Person user) throws ClassNotFoundException, IOException, SQLException {
+	public static String getTitleMessage(long msgId, Person user) throws ClassNotFoundException, IOException, SQLException {
 		
 		String queryGetTitleMessage =
 				"SELECT title FROM Message WHERE msgId='%i'";
 		
 		return Execute.executeGetString(String.format(queryGetTitleMessage, msgId));
 	}
-	public Date getDateSentMessage(long msgId, Person user) throws ClassNotFoundException, IOException, SQLException {
+	public static Date getDateSentMessage(long msgId, Person user) throws ClassNotFoundException, IOException, SQLException {
 		
 		String queryGetDateSentMessage =
 				"SELECT dateSent FROM Message WHERE msgId='%i'";
