@@ -1,19 +1,14 @@
 package calendar;
 
-import server.AwesomeXml;
-import java.io.IOException;
-import java.net.ConnectException;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.NoSuchElementException;
 
-import javax.naming.directory.NoSuchAttributeException;
-
-import no.ntnu.fp.net.co.ConnectionImpl;
+import server.AwesomeXml;
+import client.ClientController;
 
 
 public class DBObject<T> {
@@ -77,16 +72,10 @@ public class DBObject<T> {
 	 * Create xml of the object, and send it to the server.
 	 * @param obj
 	 */
-	private long sendObjectToServerAndGetId(){
-		String xmldata = AwesomeXml.ObjectToXml(this);
-		ConnectionImpl a1 = new ConnectionImpl(PORT);
-		try {
-			a1.send(xmldata);
-		} catch (ConnectException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+	protected long sendObjectToServerAndGetId(){
+		long id = ClientController.saveObjectAndGetId(this);
+//		client.
+		return id;
 	}
 	
 	private void createTablesIfNecessary() throws SQLException {

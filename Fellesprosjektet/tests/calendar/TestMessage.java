@@ -16,16 +16,14 @@ public class TestMessage {
 	
 	@Test
 	public void testCreateMessage() throws ClassNotFoundException, IOException, SQLException{
-		Message testMessage1 = new Message("Test 1", "Dette er en test for å opprette en melding!", new Date());
-//		MessageHandler.createMessage(testMessage);
-//		Person user = new Person("Anne", "Olsen", "anne_olsen@gmail.com", "Teknisk", "Banan");
-//		testMessage.save();
-//		user.save();
-//		long msgId = testMessage.getId();
-//		testMessage.showMessage(msgId, user);
+		Message testMessage = new Message("Test 1", "Dette er en test for å opprette en melding!", new Date());
+		MessageHandler.createMessage(testMessage);
+		Person user = new Person("Anne", "Olsen", "anne_olsen@gmail.com", "Teknisk", "Banan");
+		long msgId = testMessage.getId();
+		testMessage.showMessage(msgId, user);
 		
-		assertTrue(testMessage1.getTitle().equals("Test 1"));
-		assertTrue(testMessage1.getContent().equals("Dette er en test for å opprette en melding!"));
+		assertTrue(testMessage.getTitle().equals("Test 1"));
+		assertTrue(testMessage.getContent().equals("Dette er en test for å opprette en melding!"));
 	}
 	@Test
 	public void testSetTitle(){

@@ -17,8 +17,6 @@ public class TestPerson {
 		assertFalse("Hashene skal ikke v¾re like!", johnHash.equals(otherHash));
 		p.setPasswordHash("banan");
 		String secondHash = p.getPasswordHash();
-		assertEquals("Samme passord skal ha samme hash pA samme person", secondHash, johnHash);
-		
+		assertEquals("Samme passord skal ha samme hash på samme person", secondHash, johnHash);
 	}
-
 }

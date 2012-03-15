@@ -8,6 +8,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import server.AppointmentHandler;
+
 import no.ntnu.fp.model.Person;
 
 public class Appointment extends DBObject<Appointment> implements Serializable {
@@ -32,6 +34,7 @@ public class Appointment extends DBObject<Appointment> implements Serializable {
 		this.endTime = endTime;
 		this.isPrivate = isPrivate;
 		this.participants = participants;
+		AppointmentHandler.createAppointment(this);
 	}
 	
 	public Appointment(){

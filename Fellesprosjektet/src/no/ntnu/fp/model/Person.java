@@ -5,9 +5,6 @@ import hashtools.Hash;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.Date;
 
 /**
  * The <code>Person</code> class stores information about a single person.
@@ -122,7 +119,7 @@ public class Person extends calendar.DBObject{
 	}
 	
 	private String getSalt(){
-		return "123";
+		return Long.toString(System.currentTimeMillis());
 	}
 	/**
 	 * Assigns a new name to the person.<P>
