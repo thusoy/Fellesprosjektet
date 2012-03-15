@@ -10,7 +10,7 @@ import calendar.Message;
 
 public class MessageHandler {
 	
-	public static void createMessage(Message msg) throws ClassNotFoundException, IOException, SQLException {
+	public static void createMessage(Message msg) throws IOException {
 		Date dateSent = msg.getDateSent();
 		String content = msg.getContent();
 		String title = msg.getTitle();
@@ -18,27 +18,43 @@ public class MessageHandler {
 		String querySaveMessage = 
 				"INSERT INTO Message VALUES('%s', '%s', '%s')";
 			
-		Execute.executeUpdate(String.format(querySaveMessage, dateSent, content, title));
+		try {
+			Execute.executeUpdate(String.format(querySaveMessage, dateSent, content, title));
+		} catch (SQLException e) {
+			throw new RuntimeException("SQLFeil");
+		}
 	}
-	public static String getTitleMessage(long msgId, Person user) throws ClassNotFoundException, IOException, SQLException {
+	public static String getTitleMessage(long msgId, Person user) throws IOException {
 		
 		String queryGetTitleMessage =
 				"SELECT title FROM Message WHERE msgId='%i'";
 		
-		return Execute.executeGetString(String.format(queryGetTitleMessage, msgId));
+		try {
+			return Execute.executeGetString(String.format(queryGetTitleMessage, msgId));
+		} catch (SQLException e) {
+			throw new RuntimeException("SQLFeil");
+		}
 	}
-	public static Date getDateSentMessage(long msgId, Person user) throws ClassNotFoundException, IOException, SQLException {
+	public static Date getDateSentMessage(long msgId, Person user) throws IOException {
 		
 		String queryGetDateSentMessage =
 				"SELECT dateSent FROM Message WHERE msgId='%i'";
 		
-		return Execute.executeGetDate(String.format(queryGetDateSentMessage, msgId));
+		try {
+			return Execute.executeGetDate(String.format(queryGetDateSentMessage, msgId));
+		} catch (SQLException e) {
+			throw new RuntimeException("SQLFeil");
+		}
 	}
-	public static String getContentMessage(long msgId, Person user) throws ClassNotFoundException, IOException, SQLException {
+	public static String getContentMessage(long msgId, Person user) throws IOException {
 		
 		String queryGetContentMessage =
 				"SELECT content FROM Message WHERE msgId='%i'";
 		
-		return Execute.executeGetString(String.format(queryGetContentMessage, msgId));
+		try {
+			return Execute.executeGetString(String.format(queryGetContentMessage, msgId));
+		} catch (SQLException e) {
+			throw new RuntimeException("SQLFeil");
+		}
 	}
 }

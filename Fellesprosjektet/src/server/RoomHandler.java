@@ -9,22 +9,29 @@ import calendar.Room;
 
 public class RoomHandler {
 		
-	public static List<Room> getAllRooms() throws ClassNotFoundException, IOException, SQLException{
+	public static List<Room> getAllRooms() throws IOException{
 		
 		String queryGetAllRooms =
 				"SELECT name FROM Room";
 		
 		List<Room> roomList = new ArrayList<Room>();
-		List<String> RoomNameList= Execute.executeGetStringList(queryGetAllRooms);
+		List<String> RoomNameList;
+		try {
+			RoomNameList = Execute.executeGetStringList(queryGetAllRooms);
+		} catch (SQLException e) {
+			throw new RuntimeException("SQLFeil");
+		}
 		for (String roomName : RoomNameList) {
-			Room room = new Room();
-			room.setName(roomName);
-			
 			String queryGetCapacity =
 					"Select capacity FROM Room";
-			int capacity = Execute.executeGetInt(queryGetCapacity);
+			int capacity;
+			try {
+				capacity = Execute.executeGetInt(queryGetCapacity);
+			} catch (SQLException e) {
+				throw new RuntimeException("SQLFeil");
+			}
+			Room room = new Room(roomName, capacity);
 			
-			room.setCapacity(capacity);
 			roomList.add(room);
 		}
 	return roomList;	 
@@ -40,7 +47,7 @@ public class RoomHandler {
 		}		
 		return true;
 	}
-	public static List<Room> availableRooms(Date start, Date end, int capacity) throws ClassNotFoundException, IOException, SQLException{
+	public static List<Room> availableRooms(Date start, Date end, int capacity) throws IOException {
 		List<Room> rooms = new ArrayList<Room>();
 		for(Room room: RoomHandler.getAllRooms()) {
 			if (RoomHandler.isValid(start, end, capacity, room)) {
