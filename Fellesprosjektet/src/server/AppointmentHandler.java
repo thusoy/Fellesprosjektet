@@ -175,7 +175,7 @@ public class AppointmentHandler {
 			throw new RuntimeException("Feil i SQL!");
 		}
 	}
-	public void deleteAppointment(long appId) throws IOException {
+	public static void deleteAppointment(long appId) throws IOException {
 		Appointment app = getAppointment(appId);
 		sendMessageToAllParticipants(app, "Avtale slettet.", "Denne avtalen er blitt slettet");
 		String query =

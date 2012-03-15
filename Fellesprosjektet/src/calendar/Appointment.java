@@ -1,5 +1,6 @@
 package calendar;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -28,7 +29,7 @@ public class Appointment extends DBObject<Appointment> implements Serializable {
 	private String room_name;
 	
 	public Appointment(String title, Date startTime, Date endTime, boolean isPrivate, 
-			Map<Person, Boolean> participants) {
+			Map<Person, Boolean> participants) throws IOException {
 		this.title = title;
 		this.startTime = startTime;
 		this.endTime = endTime;
@@ -123,9 +124,10 @@ public class Appointment extends DBObject<Appointment> implements Serializable {
 	/**
 	 * Server sender ut melding til alle deltakere om at appointment'en er slettet. 
 	 * Deretter blir appointment-objektet slettet.
+	 * @throws IOException 
 	 */
-	public void deleteAppointment() {
-		delete();
+	public void deleteAppointment() throws IOException {
+		AppointmentHandler.deleteAppointment(this.appId);
 	}
 	public void updateDaysAppearing(Set<Day> days){
 		this.daysAppearing = days;
