@@ -7,7 +7,7 @@ import no.ntnu.fp.model.Person;
 
 public class PersonHandler {
 	
-	public static void createUser(Person person) throws ClassNotFoundException, IOException, SQLException{
+	public static void createUser(Person person) throws IOException{
 		String firstname = person.getFirstname();
 		String lastname = person.getLastname();
 		String email = person.getLastname();
@@ -18,10 +18,14 @@ public class PersonHandler {
 				"INSERT INTO Person( email, firstname, lastname, department, passwordHash) " +
 				"VALUES('%s', '%s', '%s', '%s', '%s')";
 		
-		Execute.executeUpdate(String.format(query, email, firstname, lastname, department, passwordHash));
+		try {
+			Execute.executeUpdate(String.format(query, email, firstname, lastname, department, passwordHash));
+		} catch (SQLException e) {
+			throw new RuntimeException("Feil i sql");
+		}
 		
 	}
-	public static void updateUser(Person person) throws ClassNotFoundException, IOException, SQLException {
+	public static void updateUser(Person person) throws IOException {
 		String firstname = person.getFirstname();
 		String lastname = person.getLastname();
 		String email = person.getLastname();
@@ -36,45 +40,71 @@ public class PersonHandler {
 						" department='%s'" +
 						" passwordHash='%s'";
 		
-		Execute.executeUpdate(String.format(query, email, firstname, lastname, department, passwordHash));
-		
+		try{	
+			Execute.executeUpdate(String.format(query, email, firstname, lastname, department, passwordHash));
+		} catch (SQLException e) {
+			throw new RuntimeException("Feil i sql");
+		}
 	}
-	public static void deleteUser(long personId) throws ClassNotFoundException, IOException, SQLException{
+	public static void deleteUser(long personId) throws IOException{
 		String query =
 				"DELETE FROM Person WHERE userId='%d'";
-		Execute.executeUpdate(String.format(query, personId));
+		try {
+			Execute.executeUpdate(String.format(query, personId));
+		} catch (SQLException e) {
+			throw new RuntimeException("Feil i sql");
+		}
 	}
-	public static String getFirstname(long personId) throws ClassNotFoundException, IOException, SQLException {
+	public static String getFirstname(long personId) throws IOException {
 		String query =
 				"SELECT firstname FROM User WHERE userId='%d'";
 		
-		return Execute.executeGetString(String.format(query, personId));
+		try {
+			return Execute.executeGetString(String.format(query, personId));
+		} catch (SQLException e) {
+			throw new RuntimeException("Feil i sql");
+		}
 	}
-	public static String getLastname(long personId) throws ClassNotFoundException, IOException, SQLException {
+	public static String getLastname(long personId) throws IOException {
 		String query =
 				"SELECT lastname FROM User WHERE userId='%d'";
 		
-		return Execute.executeGetString(String.format(query, personId));
+		try {
+			return Execute.executeGetString(String.format(query, personId));
+		} catch (SQLException e) {
+			throw new RuntimeException("Feil i sql");		}
 	}
-	public static String getEmail(long personId) throws ClassNotFoundException, IOException, SQLException {
+	public static String getEmail(long personId) throws IOException {
 		String query =
 				"SELECT email FROM User WHERE userId='%d'";
 		
-		return Execute.executeGetString(String.format(query, personId));
+		try {
+			return Execute.executeGetString(String.format(query, personId));
+		} catch (SQLException e) {
+			throw new RuntimeException("Feil i sql");
+		}
 	}
-	public static String getDepartment(long personId) throws ClassNotFoundException, IOException, SQLException {
+	public static String getDepartment(long personId) throws IOException {
 		String query =
 				"SELECT department FROM User WHERE userId='%d'";
 		
-		return Execute.executeGetString(String.format(query, personId));
+		try {
+			return Execute.executeGetString(String.format(query, personId));
+		} catch (SQLException e) {
+			throw new RuntimeException("Feil i sql");
+		}
 	}
-	public static String getPasswordHash(long personId) throws ClassNotFoundException, IOException, SQLException {
+	public static String getPasswordHash(long personId) throws IOException {
 		String query =
 				"SELECT passwordHash FROM User WHERE userId='%d'";
 		
-		return Execute.executeGetString(String.format(query, personId));
+		try {
+			return Execute.executeGetString(String.format(query, personId));
+		} catch (SQLException e) {
+			throw new RuntimeException("Feil i sql");
+		}
 	}
-	public static Person getPerson(long personId) throws ClassNotFoundException, IOException, SQLException {
+	public static Person getPerson(long personId) throws IOException {
 		String firstname = getFirstname(personId);
 		String lastname = getLastname(personId);
 		String email = getEmail(personId);
