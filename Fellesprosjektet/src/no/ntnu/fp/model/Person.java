@@ -1,8 +1,12 @@
 package no.ntnu.fp.model;
 
+import hashtools.Hash;
+
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 
 /**
@@ -12,7 +16,7 @@ import java.util.Date;
  *
  * @version $Revision: 1.5 $ - $Date: 2005/02/20 14:52:29 $
  */
-public class Person {
+public class Person extends calendar.DBObject{
 	
 	/**
 	 * This member variable holds the person's name.
@@ -100,16 +104,26 @@ public class Person {
 	 * @param email The person's e-mail address
 	 * @param dateOfBirth The person's date of birth.
 	 */
-	public Person(String firstname, String lastname, String email, String department, String passwordHash) {
+	public Person(String firstname, String lastname, String email, String department, String password) {		
 		this();
 		this.firstname = firstname;
 		this.lastname = lastname;
 		this.email = email;
+		String passwordHash = setPasswordHash(password);
 		this.passwordHash = passwordHash;
 //		this.dateOfBirth = dateOfBirth;
 		this.department = department;
 	}
 	
+	public String setPasswordHash(String password) {
+		String salt = getSalt();
+		String bytes = Hash.SHA512(password + salt);
+		return bytes;
+	}
+	
+	private String getSalt(){
+		return "123";
+	}
 	/**
 	 * Assigns a new name to the person.<P>
 	 * 
@@ -221,12 +235,7 @@ public class Person {
 		PropertyChangeEvent event = new PropertyChangeEvent(this, DEPARTMENT_PROPERTY_NAME, oldDepartment, this.department);
 		propChangeSupp.firePropertyChange(event);
 	}
-	public void setPasswordHash(String passwordHash) {
-		String oldPasswordHash = this.passwordHash;
-		this.passwordHash = passwordHash;
-		PropertyChangeEvent event = new PropertyChangeEvent(this, PASSWORDHASH_PROPERTY_NAME, oldPasswordHash, this.passwordHash);
-		propChangeSupp.firePropertyChange(event);
-	}
+
 	/**
 	 * Returns the person's name.
 	 * 
