@@ -48,7 +48,7 @@ public class PersonHandler {
 	}
 	public static void deleteUser(long personId) throws IOException{
 		String query =
-				"DELETE FROM Person WHERE userId='%d'";
+				"DELETE FROM Person WHERE userId=%d";
 		try {
 			Execute.executeUpdate(String.format(query, personId));
 		} catch (SQLException e) {
@@ -57,7 +57,7 @@ public class PersonHandler {
 	}
 	public static String getFirstname(long personId) throws IOException {
 		String query =
-				"SELECT firstname FROM User WHERE userId='%d'";
+				"SELECT firstname FROM User WHERE userId=%d";
 
 		try {
 			return Execute.executeGetString(String.format(query, personId));
@@ -67,7 +67,7 @@ public class PersonHandler {
 	}
 	public static String getLastname(long personId) throws IOException {
 		String query =
-				"SELECT lastname FROM User WHERE userId='%d'";
+				"SELECT lastname FROM User WHERE userId=%d";
 
 		try {
 			return Execute.executeGetString(String.format(query, personId));
@@ -76,7 +76,7 @@ public class PersonHandler {
 	}
 	public static String getEmail(long personId) throws IOException {
 		String query =
-				"SELECT email FROM User WHERE userId='%d'";
+				"SELECT email FROM User WHERE userId=%d";
 
 		try {
 			return Execute.executeGetString(String.format(query, personId));
@@ -86,7 +86,7 @@ public class PersonHandler {
 	}
 	public static String getDepartment(long personId) throws IOException {
 		String query =
-				"SELECT department FROM User WHERE userId='%d'";
+				"SELECT department FROM User WHERE userId=%d";
 
 		try {
 			return Execute.executeGetString(String.format(query, personId));
@@ -96,7 +96,7 @@ public class PersonHandler {
 	}
 	public static String getPasswordHash(long personId) throws IOException {
 		String query =
-				"SELECT passwordHash FROM User WHERE userId='%d'";
+				"SELECT passwordHash FROM User WHERE userId=%d";
 
 		try {
 			return Execute.executeGetString(String.format(query, personId));

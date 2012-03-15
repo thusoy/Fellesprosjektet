@@ -72,8 +72,8 @@ public class AppointmentHandler {
 				" endOfRepeatDate='%s'" +
 				" roomName='%s'" +
 				" isPrivate='%b'" +
-				" creatorId='%d'" +
-				" WHERE appId='%d'";		
+				" creatorId=%d" +
+				" WHERE appId=%d";		
 		Execute.executeUpdate(String.format(query, place, title, start, end, des, 
 				daysAppearing, endOfRe, roomName, isPrivate, creatorId));
 	}
@@ -99,7 +99,7 @@ public class AppointmentHandler {
 
 	public static Date getStart(long appId) throws IOException {
 		String query =
-				"SELECT startTime FROM Appointment WHERE appId='%d'";
+				"SELECT startTime FROM Appointment WHERE appId=%d";
 		
 		try {
 			return Execute.executeGetDate(String.format(query, appId));
@@ -109,7 +109,7 @@ public class AppointmentHandler {
 	}
 	public static Date getEnd(long appId) throws IOException {
 		String query =
-				"SELECT endTime FROM Appointment WHERE appId='%d'";
+				"SELECT endTime FROM Appointment WHERE appId=%d";
 		
 		try {
 			return Execute.executeGetDate(String.format(query, appId));
@@ -119,7 +119,7 @@ public class AppointmentHandler {
 	}
 	public static String getDescription(long appId) throws IOException {
 		String query =
-				"SELECT description FROM Appointment WHERE appId='%d'";
+				"SELECT description FROM Appointment WHERE appId=%d";
 		
 		try {
 			return Execute.executeGetString(String.format(query, appId));
@@ -129,7 +129,7 @@ public class AppointmentHandler {
 	}
 	public static String getDaysAppearing(long appId) throws IOException {
 		String query =
-				"SELECT daysAppearing FROM Appointment WHERE appId='%d'";
+				"SELECT daysAppearing FROM Appointment WHERE appId=%d";
 		
 		try {
 			return Execute.executeGetString(String.format(query, appId));
@@ -139,7 +139,7 @@ public class AppointmentHandler {
 	}
 	public static Date getEndOfRepeatDate(long appId) throws IOException {
 		String query =
-				"SELECT endOfRepeatDate FROM Appointment WHERE appId='%d'";
+				"SELECT endOfRepeatDate FROM Appointment WHERE appId=%d";
 		
 		try {
 			return Execute.executeGetDate(String.format(query, appId));
@@ -149,7 +149,7 @@ public class AppointmentHandler {
 	}
 	public static String getRoomName(long appId) throws IOException {
 		String query =
-				"SELECT roomName FROM Appointment WHERE appId='%d'";
+				"SELECT roomName FROM Appointment WHERE appId=%d";
 		
 		try {
 			return Execute.executeGetString(String.format(query, appId));
@@ -159,7 +159,7 @@ public class AppointmentHandler {
 	}
 	public static boolean getIsPrivate(long appId) throws IOException {
 		String query =
-				"SELECT isPrivate FROM Appointment WHERE appId='%d'";
+				"SELECT isPrivate FROM Appointment WHERE appId=%d";
 		
 		try {
 			return Execute.executeGetBoolean(String.format(query, appId));
@@ -169,7 +169,7 @@ public class AppointmentHandler {
 	}
 	public static long getCreatorId(long appId) throws IOException {
 		String query =
-				"SELECT creatorId FROM Appointment WHERE appId='%d'";
+				"SELECT creatorId FROM Appointment WHERE appId=%d";
 		
 		try {
 			return Execute.executeGetLong(String.format(query, appId));
@@ -181,7 +181,7 @@ public class AppointmentHandler {
 		Appointment app = getAppointment(appId);
 		sendMessageToAllParticipants(app, "Avtale slettet.", "Denne avtalen er blitt slettet");
 		String query =
-				"DELETE FROM Appointment WHERE appId='%d'";
+				"DELETE FROM Appointment WHERE appId=%d";
 		
 		try {
 			Execute.executeUpdate(String.format(query, appId));
@@ -195,7 +195,7 @@ public class AppointmentHandler {
 		String query = 
 				"UPDATE UserAppointment SET" +
 				" hasAccepted='%b'" +
-				" WHERE userId='%d' AND msgId='%d'";
+				" WHERE userId=%d AND msgId=%d";
 		
 		try {
 			Execute.executeUpdate(String.format(query, bool, personId, appId));
@@ -206,7 +206,7 @@ public class AppointmentHandler {
 	public static Map<Integer, Boolean> getParticipants(long appId) throws IOException {
 		String query =
 				"SELECT userId, hasAccepted FROM UserAppointment" +
-				" WHERE appId='%d'";
+				" WHERE appId=%d";
 		
 		try {
 			return Execute.executeGetHashMap(String.format(query, appId));
@@ -226,7 +226,7 @@ public class AppointmentHandler {
 	}
 	public static void deleteUserFromAppointment(long appId) throws IOException {
 		String query = 
-				"DELETE FROM UserAppoinment WHERE userId='%d' AND msgId='%d'";
+				"DELETE FROM UserAppoinment WHERE userId=%d AND msgId=%d";
 		
 		try {
 			Execute.executeUpdate(String.format(query, appId));
