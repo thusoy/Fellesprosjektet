@@ -7,7 +7,7 @@ import java.util.Date;
 import server.MessageHandler;
 import no.ntnu.fp.model.Person;
 
-public class Message extends DBObject {
+public class Message extends DBObject<Message> {
 	
 	private long msgId;
 	private Date dateSent;
@@ -20,7 +20,7 @@ public class Message extends DBObject {
 		this.dateSent=dateSent;
 	}
 	
-	public String showMessage(Message msgId, Person user) throws ClassNotFoundException, IOException, SQLException{
+	public String showMessage(long msgId, Person user) throws ClassNotFoundException, IOException, SQLException{
 		return MessageHandler.getContentMessage(msgId, user) ;
 	}
 	

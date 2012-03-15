@@ -35,6 +35,7 @@ public class Person {
 	private long id;
 	
 	private String department;
+	private String passwordHash;
 	
 	/**
 	 * This member variable provides functionality for notifying of changes to
@@ -73,6 +74,7 @@ public class Person {
 	//public final static String DATEOFBIRTH_PROPERTY_NAME = "dateOfBirth";
 	
 	public final static String DEPARTMENT_PROPERTY_NAME = "department";
+	public final static String PASSWORDHASH_PROPERTY_NAME = "password";
 	/**
 	 * Default constructor. Must be called to initialize the object's member variables.
 	 * The constructor sets the name and email of this person to empty
@@ -83,6 +85,7 @@ public class Person {
 		firstname = "";
 		lastname = "";
 		email = "";
+		passwordHash = "";
 		department = "";
 //		dateOfBirth = new Date();
 		id = System.currentTimeMillis();
@@ -97,11 +100,12 @@ public class Person {
 	 * @param email The person's e-mail address
 	 * @param dateOfBirth The person's date of birth.
 	 */
-	public Person(String firstname, String lastname, String email, String department) {
+	public Person(String firstname, String lastname, String email, String department, String passwordHash) {
 		this();
 		this.firstname = firstname;
 		this.lastname = lastname;
 		this.email = email;
+		this.passwordHash = passwordHash;
 //		this.dateOfBirth = dateOfBirth;
 		this.department = department;
 	}
@@ -217,6 +221,12 @@ public class Person {
 		PropertyChangeEvent event = new PropertyChangeEvent(this, DEPARTMENT_PROPERTY_NAME, oldDepartment, this.department);
 		propChangeSupp.firePropertyChange(event);
 	}
+	public void setPasswordHash(String passwordHash) {
+		String oldPasswordHash = this.passwordHash;
+		this.passwordHash = passwordHash;
+		PropertyChangeEvent event = new PropertyChangeEvent(this, PASSWORDHASH_PROPERTY_NAME, oldPasswordHash, this.passwordHash);
+		propChangeSupp.firePropertyChange(event);
+	}
 	/**
 	 * Returns the person's name.
 	 * 
@@ -259,6 +269,10 @@ public class Person {
 	public String getDepartment() {
 		return department;
 	}
+	
+	public String getPasswordHash() {
+		return passwordHash;
+	}
 	/**
 	 * Add a {@link java.beans.PropertyChangeListener} to the listener list.
 	 * 
@@ -291,6 +305,8 @@ public class Person {
 		
 		if (aPerson.getFirstname().compareTo(getFirstname()) != 0) 
 			return false;
+		if (aPerson.getLastname().compareTo(getLastname()) != 0)
+			return false;
 		if (aPerson.getEmail().compareTo(getEmail()) != 0)
 			return false;
 //		if (aPerson.getDateOfBirth().compareTo(getDateOfBirth()) != 0)
@@ -303,8 +319,10 @@ public class Person {
 	 * {@inheritDoc}
 	 */
 	public String toString() {
-		String s = "Name: " + getFirstname() + "; ";
+		String s = "Firstname: " + getFirstname() + "; ";
+		s += "Lastname: " + getLastname() + "; ";
 		s += "Email: " + getEmail() + "; ";
+		s += "Department: " + getDepartment() + "; ";
 //		s += "Date of birth: " + getDateOfBirth().toString();
 		return s;
 	}
