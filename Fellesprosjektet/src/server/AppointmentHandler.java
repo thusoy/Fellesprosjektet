@@ -27,6 +27,8 @@ public class AppointmentHandler {
 		String roomName = app.getRoom_name();
 		boolean isPrivate = app.isPrivate();
 		long creatorId = app.getCreator() != null ? app.getCreator().getId() : 0;
+		long appId = System.currentTimeMillis();
+		app.setAppId(appId);
 		
 		String query = 
 				"INSERT INTO Appointment(title, place, startTime, endTime, description" +
@@ -77,7 +79,7 @@ public class AppointmentHandler {
 	}
 	public static String getTitleAppointment(long appId) throws IOException {
 		String query =
-				"SELECT title FROM Appointment WHERE appId='%d'";
+				"SELECT title FROM Appointment WHERE appId=%d";
 		
 		try {
 			return Execute.executeGetString(String.format(query, appId));
@@ -87,7 +89,7 @@ public class AppointmentHandler {
 	}
 	public static String getPlace(long appId) throws IOException {
 		String query =
-				"SELECT place FROM Appointment WHERE appId='%d'";
+				"SELECT place FROM Appointment WHERE appId=%d";
 		try {
 			return Execute.executeGetString(String.format(query, appId));
 		} catch (SQLException e) {
@@ -271,6 +273,7 @@ public class AppointmentHandler {
 		Appointment appointment = new Appointment(title, start, 
 				end, isPrivate, participants);
 		appointment.setPlace(place);
+		appointment.setId(appId);
 		appointment.setDescription(des);
 //		appointment.setDaysAppearing(daysAppearing);
 		appointment.setEndOfRepeatDate(endOfRe);

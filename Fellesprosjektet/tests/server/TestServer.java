@@ -17,6 +17,6 @@ public class TestServer {
 	public void test() throws IOException {	
 		Person p = new Person();
 		Appointment app = new Appointment("tannlege", new Date(System.currentTimeMillis()), new Date(System.currentTimeMillis()+2700), false, null);
-		assertTrue("Objektene skal være like!", app == AppointmentHandler.getAppointment(app.getId()));
+		assertTrue("Objektene skal være like!", app == AppointmentHandler.getAppointment(app.getAppId()));
 	}
 }

@@ -15,7 +15,7 @@ import no.ntnu.fp.model.Person;
 
 public class Appointment extends DBObject<Appointment> implements Serializable {
 	private static final long serialVersionUID = -5442910434292395380L;
-	private int appId;
+	private Long appId = null;
 	private String place;
 	private String title;
 	private String description;
@@ -61,7 +61,7 @@ public class Appointment extends DBObject<Appointment> implements Serializable {
 		save();
 	}
 	
-	public void setAppId(int appId) {
+	public void setAppId(long appId) {
 		this.appId = appId;
 	}
 
@@ -73,7 +73,10 @@ public class Appointment extends DBObject<Appointment> implements Serializable {
 		this.creator = creator;
 	}
 
-	public int getAppId() {
+	public long getAppId() {
+		if (appId == null){
+			throw new IllegalStateException("AppId ikke satt enda!");
+		}
 		return appId;
 	}
 	public String getTitle() {
@@ -157,6 +160,10 @@ public class Appointment extends DBObject<Appointment> implements Serializable {
 		DateFormat formatter = new SimpleDateFormat("dd.MM HH:mm");
 		String startdate = formatter.format(startTime);
 		return String.format(base, title, startdate);
+	}
+
+	public void setId(long appId) {
+		this.appId = appId;
 	}
 	
 }
