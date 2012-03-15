@@ -1,22 +1,16 @@
 package server;
 
 import java.io.IOException;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.Date;
-
+import java.sql.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import no.ntnu.fp.model.Person;
-
 import calendar.Appointment;
-import calendar.Day;
 import calendar.Message;
-
-import server.Execute;
-import server.PersonHandler;
 
 public class AppointmentHandler {
 	
@@ -36,13 +30,19 @@ public class AppointmentHandler {
 		
 		String query = 
 				"INSERT INTO Appointment(title, place, startTime, endTime, description" +
-				" , daysAppearing, endOfRepeatDate, roomName, isPrivate, creatorId) VALUES('%s', '%s', '%s', " +
-				"'%s', '%s', '%s', '%s', '%s', '%b', '%d')";
-			
+				" , daysAppearing, endOfRepeatDate, roomName, isPrivate, creatorId) VALUES('%s', '%s', ?, " +
+				"?, '%s', '%s', ?, '%s', %b, %d)";
 		try {
-			Execute.executeUpdate(String.format(query, title, place, start, end, des, 
-					daysAppearing, endOfRe, roomName, isPrivate, creatorId));
-		} catch (SQLException e) {
+			String formatted = String.format(query, title, place, des, 
+					daysAppearing, roomName, isPrivate, creatorId);
+			System.out.println(formatted);
+			PreparedStatement ps = Execute.getPreparedStatement(formatted);
+			ps.setDate(1, start);
+			ps.setDate(2, end);
+			ps.setDate(3, endOfRe);
+			ps.executeUpdate();
+		} catch (SQLException e1) {
+			e1.printStackTrace();
 			throw new RuntimeException("Feil i SQL!");
 		}
 	}

@@ -3,6 +3,7 @@ package server;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -15,7 +16,7 @@ import java.util.Map;
 public class Execute {
 	private static final String driver = "com.mysql.jdbc.Driver";
 	private static final String database = "jdbc:mysql://mysql.stud.ntnu.no/tarjeikl_fp33";
-	private static Connection conn;
+	private static Connection conn = null;
 	
 	/**
 	 * Used internally to initialize the connection to the database and return the statement.
@@ -23,20 +24,41 @@ public class Execute {
 	 * @throws ClassNotFoundException
 	 * @throws IOException
 	 */
-	private static Statement getStatement() throws IOException{
+	private static Statement getStatement() throws IOException {
+		setUpConnection();
+		try {
+			return conn.createStatement();
+		} catch (SQLException e){
+			throw new RuntimeException("Feil i SQL!");
+		}
+	}
+	
+	public static PreparedStatement getPreparedStatement(String query) throws SQLException, IOException{
+		setUpConnection();
+		return conn.prepareStatement(query);
+	}
+	
+	private static void setUpConnection() throws IOException{
 		try {
 			Class.forName(driver);
+			System.out.println("Driver satt opp");
 		} catch (ClassNotFoundException e2) {
 			throw new RuntimeException("Fant ikke SQL-drivere!");
+		}
+		if (conn != null){
+			System.out.println("Allerede koblet til...");
+			return;
 		}
 		int tries = 3;
 		while(tries > 0){
 			try {
+				System.out.println("kobler opp mot db...");
+				System.out.println("tries: " + tries);
 				conn = DriverManager.getConnection(database, "tarjeikl_fpuser", "bruker");
-				Statement stmt = conn.createStatement();
-				return stmt;
+				break;
 			} catch (SQLException e) {
 				tries--;
+				System.out.println("klarte ikke koble til, prøver igjen...");
 				try {
 					Thread.sleep(100);
 				} catch (InterruptedException e1) {
@@ -44,7 +66,6 @@ public class Execute {
 				}
 			}
 		}
-		throw new IOException("Couldn't connect to database!");
 	}
 	
 	/**
