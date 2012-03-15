@@ -253,35 +253,30 @@ public class AppointmentHandler {
 	}
 	
 	public static Appointment getAppointment(long appId) throws IOException {		
-		
-		try {
-			String place = getPlace(appId);
-			String title = getTitleAppointment(appId);
-			Date start = getStart(appId);
-			Date end = getEnd(appId);
-			String des = getDescription(appId);
-			String daysAppearing = getDaysAppearing(appId);
-			Date endOfRe = getEndOfRepeatDate(appId);
-			String roomName = getRoomName(appId);
-			boolean isPrivate = getIsPrivate(appId);
-			long creatorId = getCreatorId(appId);
-			Map<Integer, Boolean> p = getParticipants(appId);
-			Map<Person, Boolean> participants = null;
-			for (Integer i: p.keySet()){
-				participants.put(PersonHandler.getPerson(i), p.get(i));
-			}
-			Appointment appointment = new Appointment(title, start, 
-					end, isPrivate, participants);
-			appointment.setPlace(place);
-			appointment.setDescription(des);
-//		appointment.setDaysAppearing(daysAppearing);
-			appointment.setEndOfRepeatDate(endOfRe);
-			appointment.setRoom_name(roomName);		
-			
-			return appointment;
-		} catch (SQLException e) {
-			throw new RuntimeException("Feil i SQL!");
+		String place = getPlace(appId);
+		String title = getTitleAppointment(appId);
+		Date start = getStart(appId);
+		Date end = getEnd(appId);
+		String des = getDescription(appId);
+		String daysAppearing = getDaysAppearing(appId);
+		Date endOfRe = getEndOfRepeatDate(appId);
+		String roomName = getRoomName(appId);
+		boolean isPrivate = getIsPrivate(appId);
+		long creatorId = getCreatorId(appId);
+		Map<Integer, Boolean> p = getParticipants(appId);
+		Map<Person, Boolean> participants = new HashMap<Person, Boolean>();
+		for (Integer i: p.keySet()){
+			participants.put(PersonHandler.getPerson(i), p.get(i));
 		}
+		Appointment appointment = new Appointment(title, start, 
+				end, isPrivate, participants);
+		appointment.setPlace(place);
+		appointment.setDescription(des);
+//		appointment.setDaysAppearing(daysAppearing);
+		appointment.setEndOfRepeatDate(endOfRe);
+		appointment.setRoom_name(roomName);		
+		
+		return appointment;
 	}
 
 }
