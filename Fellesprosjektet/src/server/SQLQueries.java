@@ -156,7 +156,6 @@ public class SQLQueries {
 	
 	String queryDeleteUserFromCalendar = 
 				"DELETE FROM UserCalendar WHERE userId='%i' AND calendarId='%i'";
-				
 
 //	Spørringer til klasse Room:
 
