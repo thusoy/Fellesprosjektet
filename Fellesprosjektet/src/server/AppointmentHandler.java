@@ -35,10 +35,11 @@ public class AppointmentHandler {
 		long creatorId = app.getCreator() != null ? app.getCreator().getId() : 0;
 		
 		String query = 
-				"INSERT INTO Appointment VALUES('%s', '%s', '%s', " +
+				"INSERT INTO Appointment(title, place, startTime, endTime, description" +
+				" , daysAppearing, endOfRepeatDate, roomName, isPrivate, creatorId) VALUES('%s', '%s', '%s', " +
 				"'%s', '%s', '%s', '%s', '%s', '%b', '%d')";
 			
-		Execute.executeUpdate(String.format(query, place, title, start, end, des, 
+		Execute.executeUpdate(String.format(query, title, place, start, end, des, 
 				daysAppearing, endOfRe, roomName, isPrivate, creatorId));
 	}
 	public static void updateAppointment(Appointment app) throws ClassNotFoundException, IOException, SQLException {
