@@ -316,27 +316,65 @@ public class Person extends calendar.DBObject{
 		propChangeSupp.removePropertyChangeListener(listener);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((department == null) ? 0 : department.hashCode());
+		result = prime * result + ((email == null) ? 0 : email.hashCode());
+		result = prime * result
+				+ ((firstname == null) ? 0 : firstname.hashCode());
+		result = prime * result + (int) (id ^ (id >>> 32));
+		result = prime * result
+				+ ((lastname == null) ? 0 : lastname.hashCode());
+		result = prime * result
+				+ ((passwordHash == null) ? 0 : passwordHash.hashCode());
+		result = prime * result
+				+ (int) (personalCalendarId ^ (personalCalendarId >>> 32));
+		return result;
+	}
+
+	@Override
 	public boolean equals(Object obj) {
-		if (super.equals(obj))
+		if (this == obj)
 			return true;
-
-		if (obj.getClass() != this.getClass())
+		if (obj == null)
 			return false;
-
-		Person aPerson = (Person)obj;
-
-		if (aPerson.getFirstname().compareTo(getFirstname()) != 0) 
+		if (getClass() != obj.getClass())
 			return false;
-		if (aPerson.getLastname().compareTo(getLastname()) != 0)
+		Person other = (Person) obj;
+		if (department == null) {
+			if (other.department != null)
+				return false;
+		} else if (!department.equals(other.department))
 			return false;
-		if (aPerson.getEmail().compareTo(getEmail()) != 0)
+		if (email == null) {
+			if (other.email != null)
+				return false;
+		} else if (!email.equals(other.email))
 			return false;
-//		if (aPerson.getDateOfBirth().compareTo(getDateOfBirth()) != 0)
-//			return false;
-
+		if (firstname == null) {
+			if (other.firstname != null)
+				return false;
+		} else if (!firstname.equals(other.firstname))
+			return false;
+		if (id != other.id)
+			return false;
+		if (lastname == null) {
+			if (other.lastname != null)
+				return false;
+		} else if (!lastname.equals(other.lastname))
+			return false;
+		if (passwordHash == null) {
+			if (other.passwordHash != null)
+				return false;
+		} else if (!passwordHash.equals(other.passwordHash))
+			return false;
+		if (personalCalendarId != other.personalCalendarId)
+			return false;
 		return true;
 	}
 
