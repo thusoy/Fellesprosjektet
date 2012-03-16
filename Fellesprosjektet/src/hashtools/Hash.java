@@ -4,7 +4,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 public class Hash {
-	private static final int rounds = 1000;
+	private static final int rounds = 20000;
 	
 	public static String SHA512(String rawtext){
 		MessageDigest md;

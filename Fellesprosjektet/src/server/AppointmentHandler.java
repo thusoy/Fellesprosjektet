@@ -21,26 +21,32 @@ public class AppointmentHandler {
 		String title = app.getTitle();
 		Date start = app.getStartTime();
 		Date end = app.getEndTime();
-		String des = app.getDescription();
+		String description = app.getDescription();
 		String rawText = app.getDaysAppearing() != null ? app.getDaysAppearing().toString() : null;
 		String daysAppearing = rawText != null ? rawText.substring(1, rawText.length()-1) : null;
-		Date endOfRe = app.getEndOfRepeatDate();
+		Date endOfRepeat = app.getEndOfRepeatDate();
 		String roomName = app.getRoom_name();
 		boolean isPrivate = app.isPrivate();
 		long creatorId = app.getCreator() != null ? app.getCreator().getId() : 0;
 		long appId = System.currentTimeMillis();
 		app.setAppId(appId);
+		/*
+		 * Alle verdier som kan være null må settes inn ved bruk av PreparedStatement sine settere.
+		 */
 		String query = 
 				"INSERT INTO Appointment(appId, title, place, startTime, endTime, description" +
-				" , daysAppearing, endOfRepeatDate, roomName, isPrivate, creatorId) VALUES(%d, '%s', '%s', ?, " +
-				"?, '%s', '%s', ?, '%s', %b, %d)";
+				" , daysAppearing, endOfRepeatDate, roomName, isPrivate, creatorId) VALUES(%d, '%s', ?, ?, " +
+				"?, ?, ?, ?, ?, %b, %d)";
 		try {
-			String formatted = String.format(query, appId, title, place, des, 
-					daysAppearing, roomName, isPrivate, creatorId);
+			String formatted = String.format(query, appId, title, isPrivate, creatorId);
 			PreparedStatement ps = Execute.getPreparedStatement(formatted);
-			ps.setTimestamp(1, new Timestamp(start.getTime()));
-			ps.setTimestamp(2, new Timestamp(end.getTime()));
-			ps.setDate(3, endOfRe);
+			ps.setString(1, place);
+			ps.setTimestamp(2, new Timestamp(start.getTime()));
+			ps.setTimestamp(3, new Timestamp(end.getTime()));
+			ps.setString(4, description);
+			ps.setString(5, daysAppearing);
+			ps.setDate(6, endOfRepeat);
+			ps.setString(7, roomName);
 			ps.executeUpdate();
 		} catch (SQLException e1) {
 			e1.printStackTrace();
