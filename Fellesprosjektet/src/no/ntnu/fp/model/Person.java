@@ -5,6 +5,9 @@ import hashtools.Hash;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.io.IOException;
+
+import server.PersonHandler;
 
 /**
  * The <code>Person</code> class stores information about a single person.
@@ -14,7 +17,7 @@ import java.beans.PropertyChangeSupport;
  * @version $Revision: 1.5 $ - $Date: 2005/02/20 14:52:29 $
  */
 public class Person extends calendar.DBObject{
-	
+
 	/**
 	 * This member variable holds the person's name.
 	 */
@@ -24,26 +27,27 @@ public class Person extends calendar.DBObject{
 	 * This member variable holds the person's email address.
 	 */
 	private String email;
-	
+
 	/**
 	 * This member variable holds the person's date of birth.
 	 */
 	//private Date dateOfBirth;
-	
+
 	/**
 	 * This member variable holds a unique identifier for this object.
 	 */
 	private long id;
-	
+	private long personalCalendarId;
+
 	private String department;
 	private String passwordHash;
-	
+
 	/**
 	 * This member variable provides functionality for notifying of changes to
 	 * the <code>Group</code> class.
 	 */
 	private PropertyChangeSupport propChangeSupp;
-	
+
 	/**
 	 * Constant used when calling 
 	 * {@link java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)}
@@ -63,7 +67,7 @@ public class Person extends calendar.DBObject{
 	 * @see #setEmail(String) the setEmail(String) method
 	 */
 	public final static String EMAIL_PROPERTY_NAME = "email";
-	
+
 	/**
 	 * Constant used when calling 
 	 * {@link java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)}
@@ -73,7 +77,7 @@ public class Person extends calendar.DBObject{
 	 * @see #setEmail(String) the setDateOfBirth(java.util.Date) method
 	 */
 	//public final static String DATEOFBIRTH_PROPERTY_NAME = "dateOfBirth";
-	
+
 	public final static String DEPARTMENT_PROPERTY_NAME = "department";
 	public final static String PASSWORDHASH_PROPERTY_NAME = "password";
 	/**
@@ -92,7 +96,7 @@ public class Person extends calendar.DBObject{
 		id = System.currentTimeMillis();
 		propChangeSupp = new PropertyChangeSupport(this);
 	}
-	
+
 	/**
 	 * Constructs a new <code>Person</code> object with specified name, email, and date
 	 * of birth.
@@ -100,8 +104,9 @@ public class Person extends calendar.DBObject{
 	 * @param name The name of the person.
 	 * @param email The person's e-mail address
 	 * @param dateOfBirth The person's date of birth.
+	 * @throws IOException 
 	 */
-	public Person(String firstname, String lastname, String email, String department, String password) {		
+	public Person(String firstname, String lastname, String email, String department, String password, boolean recreation) throws IOException {		
 		this();
 		this.firstname = firstname;
 		this.lastname = lastname;
@@ -110,14 +115,19 @@ public class Person extends calendar.DBObject{
 		this.passwordHash = passwordHash;
 //		this.dateOfBirth = dateOfBirth;
 		this.department = department;
+		id = System.currentTimeMillis();
+		this.personalCalendarId = id;
+		if(!recreation) {
+			PersonHandler.createUser(this);
+		}
 	}
-	
+
 	public String setPasswordHash(String password) {
 		String salt = getSalt();
 		String bytes = Hash.SHA512(password + salt);
 		return bytes;
 	}
-	
+
 	private String getSalt(){
 		return Long.toString(System.currentTimeMillis());
 	}
@@ -159,7 +169,7 @@ public class Person extends calendar.DBObject{
 		PropertyChangeEvent event = new PropertyChangeEvent(this, LASTNAME_PROPERTY_NAME, oldName, lastname);
 		propChangeSupp.firePropertyChange(event);
 	}
-	
+
 	/**
 	 * Assigns a new email address to the person.<P>
 	 * 
@@ -192,7 +202,7 @@ public class Person extends calendar.DBObject{
 		PropertyChangeEvent event = new PropertyChangeEvent(this, EMAIL_PROPERTY_NAME, oldEmail, this.email);
 		propChangeSupp.firePropertyChange(event);
 	}
-	
+
 	/**
 	 * Assigns a new date of birth to the person.<P>
 	 * 
@@ -232,6 +242,12 @@ public class Person extends calendar.DBObject{
 		PropertyChangeEvent event = new PropertyChangeEvent(this, DEPARTMENT_PROPERTY_NAME, oldDepartment, this.department);
 		propChangeSupp.firePropertyChange(event);
 	}
+	public void setId(long id) {
+		this.id = id;
+	}
+	public void setPCalendarId(long id) {
+		this.personalCalendarId = id;
+	}
 
 	/**
 	 * Returns the person's name.
@@ -253,7 +269,7 @@ public class Person extends calendar.DBObject{
 	public String getEmail() {
 		return email;
 	}
-	
+
 	/**
 	 * Returns the person's date of birth.
 	 * 
@@ -262,7 +278,7 @@ public class Person extends calendar.DBObject{
 //	public Date getDateOfBirth() {
 //		return dateOfBirth;
 //	}
-	
+
 	/**
 	 * Returns this object's unique identification.
 	 * 
@@ -271,13 +287,16 @@ public class Person extends calendar.DBObject{
 	public long getId() {
 		return id;
 	}
-	
+
 	public String getDepartment() {
 		return department;
 	}
-	
+
 	public String getPasswordHash() {
 		return passwordHash;
+	}
+	public long getPCalendarId() {
+		return personalCalendarId;
 	}
 	/**
 	 * Add a {@link java.beans.PropertyChangeListener} to the listener list.
@@ -287,7 +306,7 @@ public class Person extends calendar.DBObject{
 	public void addPropertyChangeListener(PropertyChangeListener listener) {
 		propChangeSupp.addPropertyChangeListener(listener);
 	}
-	
+
 	/**
 	 * Remove a {@link java.beans.PropertyChangeListener} from the listener list.
 	 * 
@@ -296,19 +315,19 @@ public class Person extends calendar.DBObject{
 	public void removePropertyChangeListener(PropertyChangeListener listener) {
 		propChangeSupp.removePropertyChangeListener(listener);
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
 	public boolean equals(Object obj) {
 		if (super.equals(obj))
 			return true;
-		
+
 		if (obj.getClass() != this.getClass())
 			return false;
-		
+
 		Person aPerson = (Person)obj;
-		
+
 		if (aPerson.getFirstname().compareTo(getFirstname()) != 0) 
 			return false;
 		if (aPerson.getLastname().compareTo(getLastname()) != 0)
@@ -317,10 +336,10 @@ public class Person extends calendar.DBObject{
 			return false;
 //		if (aPerson.getDateOfBirth().compareTo(getDateOfBirth()) != 0)
 //			return false;
-		
+
 		return true;
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */

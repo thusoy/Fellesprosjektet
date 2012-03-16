@@ -99,6 +99,7 @@ public class Appointment extends DBObject<Appointment> implements Serializable {
 			return false;
 		if (description == null) {
 			if (other.description != null)
+				System.out.println("");
 				return false;
 		System.out.println("got here");
 		} else if (!description.equals(other.description))
