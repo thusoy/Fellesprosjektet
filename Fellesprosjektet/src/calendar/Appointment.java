@@ -34,7 +34,10 @@ public class Appointment extends DBObject<Appointment> implements Serializable {
 		this.startTime = roundTime(startTime);
 		this.endTime = roundTime(endTime);
 		this.isPrivate = isPrivate;
-		this.participants = participants;
+		if (participants == null)
+			this.participants = new HashMap<Person, Boolean>();
+		else
+			this.participants = participants;
 		this.description = new String();
 		if(!recreation){
 			AppointmentHandler.createAppointment(this);
@@ -99,9 +102,7 @@ public class Appointment extends DBObject<Appointment> implements Serializable {
 			return false;
 		if (description == null) {
 			if (other.description != null)
-				System.out.println("");
 				return false;
-		System.out.println("got here");
 		} else if (!description.equals(other.description))
 			return false;
 		if (endOfRepeatDate == null) {
