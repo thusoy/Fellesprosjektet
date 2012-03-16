@@ -76,7 +76,6 @@ public class Person extends calendar.DBObject{
 	 * 
 	 * @see #setEmail(String) the setDateOfBirth(java.util.Date) method
 	 */
-	//public final static String DATEOFBIRTH_PROPERTY_NAME = "dateOfBirth";
 
 	public final static String DEPARTMENT_PROPERTY_NAME = "department";
 	public final static String PASSWORDHASH_PROPERTY_NAME = "password";
@@ -92,7 +91,6 @@ public class Person extends calendar.DBObject{
 		email = "";
 		passwordHash = "";
 		department = "";
-//		dateOfBirth = new Date();
 		id = System.currentTimeMillis();
 		propChangeSupp = new PropertyChangeSupport(this);
 	}
@@ -108,12 +106,15 @@ public class Person extends calendar.DBObject{
 	 */
 	public Person(String firstname, String lastname, String email, String department, String password, boolean recreation) throws IOException {		
 		this();
+		if (firstname == null || lastname == null || email == null || 
+				department == null || password == null)
+			throw new IllegalArgumentException("A person needs no-null values for firstname, " +
+				"lastname, email, department and password!");
 		this.firstname = firstname;
 		this.lastname = lastname;
 		this.email = email;
 		String passwordHash = setPassword(password);
 		this.passwordHash = passwordHash;
-//		this.dateOfBirth = dateOfBirth;
 		this.department = department;
 		id = System.currentTimeMillis();
 		this.personalCalendarId = id;
@@ -127,6 +128,11 @@ public class Person extends calendar.DBObject{
 		String bytes = Hash.SHA512(password + salt);
 		return bytes;
 	}
+	
+	/**
+	 * OBS! Denne må KUN brukes til å sette et ferdig hashet passord, ellers vil det lagres i klartekst!
+	 * @param passwordHash
+	 */
 	public void setPasswordHash(String passwordHash) {
 		this.passwordHash = passwordHash;
 	}
