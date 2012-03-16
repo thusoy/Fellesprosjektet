@@ -111,7 +111,7 @@ public class Person extends calendar.DBObject{
 		this.firstname = firstname;
 		this.lastname = lastname;
 		this.email = email;
-		String passwordHash = setPasswordHash(password);
+		String passwordHash = setPassword(password);
 		this.passwordHash = passwordHash;
 //		this.dateOfBirth = dateOfBirth;
 		this.department = department;
@@ -122,12 +122,14 @@ public class Person extends calendar.DBObject{
 		}
 	}
 
-	public String setPasswordHash(String password) {
+	public String setPassword(String password) {
 		String salt = getSalt();
 		String bytes = Hash.SHA512(password + salt);
 		return bytes;
 	}
-
+	public void setPasswordHash(String passwordHash) {
+		this.passwordHash = passwordHash;
+	}
 	private String getSalt(){
 		return Long.toString(System.currentTimeMillis());
 	}
@@ -339,16 +341,18 @@ public class Person extends calendar.DBObject{
 
 	@Override
 	public boolean equals(Object obj) {
+		System.out.println("hei");
 		if (this == obj)
 			return true;
 		if (obj == null)
 			return false;
+		
 		if (getClass() != obj.getClass())
-			return false;
-		Person other = (Person) obj;
+			return false;		
+		Person other = (Person) obj;		
 		if (department == null) {
 			if (other.department != null)
-				return false;
+				return false;		
 		} else if (!department.equals(other.department))
 			return false;
 		if (email == null) {
@@ -360,7 +364,7 @@ public class Person extends calendar.DBObject{
 			if (other.firstname != null)
 				return false;
 		} else if (!firstname.equals(other.firstname))
-			return false;
+			return false;	
 		if (id != other.id)
 			return false;
 		if (lastname == null) {
@@ -373,6 +377,7 @@ public class Person extends calendar.DBObject{
 				return false;
 		} else if (!passwordHash.equals(other.passwordHash))
 			return false;
+		System.out.println("kom hit");
 		if (personalCalendarId != other.personalCalendarId)
 			return false;
 		return true;

@@ -10,7 +10,7 @@ public class PersonHandler {
 	public static void createUser(Person person) throws IOException{
 		String firstname = person.getFirstname();
 		String lastname = person.getLastname();
-		String email = person.getLastname();
+		String email = person.getEmail();
 		String department = person.getDepartment();
 		String passwordHash = person.getPasswordHash();
 		long userId = person.getId();
@@ -124,9 +124,11 @@ public class PersonHandler {
 		String email = getEmail(personId);
 		String department = getDepartment(personId);
 		String passwordHash = getPasswordHash(personId);
-		Person person = new Person(firstname, lastname, email, department, passwordHash, true);
+		String password = "";
+		Person person = new Person(firstname, lastname, email, department, password, true);
 		person.setId(personId);
 		person.setPCalendarId(personId);
+		person.setPasswordHash(passwordHash);
 
 		return person;
 	}
