@@ -13,17 +13,14 @@ public class PersonHandler {
 		String email = person.getLastname();
 		String department = person.getDepartment();
 		String passwordHash = person.getPasswordHash();
-		long userId = person.getId();
-		long pCalendarId = person.getPCalendarId();
-		
+
 		String query =
-				"INSERT INTO User(userId, email, firstname, lastname, department, passwordHash, personalCalendarId) " +
-				"VALUES(%d, '%s', '%s', '%s', '%s', '%s', %d)";
+				"INSERT INTO Person( email, firstname, lastname, department, passwordHash) " +
+				"VALUES('%s', '%s', '%s', '%s', '%s')";
 
 		try {
-			Execute.executeUpdate(String.format(query, userId, email, firstname, lastname, department, passwordHash, pCalendarId));
+			Execute.executeUpdate(String.format(query, email, firstname, lastname, department, passwordHash));
 		} catch (SQLException e) {
-			e.printStackTrace();
 			throw new RuntimeException("Feil i sql");
 		}
 
@@ -36,7 +33,7 @@ public class PersonHandler {
 		String passwordHash = person.getPasswordHash();
 
 		String query =
-				"UPDATE User SET" +
+				"UPDATE Person SET" +
 						" email='%s'" +
 						" firstname='%s'" +
 						" lastname='%s'" +
@@ -51,7 +48,7 @@ public class PersonHandler {
 	}
 	public static void deleteUser(long personId) throws IOException{
 		String query =
-				"DELETE FROM User WHERE userId=%d";
+				"DELETE FROM Person WHERE userId=%d";
 		try {
 			Execute.executeUpdate(String.format(query, personId));
 		} catch (SQLException e) {
@@ -107,27 +104,14 @@ public class PersonHandler {
 			throw new RuntimeException("Feil i sql");
 		}
 	}
-	public static long getPCalendarId(long personId) throws IOException {
-		String query =
-				"SELECT personalCalendarId FROM User WHERE userId=%d";
-
-		try {
-			return Execute.executeGetLong(String.format(query, personId));
-		} catch (SQLException e) {
-			throw new RuntimeException("Feil i sql");
-		}
-	}
-	
 	public static Person getPerson(long personId) throws IOException {
 		String firstname = getFirstname(personId);
 		String lastname = getLastname(personId);
 		String email = getEmail(personId);
 		String department = getDepartment(personId);
 		String passwordHash = getPasswordHash(personId);
-		Person person = new Person(firstname, lastname, email, department, passwordHash, true);
-		person.setId(personId);
-		person.setPCalendarId(personId);
-		
+
+		Person person = new Person(firstname, lastname, email, department, passwordHash);
 		return person;
 	}
 }

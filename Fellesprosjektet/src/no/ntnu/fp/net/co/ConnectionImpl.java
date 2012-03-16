@@ -35,7 +35,7 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 public class ConnectionImpl extends AbstractConnection {
 
     /** Keeps track of the used ports for each server port. */
-    private static Map<Integer, Boolean> usedPorts = Collections.synchronizedMap(new HashMap<Integer, Boolean>());
+    protected static Map<Integer, Boolean> usedPorts = Collections.synchronizedMap(new HashMap<Integer, Boolean>());
 
     /**
      * Initialise initial sequence number and setup state machine.
@@ -92,10 +92,6 @@ public class ConnectionImpl extends AbstractConnection {
     	KtnDatagram outgoing = constructInternalPacket(Flag.ACK);
     	sendAck(outgoing, false);
     	
-    	
-    	
-    	
-    	
     	this.state = State.ESTABLISHED;
     }
 
@@ -107,11 +103,17 @@ public class ConnectionImpl extends AbstractConnection {
      */
     public Connection accept() throws IOException, SocketTimeoutException {
     	this.state = State.LISTEN;
-    	KtnDatagram packet = receivePacket(true);
-    	System.out.println(packet == null);
+    	KtnDatagram packet;
+    	while( (packet = receivePacket(true)) == null){
+    		try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+    	}
     	this.remoteAddress = packet.getSrc_addr();
     	this.remotePort = packet.getSrc_port();
-//    	Log.writeToLog(packet, "Packet received!", "FroM!");
+    	Log.writeToLog(packet, "Packet received!", "FroM!");
     	KtnDatagram outgoingPacket = constructInternalPacket(Flag.SYN_ACK);
     	outgoingPacket.setPayload("hellow!");
     	System.out.println("The packet were going to send: " + outgoingPacket.getDest_addr() + outgoingPacket.getDest_port() + outgoingPacket.getSeq_nr());

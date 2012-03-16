@@ -1,10 +1,10 @@
 package server;
 
-import java.awt.SystemColor;
 import java.io.IOException;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -37,10 +37,9 @@ public class AppointmentHandler {
 		try {
 			String formatted = String.format(query, appId, title, place, des, 
 					daysAppearing, roomName, isPrivate, creatorId);
-			System.out.println(formatted);
 			PreparedStatement ps = Execute.getPreparedStatement(formatted);
-			ps.setDate(1, start);
-			ps.setDate(2, end);
+			ps.setTimestamp(1, new Timestamp(start.getTime()));
+			ps.setTimestamp(2, new Timestamp(end.getTime()));
 			ps.setDate(3, endOfRe);
 			ps.executeUpdate();
 		} catch (SQLException e1) {
@@ -90,7 +89,6 @@ public class AppointmentHandler {
 	public static String getPlace(long appId) throws IOException {
 		String query =
 				"SELECT place FROM Appointment WHERE appId=%d";
-		System.out.println(appId);
 		try {
 			return Execute.executeGetString(String.format(query, appId));
 		} catch (SQLException e) {
@@ -103,7 +101,7 @@ public class AppointmentHandler {
 				"SELECT startTime FROM Appointment WHERE appId=%d";
 		
 		try {
-			return Execute.executeGetDate(String.format(query, appId));
+			return Execute.executeGetDatetime(String.format(query, appId));
 		} catch (SQLException e) {
 			throw new RuntimeException("Feil i SQL!");
 		}
@@ -113,7 +111,7 @@ public class AppointmentHandler {
 				"SELECT endTime FROM Appointment WHERE appId=%d";
 		
 		try {
-			return Execute.executeGetDate(String.format(query, appId));
+			return Execute.executeGetDatetime(String.format(query, appId));
 		} catch (SQLException e) {
 			throw new RuntimeException("Feil i SQL!");
 		}

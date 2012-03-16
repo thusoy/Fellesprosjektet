@@ -2,13 +2,14 @@ package server;
 
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.sql.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,19 +42,16 @@ public class Execute {
 	private static void setUpConnection() throws IOException{
 		try {
 			Class.forName(driver);
-			System.out.println("Driver satt opp");
 		} catch (ClassNotFoundException e2) {
 			throw new RuntimeException("Fant ikke SQL-drivere!");
 		}
 		if (conn != null){
-			System.out.println("Allerede koblet til...");
 			return;
 		}
 		int tries = 3;
 		while(tries > 0){
 			try {
 				System.out.println("kobler opp mot db...");
-				System.out.println("tries: " + tries);
 				conn = DriverManager.getConnection(database, "tarjeikl_fpuser", "bruker");
 				break;
 			} catch (SQLException e) {
@@ -79,6 +77,23 @@ public class Execute {
 	public static void executeUpdate(String query) throws IOException, SQLException{
 		Statement stmt = getStatement();
 		stmt.executeUpdate(query);
+	}
+	
+	/**
+	 * A wrapper for the database calls. Returns the first value in the first column of 'query' as
+	 * a Date.
+	 * @param query
+	 * @return
+	 * @throws ClassNotFoundException
+	 * @throws IOException
+	 * @throws SQLException
+	 */
+	public static Date executeGetDatetime(String query) throws IOException, SQLException{
+		Statement stmt = getStatement();
+		ResultSet rs = stmt.executeQuery(query);
+		rs.next();
+		Timestamp ts = rs.getTimestamp(1);
+		return new Date(ts.getTime());
 	}
 	
 	/**
