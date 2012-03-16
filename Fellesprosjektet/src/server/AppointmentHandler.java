@@ -30,7 +30,6 @@ public class AppointmentHandler {
 		long creatorId = app.getCreator() != null ? app.getCreator().getId() : 0;
 		long appId = System.currentTimeMillis();
 		app.setAppId(appId);
-		System.out.println(appId);
 		String query = 
 				"INSERT INTO Appointment(appId, title, place, startTime, endTime, description" +
 				" , daysAppearing, endOfRepeatDate, roomName, isPrivate, creatorId) VALUES(%d, '%s', '%s', ?, " +

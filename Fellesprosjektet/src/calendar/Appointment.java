@@ -35,8 +35,9 @@ public class Appointment extends DBObject<Appointment> implements Serializable {
 		this.endTime = endTime;
 		this.isPrivate = isPrivate;
 		this.participants = participants;
-		if(!recreation)
+		if(!recreation){
 			AppointmentHandler.createAppointment(this);
+		}
 	}
 	
 	public Appointment(){
