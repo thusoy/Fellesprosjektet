@@ -5,6 +5,9 @@ import hashtools.Hash;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.io.IOException;
+
+import server.PersonHandler;
 
 /**
  * The <code>Person</code> class stores information about a single person.
@@ -34,6 +37,7 @@ public class Person extends calendar.DBObject{
 	 * This member variable holds a unique identifier for this object.
 	 */
 	private long id;
+	private long personalCalendarId;
 	
 	private String department;
 	private String passwordHash;
@@ -100,8 +104,9 @@ public class Person extends calendar.DBObject{
 	 * @param name The name of the person.
 	 * @param email The person's e-mail address
 	 * @param dateOfBirth The person's date of birth.
+	 * @throws IOException 
 	 */
-	public Person(String firstname, String lastname, String email, String department, String password) {		
+	public Person(String firstname, String lastname, String email, String department, String password, boolean recreation) throws IOException {		
 		this();
 		this.firstname = firstname;
 		this.lastname = lastname;
@@ -110,6 +115,11 @@ public class Person extends calendar.DBObject{
 		this.passwordHash = passwordHash;
 //		this.dateOfBirth = dateOfBirth;
 		this.department = department;
+		id = System.currentTimeMillis();
+		this.personalCalendarId = id;
+		if(!recreation) {
+			PersonHandler.createUser(this);
+		}
 	}
 	
 	public String setPasswordHash(String password) {
@@ -232,6 +242,12 @@ public class Person extends calendar.DBObject{
 		PropertyChangeEvent event = new PropertyChangeEvent(this, DEPARTMENT_PROPERTY_NAME, oldDepartment, this.department);
 		propChangeSupp.firePropertyChange(event);
 	}
+	public void setId(long id) {
+		this.id = id;
+	}
+	public void setPCalendarId(long id) {
+		this.personalCalendarId = id;
+	}
 
 	/**
 	 * Returns the person's name.
@@ -278,6 +294,9 @@ public class Person extends calendar.DBObject{
 	
 	public String getPasswordHash() {
 		return passwordHash;
+	}
+	public long getPCalendarId() {
+		return personalCalendarId;
 	}
 	/**
 	 * Add a {@link java.beans.PropertyChangeListener} to the listener list.
