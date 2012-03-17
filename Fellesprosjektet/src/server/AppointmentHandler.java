@@ -258,7 +258,7 @@ public class AppointmentHandler {
 			String content) throws IOException {
 		Set<Person> participants = app.getParticipants().keySet();
 		Date dateSent = new Date(System.currentTimeMillis());
-		Message msg = new Message(title, content, dateSent);
+		Message msg = new Message(title, content, dateSent, false);
 		msg.save();
 		long msgId = msg.getId();
 		String query = 

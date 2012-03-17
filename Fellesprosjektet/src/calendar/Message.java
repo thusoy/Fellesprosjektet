@@ -14,10 +14,13 @@ public class Message extends DBObject<Message> {
 	private String content;
 	private String title;
 	
-	public Message (String title, String content, Date dateSent){
+	public Message (String title, String content, Date dateSent, boolean recreation) throws IOException{
 		this.title=title;
 		this.content=content;
 		this.dateSent=dateSent;
+		if(!recreation) {
+			MessageHandler.createMessage(this);
+		}
 	}
 	
 	public String showMessage(long msgId, Person user) throws ClassNotFoundException, IOException, SQLException{

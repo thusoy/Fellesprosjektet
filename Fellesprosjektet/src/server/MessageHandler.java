@@ -27,7 +27,7 @@ public class MessageHandler {
 	public static String getTitleMessage(long msgId, Person user) throws IOException {
 		
 		String queryGetTitleMessage =
-				"SELECT title FROM Message WHERE msgId='%i'";
+				"SELECT title FROM Message WHERE msgId=%d";
 		
 		try {
 			return Execute.executeGetString(String.format(queryGetTitleMessage, msgId));
@@ -38,7 +38,7 @@ public class MessageHandler {
 	public static Date getDateSentMessage(long msgId, Person user) throws IOException {
 		
 		String queryGetDateSentMessage =
-				"SELECT dateSent FROM Message WHERE msgId='%i'";
+				"SELECT dateSent FROM Message WHERE msgId=%d";
 		
 		try {
 			return Execute.executeGetDate(String.format(queryGetDateSentMessage, msgId));
@@ -49,12 +49,19 @@ public class MessageHandler {
 	public static String getContentMessage(long msgId, Person user) throws IOException {
 		
 		String queryGetContentMessage =
-				"SELECT content FROM Message WHERE msgId='%i'";
+				"SELECT content FROM Message WHERE msgId=%d";
 		
 		try {
 			return Execute.executeGetString(String.format(queryGetContentMessage, msgId));
 		} catch (SQLException e) {
 			throw new RuntimeException("SQLFeil");
 		}
+	}
+	public static Message getMessage(long msgId) {
+		String title = getTitleMessage(msgId, user);
+		String content = getContentMessage(msgId, user);
+		Date dateSent = getDateSentMessage(msgId, user);
+		Message msg = new Message(title, content, dateSent, true);
+		return msg;
 	}
 }
