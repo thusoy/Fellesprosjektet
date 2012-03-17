@@ -24,7 +24,8 @@ public class Message extends DBObject<Message> {
 	}
 	
 	public String showMessage(long msgId, Person user) throws ClassNotFoundException, IOException, SQLException{
-		return MessageHandler.getContentMessage(msgId, user) ;
+		MessageHandler.hasReadMessage(msgId, user.getId());
+		return MessageHandler.getContentMessage(msgId) ;
 	}
 	
 	public long getId() {
@@ -46,6 +47,46 @@ public class Message extends DBObject<Message> {
 	public void setTitle(String title) {
 		this.title = title;
 	}
+	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((content == null) ? 0 : content.hashCode());
+		result = prime * result
+				+ ((dateSent == null) ? 0 : dateSent.hashCode());
+		result = prime * result + (int) (msgId ^ (msgId >>> 32));
+		result = prime * result + ((title == null) ? 0 : title.hashCode());
+		return result;
+	}
 
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Message other = (Message) obj;
+		if (content == null) {
+			if (other.content != null)
+				return false;
+		} else if (!content.equals(other.content))
+			return false;
+		if (dateSent == null) {
+			if (other.dateSent != null)
+				return false;
+		} else if (!dateSent.equals(other.dateSent))
+			return false;
+		if (msgId != other.msgId)
+			return false;
+		if (title == null) {
+			if (other.title != null)
+				return false;
+		} else if (!title.equals(other.title))
+			return false;
+		return true;
+	}
 
 }

@@ -262,7 +262,7 @@ public class AppointmentHandler {
 		msg.save();
 		long msgId = msg.getId();
 		String query = 
-				"INSERT INTO UserMessage VALUES(%d, %d, %b)";
+				"INSERT INTO UserMessages VALUES(%d, %d, %b)";
 		for (Person user: participants) {
 			long userId = user.getId();
 			try {
