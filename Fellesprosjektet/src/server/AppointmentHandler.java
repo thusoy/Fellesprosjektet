@@ -58,29 +58,43 @@ public class AppointmentHandler {
 		String title = app.getTitle();
 		Date start = app.getStartTime();
 		Date end = app.getEndTime();
-		String des = app.getDescription();
+		String description = app.getDescription();
 		String rawText = app.getDaysAppearing() != null ? app.getDaysAppearing().toString() : null;
 		String daysAppearing = rawText != null ? rawText.substring(1, rawText.length()-1) : null;
-		Date endOfRe = app.getEndOfRepeatDate();
+		Date endOfRepeat = app.getEndOfRepeatDate();
 		String roomName = app.getRoom_name();
 		boolean isPrivate = app.isPrivate();
 		long creatorId = app.getCreator() != null ? app.getCreator().getId() : 0;
 		
 		String query =
 				"UPDATE Appointment SET" +
-				" place='%s'" +
-				" title='%s'" +
-				" description='%s'" +
-				" startTime='%s'" +
-				" endTime='%s'" +
-				" daysAppearing='%s'" +
-				" endOfRepeatDate='%s'" +
-				" roomName='%s'" +
-				" isPrivate='%b'" +
+				" place=?" +
+				" title='%s'" +				
+				" startTime=?" +
+				" endTime=?" +
+				" description=?" +
+				" daysAppearing=?" +
+				" endOfRepeatDate=?" +
+				" roomName=?" +
+				" isPrivate=%b" +
 				" creatorId=%d" +
 				" WHERE appId=%d";		
-		Execute.executeUpdate(String.format(query, place, title, start, end, des, 
-				daysAppearing, endOfRe, roomName, isPrivate, creatorId));
+
+		try {
+			String formatted = String.format(query, title, isPrivate, creatorId);
+			PreparedStatement ps = Execute.getPreparedStatement(formatted);
+			ps.setString(1, place);
+			ps.setTimestamp(2, new Timestamp(start.getTime()));
+			ps.setTimestamp(3, new Timestamp(end.getTime()));
+			ps.setString(4, description);
+			ps.setString(5, daysAppearing);
+			ps.setDate(6, endOfRepeat);
+			ps.setString(7, roomName);
+			ps.executeUpdate();
+		} catch (SQLException e1) {
+			e1.printStackTrace();
+			throw new RuntimeException("Feil i SQL!");
+		}
 	}
 	public static String getTitleAppointment(long appId) throws IOException {
 		String query =
