@@ -259,7 +259,6 @@ public class AppointmentHandler {
 		Set<Person> participants = app.getParticipants().keySet();
 		Date dateSent = new Date(System.currentTimeMillis());
 		Message msg = new Message(title, content, dateSent, false);
-		msg.save();
 		long msgId = msg.getId();
 		String query = 
 				"INSERT INTO UserMessages VALUES(%d, %d, %b)";
