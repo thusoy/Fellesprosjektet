@@ -16,7 +16,7 @@ import server.PersonHandler;
  *
  * @version $Revision: 1.5 $ - $Date: 2005/02/20 14:52:29 $
  */
-public class Person extends calendar.DBObject{
+public class Person {
 
 	/**
 	 * This member variable holds the person's name.
@@ -347,7 +347,6 @@ public class Person extends calendar.DBObject{
 
 	@Override
 	public boolean equals(Object obj) {
-		System.out.println("hei");
 		if (this == obj)
 			return true;
 		if (obj == null)
@@ -383,7 +382,6 @@ public class Person extends calendar.DBObject{
 				return false;
 		} else if (!passwordHash.equals(other.passwordHash))
 			return false;
-		System.out.println("kom hit");
 		if (personalCalendarId != other.personalCalendarId)
 			return false;
 		return true;

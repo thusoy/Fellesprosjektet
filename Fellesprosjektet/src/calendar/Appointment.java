@@ -2,18 +2,18 @@ package calendar;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.sql.Date;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.sql.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import no.ntnu.fp.model.Person;
 import server.AppointmentHandler;
 
-import no.ntnu.fp.model.Person;
-
-public class Appointment extends DBObject<Appointment> implements Serializable {
+public class Appointment implements Serializable {
 	private static final long serialVersionUID = -5442910434292395380L;
 	private Long appId = null;
 	private String place;
@@ -31,6 +31,23 @@ public class Appointment extends DBObject<Appointment> implements Serializable {
 	public Appointment(String title, Date startTime, Date endTime, boolean isPrivate, 
 			Map<Person, Boolean> participants, boolean recreation) throws IOException {
 		this.title = title;
+		this.startTime = roundTime(startTime);
+		this.endTime = roundTime(endTime);
+		this.isPrivate = isPrivate;
+		if (participants == null)
+			this.participants = new HashMap<Person, Boolean>();
+		else
+			this.participants = participants;
+		this.description = new String();
+		if(!recreation){
+			AppointmentHandler.createAppointment(this);
+		}
+	}
+	
+	public Appointment(String title, Date startTime, Date endTime, boolean isPrivate, 
+			Map<Person, Boolean> participants, Person creator, boolean recreation) throws IOException {
+		this.title = title;
+		this.creator = creator;
 		this.startTime = roundTime(startTime);
 		this.endTime = roundTime(endTime);
 		this.isPrivate = isPrivate;
@@ -77,7 +94,6 @@ public class Appointment extends DBObject<Appointment> implements Serializable {
 
 	@Override
 	public boolean equals(Object obj) {
-		System.out.println("Comparing appointments!");
 		if (this == obj)
 			return true;
 		if (obj == null)
@@ -145,16 +161,12 @@ public class Appointment extends DBObject<Appointment> implements Serializable {
 		return true;
 	}
 
-
-
-
 	public void acceptInvite(Person user, Boolean answer){
 		participants.put(user, answer);
-		save();		
 	}
+	
 	public void updateParticipants(HashMap<Person, Boolean> participants){
 		this.participants = participants;
-		save();
 	}
 	
 	public void setAppId(long appId) {
@@ -230,7 +242,6 @@ public class Appointment extends DBObject<Appointment> implements Serializable {
 	}
 	public void updateDaysAppearing(Set<Day> days){
 		this.daysAppearing = days;
-		save();
 	}
 	public void updateDescription(String description){
 		this.description = description;
@@ -244,7 +255,7 @@ public class Appointment extends DBObject<Appointment> implements Serializable {
 	public String getRoom_name() {
 		return room_name;
 	}
-	public void setRoom_name(String room_name) {
+	public void setRoomName(String room_name) {
 		this.room_name = room_name;
 	}
 	public Person getCreator() {
@@ -260,6 +271,14 @@ public class Appointment extends DBObject<Appointment> implements Serializable {
 
 	public void setId(long appId) {
 		this.appId = appId;
+	}
+
+	public static Appointment getAppointment(long appId) throws IOException {
+		return AppointmentHandler.getAppointment(appId);
+	}
+
+	public static List<Appointment> getAll() throws IOException {
+		return AppointmentHandler.getAll();
 	}
 	
 }

@@ -66,6 +66,12 @@ public class Execute {
 		}
 	}
 	
+	public static ResultSet getResultSet(String query) throws SQLException, IOException{
+		setUpConnection();
+		Statement st = getStatement();
+		return st.executeQuery(query);
+	}
+	
 	/**
 	 * A wrapper for the database calls. Executes the query on the database.
 	 * @param query
@@ -191,8 +197,10 @@ public class Execute {
 	public static String executeGetString(String query) throws IOException, SQLException{
 		Statement stmt = getStatement();
 		ResultSet rs = stmt.executeQuery(query);
-		rs.next();
-		return rs.getString(1);	
+		if (rs.next())
+			return rs.getString(1);
+		else
+			throw new RuntimeException("Empty resultset!");
 	}
 	
 	/**

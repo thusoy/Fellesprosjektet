@@ -61,10 +61,10 @@ public class PersonHandler {
 	public static String getFirstname(long personId) throws IOException {
 		String query =
 				"SELECT firstname FROM User WHERE userId=%d";
-
 		try {
 			return Execute.executeGetString(String.format(query, personId));
 		} catch (SQLException e) {
+			e.printStackTrace();
 			throw new RuntimeException("Feil i sql");
 		}
 	}

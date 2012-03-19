@@ -24,11 +24,14 @@ public class TestPerson {
 	
 	@Test
 	public void testSlowEnough() throws IOException{
-		long startTime = System.currentTimeMillis();
-		new Person("john", "high", "lol", "komtek", "banan", false);
-		long durationInMs = System.currentTimeMillis() - startTime;
-		System.out.println("tid: " + durationInMs);
-		assertTrue("Å opprette en Person må ta minst 100ms!", durationInMs >= 100);
+		for(int i = 0; i<10; i++){
+			long startTime = System.currentTimeMillis();
+			new Person("john", "high", "lol", "komtek", "banan", false);
+			long durationInMs = System.currentTimeMillis() - startTime;
+			String message = String.format("Å opprette en Person må ta minst 100ms! " + 
+					"Tok bare %dms!", durationInMs);
+			assertTrue(message, durationInMs >= 100);
+		}
 	}
 	
 	@Test
