@@ -299,7 +299,18 @@ public class AppointmentHandler {
 			}
 		}		
 	}
-	
+	public static void updateRoomName(long appId, String name) throws IOException {
+		String query =
+				"UPDATE Appointment SET" +
+				" roomName='%s'" +
+				" WHERE appId=%d";
+		try {
+			Execute.executeUpdate(String.format(query, name, appId));
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new RuntimeException("Feil i SQL!");
+		}	
+	}
 	public static Appointment getAppointment(long appId) throws IOException {		
 		String place = getPlace(appId);
 		String title = getTitleAppointment(appId);
