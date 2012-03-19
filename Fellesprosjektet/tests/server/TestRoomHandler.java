@@ -32,15 +32,12 @@ public class TestRoomHandler {
 		DateFormat df = DateFormat.getDateInstance(DateFormat.LONG, Locale.GERMANY);
 		Date start = new Date(System.currentTimeMillis());
 		Date end = new Date(System.currentTimeMillis()+10000000);
-		Appointment app1 = new Appointment("Ledermøte", start, end, false, null, false);
-		Appointment app2 = new Appointment("Ledermøte", start, end, false, null, false);
-		Appointment app3 = new Appointment("Ledermøte", start, end, false, null, false);
+		Appointment app1 = new Appointment("Ledermote", start, end, false, null, false);
+		Appointment app2 = new Appointment("Ledermote", start, end, false, null, false);
+		Appointment app3 = new Appointment("Ledermote", start, end, false, null, false);
 		app1.setRoomName("Vegas");
 		app2.setRoomName("Bamba");
 		app3.setRoomName("Limba");
-		AppointmentHandler.updateAppointment(app1);
-		AppointmentHandler.updateAppointment(app2);
-		AppointmentHandler.updateAppointment(app3);
 		//tester tidspunkt som skal fungere
 		assertTrue(RoomHandler.isValid(start, end, 4, "Vegas"));
 		//tester tidspunkt som starter før møte slutt

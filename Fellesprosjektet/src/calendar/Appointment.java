@@ -172,8 +172,9 @@ public class Appointment implements Serializable {
 		this.title = title;
 	}
 
-	public void setCreator(Person creator) {
+	public void setCreator(Person creator) throws IOException {
 		this.creator = creator;
+		AppointmentHandler.updateAppointment(this);
 	}
 
 	public long getAppId() {
@@ -188,44 +189,51 @@ public class Appointment implements Serializable {
 	public String getPlace() {
 		return place;
 	}
-	public void setPlace(String place) {
+	public void setPlace(String place) throws IOException {
 		this.place = place;
+		AppointmentHandler.updateAppointment(this);
 	}
 	public String getDescription() {
 		return description;
 	}
-	public void setDescription(String description) {
+	public void setDescription(String description) throws IOException {
 		this.description = description;
+		AppointmentHandler.updateAppointment(this);
 	}
 	public Date getStartTime() {
 		return startTime;
 	}
-	public void setStartTime(Date startTime) {
+	public void setStartTime(Date startTime) throws IOException {
 		this.startTime = startTime;
+		AppointmentHandler.updateAppointment(this);
 	}
 	public Date getEndTime() {
 		return endTime;
 	}
-	public void setEndTime(Date endTime) {
+	public void setEndTime(Date endTime) throws IOException {
 		this.endTime = endTime;
+		AppointmentHandler.updateAppointment(this);
 	}
 	public Set<Day> getDaysAppearing() {
 		return daysAppearing;
 	}
-	public void setDaysAppearing(Set<Day> daysAppearing) {
+	public void setDaysAppearing(Set<Day> daysAppearing) throws IOException {
 		this.daysAppearing = daysAppearing;
+		AppointmentHandler.updateAppointment(this);
 	}
 	public Date getEndOfRepeatDate() {
 		return endOfRepeatDate;
 	}
-	public void setEndOfRepeatDate(Date endOfRepeatDate) {
+	public void setEndOfRepeatDate(Date endOfRepeatDate) throws IOException {
 		this.endOfRepeatDate = endOfRepeatDate;
+		AppointmentHandler.updateAppointment(this);
 	}
 	public boolean isPrivate() {
 		return isPrivate;
 	}
-	public void setPrivate(boolean isPrivate) {
+	public void setPrivate(boolean isPrivate) throws IOException {
 		this.isPrivate = isPrivate;
+		AppointmentHandler.updateAppointment(this);
 	}
 	/**
 	 * Server sender ut melding til alle deltakere om at appointment'en er slettet. 
@@ -235,23 +243,27 @@ public class Appointment implements Serializable {
 	public void deleteAppointment() throws IOException {
 		AppointmentHandler.deleteAppointment(this.appId);
 	}
-	public void updateDaysAppearing(Set<Day> days){
+	public void updateDaysAppearing(Set<Day> days) throws IOException{
 		this.daysAppearing = days;
+		AppointmentHandler.updateAppointment(this);
 	}
-	public void updateDescription(String description){
+	public void updateDescription(String description) throws IOException{
 		this.description = description;
+		AppointmentHandler.updateAppointment(this);
 	}
 	public Map<Person, Boolean> getParticipants() {
 		return participants;
 	}
-	public void setParticipants(HashMap<Person, Boolean> participants) {
+	public void setParticipants(HashMap<Person, Boolean> participants) throws IOException {
 		this.participants = participants;
+		AppointmentHandler.updateAppointment(this);
 	}
 	public String getRoom_name() {
 		return room_name;
 	}
-	public void setRoomName(String room_name) {
+	public void setRoomName(String room_name) throws IOException {
 		this.room_name = room_name;
+		AppointmentHandler.updateAppointment(this);
 	}
 	public Person getCreator() {
 		return creator;
