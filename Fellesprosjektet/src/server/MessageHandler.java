@@ -17,7 +17,7 @@ public class MessageHandler {
 		String content = msg.getContent();
 		String title = msg.getTitle();
 		long msgId = System.currentTimeMillis();
-		
+		msg.setId(msgId);
 		String query = 
 				"INSERT INTO Message(msgId, dateSent, content, title) VALUES(%d, '%s', '%s', '%s')";
 			
@@ -29,7 +29,7 @@ public class MessageHandler {
 		}
 	}
 	public static String getTitleMessage(long msgId) throws IOException {
-		
+		System.out.println(msgId);
 		String query =
 				"SELECT title FROM Message WHERE msgId=%d";
 		
