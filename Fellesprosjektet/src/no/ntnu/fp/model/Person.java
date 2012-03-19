@@ -18,27 +18,11 @@ import server.PersonHandler;
  */
 public class Person {
 
-	/**
-	 * This member variable holds the person's name.
-	 */
 	private String firstname;
 	private String lastname;
-	/**
-	 * This member variable holds the person's email address.
-	 */
 	private String email;
-
-	/**
-	 * This member variable holds the person's date of birth.
-	 */
-	//private Date dateOfBirth;
-
-	/**
-	 * This member variable holds a unique identifier for this object.
-	 */
 	private long id;
 	private long personalCalendarId;
-
 	private String department;
 	private String passwordHash;
 
@@ -92,6 +76,7 @@ public class Person {
 		passwordHash = "";
 		department = "";
 		id = System.currentTimeMillis();
+		this.personalCalendarId = id;
 		propChangeSupp = new PropertyChangeSupport(this);
 	}
 
