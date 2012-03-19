@@ -2,9 +2,10 @@ package calendar;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Date;
+import java.sql.Date;
 
 import server.MessageHandler;
+import server.RoundTime;
 import no.ntnu.fp.model.Person;
 
 public class Message extends DBObject<Message> {
@@ -17,7 +18,7 @@ public class Message extends DBObject<Message> {
 	public Message (String title, String content, Date dateSent, boolean recreation) throws IOException{
 		this.title=title;
 		this.content=content;
-		this.dateSent=dateSent;
+		this.dateSent= RoundTime.roundTime(dateSent);
 		if(!recreation) {
 			MessageHandler.createMessage(this);
 		}
@@ -47,7 +48,9 @@ public class Message extends DBObject<Message> {
 	public void setTitle(String title) {
 		this.title = title;
 	}
-	
+	public void setId(long msgId) {
+		this.msgId = msgId;
+	}
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -77,8 +80,9 @@ public class Message extends DBObject<Message> {
 		if (dateSent == null) {
 			if (other.dateSent != null)
 				return false;
-		} else if (!dateSent.equals(other.dateSent))
+		} else if (!dateSent.equals(other.dateSent)){
 			return false;
+		}
 		if (msgId != other.msgId)
 			return false;
 		if (title == null) {

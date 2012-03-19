@@ -80,7 +80,7 @@ public class AppointmentHandler {
 		}
 	}
 	
-	public static void updateAppointment(Appointment app) throws ClassNotFoundException, IOException, SQLException {
+	public static void updateAppointment(Appointment app) throws IOException {
 		String place = app.getPlace();
 		String title = app.getTitle();
 		Date start = app.getStartTime();
@@ -91,6 +91,7 @@ public class AppointmentHandler {
 		Date endOfRepeat = app.getEndOfRepeatDate();
 		String roomName = app.getRoom_name();
 		boolean isPrivate = app.isPrivate();
+		long appId = app.getAppId();
 		long creatorId = app.getCreator() != null ? app.getCreator().getId() : 0;
 		
 		String query =
@@ -108,7 +109,7 @@ public class AppointmentHandler {
 				" WHERE appId=%d";		
 
 		try {
-			String formatted = String.format(query, title, isPrivate, creatorId);
+			String formatted = String.format(query, title, isPrivate, creatorId, appId);
 			PreparedStatement ps = Execute.getPreparedStatement(formatted);
 			ps.setString(1, place);
 			ps.setTimestamp(2, new Timestamp(start.getTime()));
@@ -298,7 +299,18 @@ public class AppointmentHandler {
 			}
 		}		
 	}
-	
+	public static void updateRoomName(long appId, String name) throws IOException {
+		String query =
+				"UPDATE Appointment SET" +
+				" roomName='%s'" +
+				" WHERE appId=%d";
+		try {
+			Execute.executeUpdate(String.format(query, name, appId));
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new RuntimeException("Feil i SQL!");
+		}	
+	}
 	public static Appointment getAppointment(long appId) throws IOException {		
 		String place = getPlace(appId);
 		String title = getTitleAppointment(appId);

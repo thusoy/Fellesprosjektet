@@ -22,7 +22,7 @@ public class TestMessageHandler {
 		Message msg = new Message("Overskrift", "Innhold", date, false);
 		Message dbMsg = MessageHandler.getMessage(msg.getId());
 		assertEquals("Meldingene skal v¾re like", msg, dbMsg);
-		
+		//Alt er likt, men datoen slŒr feil av en eller annen grunn.. 
 	}
 	
 	@Test
