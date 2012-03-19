@@ -80,9 +80,9 @@ public class Message extends DBObject<Message> {
 		if (dateSent == null) {
 			if (other.dateSent != null)
 				return false;
-		} else if (!dateSent.equals(other.dateSent))
+		} else if (!dateSent.equals(other.dateSent)){
 			return false;
-		System.out.println("kom hit");
+		}
 		if (msgId != other.msgId)
 			return false;
 		if (title == null) {
