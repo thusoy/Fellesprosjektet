@@ -102,7 +102,7 @@ public class ClientController extends Thread {
 			input = br.readLine();
 			out.println(input);
 		}
-		String hash = 
+//		String hash = 
 	}
 	
 	public static ClientController getClient(){

@@ -375,6 +375,7 @@ public class AppointmentHandler {
 				all.add(a);
 			}
 		} catch (SQLException e) {
+			e.printStackTrace();
 			throw new RuntimeException("Feil i SQL, stoopid!");
 		}
 		return all;

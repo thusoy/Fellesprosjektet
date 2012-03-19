@@ -1,16 +1,16 @@
 package server;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.*;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
+import java.sql.Date;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.util.List;
 import java.util.Locale;
-import java.sql.Date;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import calendar.Appointment;
@@ -18,18 +18,28 @@ import calendar.Room;
 
 public class TestRoomHandler {
 		
+	
+	@Before
+	public void truncateRooms() throws IOException, SQLException{
+		String query = "TRUNCATE TABLE Room";
+		Execute.executeUpdate(query);
+	}
+	
 	@Test
 	public void testGetAllRooms() throws ClassNotFoundException, IOException, SQLException{
-		for (Room room: RoomHandler.getAllRooms()) {
-			//System.out.println(room.getName());
-			//System.out.println(room.getCapacity());
-			//assertTrue(RoomHandler.getAllRooms().contains(room));
-		}
+		Room a = new Room("EL-204", 6, false);
+		Room b = new Room("EL-304", 6, false);
+		Room c = new Room("random", 150, false);
+		List<Room> allRooms = RoomHandler.getAllRooms();
+		int numRooms = allRooms.size();
+		assertEquals("Skal være tre rom i databasen!", 3, numRooms);
+		assertTrue("Rom a skal ligge i databasen!", allRooms.contains(a));
+		assertTrue("Rom b skal ligge i databasen!", allRooms.contains(b));
+		assertTrue("Rom c skal ligge i databasen!", allRooms.contains(c));
 	}
 	
 	@Test
 	public void testIsValid() throws IOException{
-		DateFormat df = DateFormat.getDateInstance(DateFormat.LONG, Locale.GERMANY);
 		Date start = new Date(System.currentTimeMillis());
 		Date end = new Date(System.currentTimeMillis()+10000000);
 		Appointment app1 = new Appointment("Ledermote", start, end, false, null, false);
