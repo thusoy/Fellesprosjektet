@@ -1,6 +1,7 @@
 package no.ntnu.fp.model;
 
-import hashtools.Hash;
+import static hashtools.Hash.createHash;
+import static hashtools.Hash.SHA512;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -22,9 +23,9 @@ public class Person {
 	private String lastname;
 	private String email;
 	private long id;
-	private long personalCalendarId;
 	private String department;
 	private String passwordHash;
+	private String salt;
 
 	/**
 	 * This member variable provides functionality for notifying of changes to
@@ -76,7 +77,6 @@ public class Person {
 		passwordHash = "";
 		department = "";
 		id = System.currentTimeMillis();
-		this.personalCalendarId = id;
 		propChangeSupp = new PropertyChangeSupport(this);
 	}
 
@@ -98,20 +98,18 @@ public class Person {
 		this.firstname = firstname;
 		this.lastname = lastname;
 		this.email = email;
-		String passwordHash = setPassword(password);
-		this.passwordHash = passwordHash;
+		setFirstSalt();
+		setPassword(password);
 		this.department = department;
 		id = System.currentTimeMillis();
-		this.personalCalendarId = id;
 		if(!recreation) {
 			PersonHandler.createUser(this);
 		}
 	}
 
-	public String setPassword(String password) {
-		String salt = getSalt();
-		String bytes = Hash.SHA512(password + salt);
-		return bytes;
+	public void setPassword(String password) {
+		String hash = createHash(password, salt);
+		this.passwordHash = hash;
 	}
 	
 	/**
@@ -121,8 +119,12 @@ public class Person {
 	public void setPasswordHash(String passwordHash) {
 		this.passwordHash = passwordHash;
 	}
-	private String getSalt(){
-		return Long.toString(System.currentTimeMillis());
+	private void setFirstSalt(){
+		this.salt =  SHA512(Long.toString(System.currentTimeMillis()));
+	}
+	
+	public String getSalt(){
+		return this.salt;
 	}
 	/**
 	 * Assigns a new name to the person.<P>
@@ -238,9 +240,6 @@ public class Person {
 	public void setId(long id) {
 		this.id = id;
 	}
-	public void setPCalendarId(long id) {
-		this.personalCalendarId = id;
-	}
 
 	/**
 	 * Returns the person's name.
@@ -288,9 +287,6 @@ public class Person {
 	public String getPasswordHash() {
 		return passwordHash;
 	}
-	public long getPCalendarId() {
-		return personalCalendarId;
-	}
 	/**
 	 * Add a {@link java.beans.PropertyChangeListener} to the listener list.
 	 * 
@@ -325,8 +321,6 @@ public class Person {
 				+ ((lastname == null) ? 0 : lastname.hashCode());
 		result = prime * result
 				+ ((passwordHash == null) ? 0 : passwordHash.hashCode());
-		result = prime * result
-				+ (int) (personalCalendarId ^ (personalCalendarId >>> 32));
 		return result;
 	}
 
@@ -367,8 +361,6 @@ public class Person {
 				return false;
 		} else if (!passwordHash.equals(other.passwordHash))
 			return false;
-		if (personalCalendarId != other.personalCalendarId)
-			return false;
 		return true;
 	}
 
@@ -380,7 +372,6 @@ public class Person {
 		s += "Lastname: " + getLastname() + "; ";
 		s += "Email: " + getEmail() + "; ";
 		s += "Department: " + getDepartment() + "; ";
-//		s += "Date of birth: " + getDateOfBirth().toString();
 		return s;
 	}
 }

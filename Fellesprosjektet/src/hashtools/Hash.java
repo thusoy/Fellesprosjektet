@@ -40,4 +40,8 @@ public class Hash {
         }
         return buf.toString();
     }
+	
+	public static String createHash(String password, String salt){
+		return SHA512(password + salt);
+	}
 }

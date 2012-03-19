@@ -1,20 +1,31 @@
 package no.ntnu.fp.model;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
+import java.sql.SQLException;
 
+import org.junit.Before;
 import org.junit.Test;
 
+import server.Execute;
 import server.PersonHandler;
 
 public class TestPerson {
-
+	
+	@Before
+	public void truncateUser() throws IOException, SQLException{
+		String query = "TRUNCATE TABLE User";
+		Execute.executeUpdate(query);
+	}
+	
 	@Test
 	public void testUniquePasswordHashes() throws IOException {
 		Person p = new Person("john", "high", "lol", "komtek", "banan", false);
 		String johnHash = p.getPasswordHash();
-		Person p2 = new Person("john", "high", "lol", "komtek", "banan", false);
+		Person p2 = new Person("john", "high", "lol2", "komtek", "banan", false);
 		String otherHash = p2.getPasswordHash();
 		assertFalse("Hashene skal ikke v¾re like!", johnHash.equals(otherHash));
 		p.setPassword("banan");
@@ -26,7 +37,7 @@ public class TestPerson {
 	public void testSlowEnough() throws IOException{
 		for(int i = 0; i<10; i++){
 			long startTime = System.currentTimeMillis();
-			new Person("john", "high", "lol", "komtek", "banan", false);
+			new Person("john", "high", "lol" + i, "komtek", "banan", false);
 			long durationInMs = System.currentTimeMillis() - startTime;
 			String message = String.format("Å opprette en Person må ta minst 100ms! " + 
 					"Tok bare %dms!", durationInMs);

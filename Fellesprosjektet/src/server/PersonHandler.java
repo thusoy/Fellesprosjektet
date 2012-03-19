@@ -13,15 +13,16 @@ public class PersonHandler {
 		String email = person.getEmail();
 		String department = person.getDepartment();
 		String passwordHash = person.getPasswordHash();
+		String salt = person.getSalt();
 		long userId = person.getId();
-		long pCalendarId = person.getPCalendarId();
 
 		String query =
-				"INSERT INTO User(userId, email, firstname, lastname, department, passwordHash, personalCalendarId) " +
-				"VALUES(%d, '%s', '%s', '%s', '%s', '%s', %d)";
+				"INSERT INTO User(userId, email, firstname, lastname, department, passwordHash, salt) " +
+				"VALUES(%d, '%s', '%s', '%s', '%s', '%s', '%s')";
 
 		try {
-			Execute.executeUpdate(String.format(query, userId, email, firstname, lastname, department, passwordHash, pCalendarId));
+			Execute.executeUpdate(String.format(query, userId, email, firstname, 
+					lastname, department, passwordHash, salt));
 		} catch (SQLException e) {
 			e.printStackTrace();
 			throw new RuntimeException("Feil i sql");
@@ -127,7 +128,6 @@ public class PersonHandler {
 		String password = "";
 		Person person = new Person(firstname, lastname, email, department, password, true);
 		person.setId(personId);
-		person.setPCalendarId(personId);
 		person.setPasswordHash(passwordHash);
 
 		return person;
