@@ -2,7 +2,7 @@ package server;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Date;
+import java.sql.Date;
 import java.util.Set;
 
 import no.ntnu.fp.model.Person;
