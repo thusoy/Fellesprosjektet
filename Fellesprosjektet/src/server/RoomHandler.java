@@ -37,10 +37,10 @@ public class RoomHandler {
 		}
 		for (String roomName : RoomNameList) {
 			String queryGetCapacity =
-					"Select capacity FROM Room";
+					"Select capacity FROM Room WHERE name='%s'";
 			int capacity;
 			try {
-				capacity = Execute.executeGetInt(queryGetCapacity);
+				capacity = Execute.executeGetInt(String.format(queryGetCapacity, roomName));
 			} catch (SQLException e) {
 				throw new RuntimeException("SQLFeil");
 			}
@@ -50,10 +50,25 @@ public class RoomHandler {
 		}
 	return roomList;	 
 	}
+	public static Room getRoom(String name) throws IOException {
+		String query =
+				"Select capacity FROM Room WHERE name='%s'";
+		int capacity;
+		try {
+			capacity = Execute.executeGetInt(String.format(query, name));
+		} catch (SQLException e) {
+			throw new RuntimeException("SQLFeil");
+		}
+		Room room = new Room(name, capacity, true);
+		return room;
+	}
 	
 	public static boolean isValid(Date startCandidate, Date endCandidate, int capacity, String name) throws IOException {
 		for (Room rom: RoomHandler.getAllRooms()) {
 			if (rom.getName().equals(name))
+				if (capacity > rom.getCapacity()) {
+					return false;
+				}
 				for (Date start: rom.getIsOccupied().keySet()) {
 					Date end = rom.getIsOccupied().get(start);
 					if (!(startCandidate.before(start) || startCandidate.after(end)) || 
