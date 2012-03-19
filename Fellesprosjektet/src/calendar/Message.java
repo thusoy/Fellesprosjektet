@@ -47,7 +47,9 @@ public class Message extends DBObject<Message> {
 	public void setTitle(String title) {
 		this.title = title;
 	}
-	
+	public void setId(long msgId) {
+		this.msgId = msgId;
+	}
 	@Override
 	public int hashCode() {
 		final int prime = 31;

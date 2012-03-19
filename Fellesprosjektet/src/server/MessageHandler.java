@@ -16,13 +16,15 @@ public class MessageHandler {
 		Date dateSent = msg.getDateSent();
 		String content = msg.getContent();
 		String title = msg.getTitle();
+		long msgId = System.currentTimeMillis();
 		
 		String query = 
-				"INSERT INTO Message VALUES('%s', '%s', '%s')";
+				"INSERT INTO Message(msgId, dateSent, content, title) VALUES(%d, '%s', '%s', '%s')";
 			
 		try {
-			Execute.executeUpdate(String.format(query, dateSent, content, title));
+			Execute.executeUpdate(String.format(query, msgId, dateSent, content, title));
 		} catch (SQLException e) {
+			e.printStackTrace();
 			throw new RuntimeException("SQLFeil");
 		}
 	}
@@ -34,6 +36,7 @@ public class MessageHandler {
 		try {
 			return Execute.executeGetString(String.format(query, msgId));
 		} catch (SQLException e) {
+			e.printStackTrace();
 			throw new RuntimeException("SQLFeil");
 		}
 	}
@@ -88,6 +91,7 @@ public class MessageHandler {
 		String content = getContentMessage(msgId);
 		Date dateSent = getDateSentMessage(msgId);
 		Message msg = new Message(title, content, dateSent, true);
+		msg.setId(msgId);
 		return msg;
 	}
 	public static boolean getHasBeenRead(long msgId, long userId) throws IOException{
