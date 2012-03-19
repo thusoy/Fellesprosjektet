@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.util.Locale;
+import java.sql.Date;
 
 import org.junit.Test;
 
@@ -15,19 +16,19 @@ import calendar.Room;
 
 public class TestRoomHandler {
 	
-	@Test 
+//	@Test 
 	//tester at det i utgangspunktet ikke er rom i databasen
-	public void testGetAllRoomsNull() throws ClassNotFoundException, IOException, SQLException{
-		assertEquals(RoomHandler.getAllRooms().size(), 0);
-		assertTrue(RoomHandler.getAllRooms().contains(null));
-}	
+//	public void testGetAllRoomsNull() throws ClassNotFoundException, IOException, SQLException{
+//		assertEquals(RoomHandler.getAllRooms().size(), 0);
+//		assertTrue(RoomHandler.getAllRooms().contains(null));
+//	}	
 	@Test
 	//tester at fire rom blir lagt til databasen og legges til lista som returneres av getAllRooms
 	public void testGetAllRooms() throws ClassNotFoundException, IOException, SQLException{
-		Room testRoom1 = new Room("Vegas", 5);
-		Room testRoom2 = new Room("Bamba", 10);
-		Room testRoom3 = new Room("Limba", 3);
-		Room testRoom4 = new Room("Soru", 6);
+		Room testRoom1 = new Room("Vegas", 5, false);
+		Room testRoom2 = new Room("Bamba", 10, false);
+		Room testRoom3 = new Room("Limba", 3, false);
+		Room testRoom4 = new Room("Soru", 6, false);
 		assertEquals(RoomHandler.getAllRooms().size(), 4);
 		assertTrue(RoomHandler.getAllRooms().contains(testRoom1));
 		assertTrue(RoomHandler.getAllRooms().contains(testRoom2));
@@ -36,20 +37,22 @@ public class TestRoomHandler {
 	}
 	
 	@Test
-	public void testIsValid(){
+	public void testIsValid() throws IOException{
 		DateFormat df = DateFormat.getDateInstance(DateFormat.LONG, Locale.GERMANY);
-		Appointment app1 = new Appointment("Ledermøte", df, slutt, false, null);
-		Appointment app2 = new Appointment("Ledermøte", df, slutt, false, null);
-		Appointment app3 = new Appointment("Ledermøte", df, slutt, false, null);
+		Date start = new Date(System.currentTimeMillis());
+		Date end = new Date(System.currentTimeMillis()+400000);
+		Appointment app1 = new Appointment("Ledermøte", start, end, false, null, false);
+		Appointment app2 = new Appointment("Ledermøte", start, end, false, null, false);
+		Appointment app3 = new Appointment("Ledermøte", start, end, false, null, false);
 		AppointmentHandler.createAppointment(app1);
 		AppointmentHandler.createAppointment(app2);
 		AppointmentHandler.createAppointment(app3);
 		//tester tidspunkt som skal fungere
-		asserTrue(RoomHandler.isValid(starttid, slutttid, 4, "Vegas"));
+		assertTrue(RoomHandler.isValid(start, end, 4, "Vegas"));
 		//tester tidspunkt som starter før møte slutt
-		assertTrue(RoomHandler.isValid(startCandidate, endCandidate, 10, "Bamba"));
+		assertTrue(RoomHandler.isValid(start, end, 10, "Bamba"));
 		//tester tidspunkt som slutter etter møte startet
-		assertTrue(RoomHandler.isValid(startCandidate, endCandidate, 2, "Soru"));
+		assertTrue(RoomHandler.isValid(start, end, 2, "Soru"));
 		//tester tidspunkt som starter
 	}
 	
