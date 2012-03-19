@@ -12,6 +12,7 @@ import java.util.Set;
 
 import no.ntnu.fp.model.Person;
 import server.AppointmentHandler;
+import server.RoundTime;
 
 public class Appointment implements Serializable {
 	private static final long serialVersionUID = -5442910434292395380L;
@@ -31,8 +32,8 @@ public class Appointment implements Serializable {
 	public Appointment(String title, Date startTime, Date endTime, boolean isPrivate, 
 			Map<Person, Boolean> participants, boolean recreation) throws IOException {
 		this.title = title;
-		this.startTime = roundTime(startTime);
-		this.endTime = roundTime(endTime);
+		this.startTime = RoundTime.roundTime(startTime);
+		this.endTime = RoundTime.roundTime(endTime);
 		this.isPrivate = isPrivate;
 		if (participants == null)
 			this.participants = new HashMap<Person, Boolean>();
@@ -48,8 +49,8 @@ public class Appointment implements Serializable {
 			Map<Person, Boolean> participants, Person creator, boolean recreation) throws IOException {
 		this.title = title;
 		this.creator = creator;
-		this.startTime = roundTime(startTime);
-		this.endTime = roundTime(endTime);
+		this.startTime = RoundTime.roundTime(startTime);
+		this.endTime = RoundTime.roundTime(endTime);
 		this.isPrivate = isPrivate;
 		if (participants == null)
 			this.participants = new HashMap<Person, Boolean>();
@@ -59,12 +60,6 @@ public class Appointment implements Serializable {
 		if(!recreation){
 			AppointmentHandler.createAppointment(this);
 		}
-	}
-	
-	private static Date roundTime(Date date){
-		long original = date.getTime();
-		long newTime = (original/1000)*1000;
-		return new Date(newTime);
 	}
 
 	@Override
