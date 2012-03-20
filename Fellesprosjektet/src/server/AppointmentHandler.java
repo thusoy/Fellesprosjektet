@@ -13,6 +13,7 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import no.ntnu.fp.model.Person;
 import calendar.Appointment;
@@ -32,6 +33,7 @@ public class AppointmentHandler {
 		String daysAppearing = rawText != null ? rawText.substring(1, rawText.length()-1) : null;
 		Date endOfRepeat = app.getEndOfRepeatDate();
 		String roomName = app.getRoom_name();
+		Map<Person, Boolean> participants = app.getParticipants();
 		boolean isPrivate = app.isPrivate();
 		long creatorId = app.getCreator() != null ? app.getCreator().getId() : 0;
 		long appId = getUniqueId();
@@ -57,6 +59,11 @@ public class AppointmentHandler {
 		} catch (SQLException e1) {
 			e1.printStackTrace();
 			throw new RuntimeException("Feil i SQL!");
+		}
+		if (participants != null) {
+			for (Person user: participants.keySet()) {
+				AppointmentHandler.addUserToAppointment(appId, user.getId());
+			}
 		}
 	}
 	
