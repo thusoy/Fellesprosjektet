@@ -117,10 +117,26 @@ public class AppointmentHandler {
 		} catch (SQLException e1) {
 			e1.printStackTrace();
 			throw new RuntimeException("Feil i SQL!");
+		}	
+		if (participants != null) {
+			for (Person user: participants.keySet()) {
+				AppointmentHandler.addUserToAppointment(appId, user.getId());
+			}
 		}
-		for (Person user: participants.keySet()) {
-			AppointmentHandler.addUserToAppointment(appId, user.getId());
-			Message msg = new Message("Ny avtale: "+title,"Du er blitt lagt til i avtalen: "+ title + ". Beskrivelse: " + description);
+	}
+	
+	public static void sendAppointmentInvite(long appId) throws IOException{
+		Appointment ap = getAppointment(appId);
+		Message msg = new Message("Ny avtale: "+ap.getTitle(),"Du er blitt lagt til i avtalen: "+ ap.getTitle() + ". Beskrivelse: " + ap.getDescription());
+		for (Person user: ap.getParticipants().keySet()) {
+			MessageHandler.sendMessageToUser(msg.getId(), user.getId());
+		}
+	}
+	public static void sendUpdateInfo(long appId) throws IOException {
+		Appointment ap = getAppointment(appId);
+		Message msg = new Message("Endring i avtalen: "+ap.getTitle(),
+				"Denne avtalen har blitt endret. Starttidspunkt: "+ap.getStartTime()+" Sluttidspunkt: "+ap.getEndTime());
+		for (Person user: ap.getParticipants().keySet()) {
 			MessageHandler.sendMessageToUser(msg.getId(), user.getId());
 		}
 	}

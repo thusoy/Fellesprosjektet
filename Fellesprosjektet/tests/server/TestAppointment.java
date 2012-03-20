@@ -99,7 +99,6 @@ public class TestAppointment {
 		Person jo = new Person("jo", "high", "lol@22.no", "komtek", "banan");
 		Date date = new Date(System.currentTimeMillis());
 		Appointment a1 = new Appointment("tannlege", date, date, false, null, john);
-//		AppointmentHandler.addUserToAppointment(a1.getAppId(), jo.getId());
 		HashMap<Person, Boolean> participants = new HashMap<Person, Boolean>();
 		participants.put(jo, null);
 		a1.updateParticipants(participants);
