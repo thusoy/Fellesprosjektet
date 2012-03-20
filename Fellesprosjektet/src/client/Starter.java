@@ -151,7 +151,15 @@ public class Starter {
 		}
 	}
 
-	private void changeAppointment() {
+	private void changeAppointment() throws IOException {
+		long userId = user.getId();
+		List<Appointment> appointments = AppointmentHandler.getAllCreated(userId);
+		for (Appointment app: AppointmentHandler.getAllInvited(userId)) {
+			appointments.add(app);
+		}		
+		for (int i=0; i<appointments.size(); i++) {
+			System.out.println(i+". "+appointments.get(i));
+		}
 		
 	}
 
