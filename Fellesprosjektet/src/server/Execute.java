@@ -66,10 +66,15 @@ public class Execute {
 		}
 	}
 	
-	public static ResultSet getResultSet(String query) throws SQLException, IOException{
+	public static ResultSet getResultSet(String query) throws IOException {
 		setUpConnection();
 		Statement st = getStatement();
-		return st.executeQuery(query);
+		try {
+			return st.executeQuery(query);
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new RuntimeException("Feil i SQL, stoopid!");
+		}
 	}
 	
 	/**
@@ -80,9 +85,14 @@ public class Execute {
 	 * @throws IOException
 	 * @throws SQLException
 	 */
-	public static void executeUpdate(String query) throws IOException, SQLException{
+	public static void executeUpdate(String query) throws IOException {
 		Statement stmt = getStatement();
-		stmt.executeUpdate(query);
+		try {
+			stmt.executeUpdate(query);
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new RuntimeException("Feil i SQL, stoopid!");
+		}
 	}
 	
 	/**

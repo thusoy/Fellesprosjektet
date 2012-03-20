@@ -1,7 +1,11 @@
 package server;
 
+import static no.ntnu.fp.model.Person.recreatePerson;
 import java.io.IOException;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import no.ntnu.fp.model.Person;
 
@@ -20,13 +24,8 @@ public class PersonHandler {
 				"INSERT INTO User(userId, email, firstname, lastname, department, passwordHash, salt) " +
 				"VALUES(%d, '%s', '%s', '%s', '%s', '%s', '%s')";
 
-		try {
-			Execute.executeUpdate(String.format(query, userId, email, firstname, 
-					lastname, department, passwordHash, salt));
-		} catch (SQLException e) {
-			e.printStackTrace();
-			throw new RuntimeException("Feil i sql");
-		}
+		Execute.executeUpdate(String.format(query, userId, email, firstname, 
+				lastname, department, passwordHash, salt));
 
 	}
 	public static void updateUser(Person person) throws IOException {
@@ -35,6 +34,7 @@ public class PersonHandler {
 		String email = person.getLastname();
 		String department = person.getDepartment();
 		String passwordHash = person.getPasswordHash();
+		
 
 		String query =
 				"UPDATE User SET" +
@@ -44,92 +44,47 @@ public class PersonHandler {
 						" department='%s'" +
 						" passwordHash='%s'";
 
-		try{	
-			Execute.executeUpdate(String.format(query, email, firstname, lastname, department, passwordHash));
-		} catch (SQLException e) {
-			throw new RuntimeException("Feil i sql");
-		}
+		Execute.executeUpdate(String.format(query, email, firstname, lastname, department, passwordHash));
 	}
+	
 	public static void deleteUser(long personId) throws IOException{
 		String query =
 				"DELETE FROM User WHERE userId=%d";
-		try {
-			Execute.executeUpdate(String.format(query, personId));
-		} catch (SQLException e) {
-			throw new RuntimeException("Feil i sql");
-		}
-	}
-	public static String getFirstname(long personId) throws IOException {
-		String query =
-				"SELECT firstname FROM User WHERE userId=%d";
-		try {
-			return Execute.executeGetString(String.format(query, personId));
-		} catch (SQLException e) {
-			e.printStackTrace();
-			throw new RuntimeException("Feil i sql");
-		}
-	}
-	public static String getLastname(long personId) throws IOException {
-		String query =
-				"SELECT lastname FROM User WHERE userId=%d";
-
-		try {
-			return Execute.executeGetString(String.format(query, personId));
-		} catch (SQLException e) {
-			throw new RuntimeException("Feil i sql");		}
-	}
-	public static String getEmail(long personId) throws IOException {
-		String query =
-				"SELECT email FROM User WHERE userId=%d";
-
-		try {
-			return Execute.executeGetString(String.format(query, personId));
-		} catch (SQLException e) {
-			throw new RuntimeException("Feil i sql");
-		}
-	}
-	public static String getDepartment(long personId) throws IOException {
-		String query =
-				"SELECT department FROM User WHERE userId=%d";
-
-		try {
-			return Execute.executeGetString(String.format(query, personId));
-		} catch (SQLException e) {
-			throw new RuntimeException("Feil i sql");
-		}
-	}
-	public static String getPasswordHash(long personId) throws IOException {
-		String query =
-				"SELECT passwordHash FROM User WHERE userId=%d";
-
-		try {
-			return Execute.executeGetString(String.format(query, personId));
-		} catch (SQLException e) {
-			throw new RuntimeException("Feil i sql");
-		}
-	}
-	public static long getPCalendarId(long personId) throws IOException {
-		String query =
-				"SELECT personalCalendarId FROM User WHERE userId=%d";
-
-		try {
-			return Execute.executeGetLong(String.format(query, personId));
-		} catch (SQLException e) {
-			throw new RuntimeException("Feil i sql");
-		}
+		Execute.executeUpdate(String.format(query, personId));
 	}
 
 	public static Person getPerson(long personId) throws IOException {
-		String firstname = getFirstname(personId);
-		String lastname = getLastname(personId);
-		String email = getEmail(personId);
-		String department = getDepartment(personId);
-		String passwordHash = getPasswordHash(personId);
-		String password = "";
-		Person person = new Person(firstname, lastname, email, department, password, true);
-		person.setId(personId);
-		person.setPasswordHash(passwordHash);
-
-		return person;
+		String query = "SELECT userId, email, firstname, lastname, department, passwordHash, salt FROM User " +
+						"WHERE userId=%d";
+		ResultSet rs = Execute.getResultSet(String.format(query, personId));
+		List<Person> persons = getListFromResultSet(rs);
+		if (persons.size() == 1){
+			return persons.get(0);
+		} else {
+			throw new IllegalArgumentException("Fant ikke person med den id-en!");
+		}
 	}
+	
+	private static List<Person> getListFromResultSet(ResultSet rs) throws IOException {
+		List<Person> list = new ArrayList<Person>();
+		try {
+			while(rs.next()){
+				long id = rs.getLong("userId");
+				String firstname = rs.getString("firstname");
+				String lastname = rs.getString("lastname");
+				String email = rs.getString("email");
+				String department = rs.getString("department");
+				String passwordHash = rs.getString("passwordHash");
+				Person p = recreatePerson(firstname, lastname, email, department, "");
+				p.setPasswordHash(passwordHash);
+				p.setId(id);
+				list.add(p);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new RuntimeException("FEil i SQL, stoopid!");
+		}
+		return list;
+	}
+
 }

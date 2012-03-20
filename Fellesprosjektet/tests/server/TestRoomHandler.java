@@ -1,14 +1,14 @@
 package server;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.sql.Date;
 import java.sql.SQLException;
-import java.text.DateFormat;
 import java.util.List;
-import java.util.Locale;
+
+import no.ntnu.fp.model.Person;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -23,6 +23,8 @@ public class TestRoomHandler {
 	public void truncateRooms() throws IOException, SQLException{
 		String query = "TRUNCATE TABLE Room";
 		Execute.executeUpdate(query);
+		String query2 = "TRUNCATE TABLE User";
+		Execute.executeUpdate(query2);
 	}
 	
 	@Test
@@ -33,6 +35,7 @@ public class TestRoomHandler {
 		List<Room> allRooms = RoomHandler.getAllRooms();
 		int numRooms = allRooms.size();
 		assertEquals("Skal være tre rom i databasen!", 3, numRooms);
+		assertEquals("Samme objektet skal kunne hentes ut!", a, RoomHandler.getRoom(a.getName()));
 		assertTrue("Rom a skal ligge i databasen!", allRooms.contains(a));
 		assertTrue("Rom b skal ligge i databasen!", allRooms.contains(b));
 		assertTrue("Rom c skal ligge i databasen!", allRooms.contains(c));
@@ -42,9 +45,10 @@ public class TestRoomHandler {
 	public void testIsValid() throws IOException{
 		Date start = new Date(System.currentTimeMillis());
 		Date end = new Date(System.currentTimeMillis()+10000000);
-		Appointment app1 = new Appointment("Ledermote", start, end, false, null, false);
-		Appointment app2 = new Appointment("Ledermote", start, end, false, null, false);
-		Appointment app3 = new Appointment("Ledermote", start, end, false, null, false);
+		Person creator = new Person("john", "lol", "email", null, "passord");
+		Appointment app1 = new Appointment("Ledermote", start, end, false, null, creator);
+		Appointment app2 = new Appointment("Ledermote", start, end, false, null, creator);
+		Appointment app3 = new Appointment("Ledermote", start, end, false, null, creator);
 		app1.setRoomName("Vegas");
 		app2.setRoomName("Bamba");
 		app3.setRoomName("Limba");

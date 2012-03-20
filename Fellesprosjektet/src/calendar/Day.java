@@ -14,13 +14,9 @@ public enum Day{
 		this.norwegian = norwegian;
 	}
 	
-	public String getNorwegian(){
-		return norwegian;
-	}
-	
 	public static Day fromString(String day){
 		for (Day d: Day.values()){
-			if (d.name().equalsIgnoreCase(day)){
+			if (d.name().equalsIgnoreCase(day) || d.norwegian.equalsIgnoreCase(day)){
 				return d;
 			}
 		}
@@ -41,5 +37,9 @@ public enum Day{
 			} catch (IllegalArgumentException e){}
 		}
 		return output;
+	}
+	
+	public String toString(){
+		return norwegian;
 	}
 }

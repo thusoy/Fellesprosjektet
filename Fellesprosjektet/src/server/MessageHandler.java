@@ -1,13 +1,17 @@
 package server;
 
+import static calendar.Message.recreateMessage;
+
 import java.io.IOException;
-import java.sql.SQLException;
 import java.sql.Date;
-import java.util.Set;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+import sun.reflect.ReflectionFactory.GetReflectionFactoryAction;
 
 import no.ntnu.fp.model.Person;
-
-import calendar.Appointment;
 import calendar.Message;
 
 public class MessageHandler {
@@ -21,79 +25,80 @@ public class MessageHandler {
 		String query = 
 				"INSERT INTO Message(msgId, dateSent, content, title) VALUES(%d, '%s', '%s', '%s')";
 			
-		try {
-			Execute.executeUpdate(String.format(query, msgId, dateSent, content, title));
-		} catch (SQLException e) {
-			e.printStackTrace();
-			throw new RuntimeException("SQLFeil");
-		}
-	}
-	public static String getTitleMessage(long msgId) throws IOException {
-		System.out.println(msgId);
-		String query =
-				"SELECT title FROM Message WHERE msgId=%d";
-		
-		try {
-			return Execute.executeGetString(String.format(query, msgId));
-		} catch (SQLException e) {
-			e.printStackTrace();
-			throw new RuntimeException("SQLFeil");
-		}
-	}
-	public static Date getDateSentMessage(long msgId) throws IOException {
-		
-		String query =
-				"SELECT dateSent FROM Message WHERE msgId=%d";
-		
-		try {
-			return Execute.executeGetDate(String.format(query, msgId));
-		} catch (SQLException e) {
-			throw new RuntimeException("SQLFeil");
-		}
-	}
-	public static String getContentMessage(long msgId) throws IOException {
-		
-		String query =
-				"SELECT content FROM Message WHERE msgId=%d";
-		
-		try {
-			return Execute.executeGetString(String.format(query, msgId));
-		} catch (SQLException e) {
-			throw new RuntimeException("SQLFeil");
-		}
+		Execute.executeUpdate(String.format(query, msgId, dateSent, content, title));
 	}
 	
 	public static void sendMessageToUser(Message msg, Person user) throws IOException {
 		long msgId = msg.getId();
 		long userId = user.getId();
 		String query = 
-				"INSERT INTO UserMessages VALUES(%d, %d, %b)";
-		try {
-			Execute.executeUpdate(String.format(query, userId, msgId, false));
-		} catch (SQLException e) {
-			throw new RuntimeException("Feil i SQL!");
-		}
-				
+				"INSERT INTO UserMessages(userId, msgId, hasBeenRead) VALUES(%d, %d, %b)";
+		Execute.executeUpdate(String.format(query, userId, msgId, false));
 	}
 	
-	public static void hasReadMessage(long msgId, long userId) throws IOException {
+	public static void setMessageAsRead(long msgId, long userId) throws IOException {
 		String query =
 				"UPDATE UserMessages SET hasBeenRead=%b WHERE msgId=%d AND userId=%d";
-		try {
-			Execute.executeUpdate(String.format(query, true, msgId, userId));
-		} catch (SQLException e) {
-			throw new RuntimeException("SQLFeil");
-		}
+		Execute.executeUpdate(String.format(query, true, msgId, userId));
 	}
 	
 	public static Message getMessage(long msgId) throws IOException {
-		String title = getTitleMessage(msgId);
-		String content = getContentMessage(msgId);
-		Date dateSent = getDateSentMessage(msgId);
-		Message msg = new Message(title, content, dateSent, true);
-		msg.setId(msgId);
+		String query = "SELECT msgId, title, content, dateSent FROM Message WHERE msgId=%d";
+		ResultSet rs = Execute.getResultSet(String.format(query, msgId));
+		Message msg;
+		try {
+			if(rs.next()){
+				String title = rs.getString("title");
+				String content = rs.getString("content");
+				long id = rs.getLong("msgId");
+				Date dateSent = rs.getDate("dateSent");
+				msg = recreateMessage(title, content, dateSent);
+				msg.setId(id);
+			} else {
+				throw new IllegalArgumentException("No such message!");
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new RuntimeException("Feil i SQL!");
+		}
+		
+		msg.setReceivers(getReceiversOfMessage(msgId));
 		return msg;
 	}
+	
+	public static List<Person> getReceiversOfMessage(long msgId) throws IOException{
+		String getParticipantsQuery = "SELECT msgId, userId, hasBeenRead FROM UserMessages WHERE msgId=%d";
+		List<Person> receivers = new ArrayList<Person>();
+		ResultSet rs = Execute.getResultSet(String.format(getParticipantsQuery, msgId));
+		try {
+			while (rs.next()){
+				Person p = PersonHandler.getPerson(rs.getLong("userId"));
+				receivers.add(p);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new RuntimeException("Feil i SQL!");
+		}
+		return receivers;
+	}
+	
+	public static List<Message> getUnreadMessagesForUser(Person p) throws IOException{
+		String query = "SELECT msgId FROM UserMessages WHERE userId=%d AND hasBeenRead=false"; 
+		ResultSet rs = Execute.getResultSet(String.format(query, p.getId()));
+		List<Message> unread = new ArrayList<Message>();
+		try {
+			while(rs.next()){
+				long msgId = rs.getLong("msgId");
+				Message m = getMessage(msgId);
+				unread.add(m);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new RuntimeException("Feil i SQL!");
+		}
+		return unread;
+	}
+	
 	public static boolean getHasBeenRead(long msgId, long userId) throws IOException{
 		String query =
 				"SELECT hasBeenRead FROM UserMessages WHERE msgId=%d AND userId=%d";

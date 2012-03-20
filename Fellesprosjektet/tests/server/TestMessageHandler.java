@@ -18,24 +18,21 @@ public class TestMessageHandler {
 	
 	@Test
 	public void testSaveAndFetch() throws IOException {
-		Date date = new Date(System.currentTimeMillis()); 
-		Message msg = new Message("Overskrift", "Innhold", date, false);
+		Message msg = new Message("Overskrift", "Innhold");
 		Message dbMsg = MessageHandler.getMessage(msg.getId());
-		assertEquals("Meldingene skal v¾re like", msg, dbMsg);
-		//Alt er likt, men datoen slŒr feil av en eller annen grunn.. 
+		assertEquals("Meldingene skal være like", msg, dbMsg);
 	}
 	
 	@Test
 	public void testHasBeenRead() throws IOException {
 		//Create user
-		Person p = new Person("Hans", "Hansen", "hans@hansen.no", "hjemme", "hans", false);
+		Person p = new Person("Hans", "Hansen", "hans@hansen.no", "hjemme", "hans");
 		//Create message to send
-		Date date = new Date(System.currentTimeMillis()); 
-		Message msg = new Message("Overskrift", "Innhold", date, false);
+		Message msg = new Message("Overskrift", "Innhold");
 		//Send message to user
 		MessageHandler.sendMessageToUser(msg, p);
 		//setMessageToHasBeenRead
-		MessageHandler.hasReadMessage(msg.getId(), p.getId());
+		MessageHandler.setMessageAsRead(msg.getId(), p.getId());
 		assertTrue("hasReadMessage skal v¾re true", MessageHandler.getHasBeenRead(msg.getId(), p.getId()));
 	}
 }

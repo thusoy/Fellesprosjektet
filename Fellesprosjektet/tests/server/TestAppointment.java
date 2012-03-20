@@ -19,31 +19,33 @@ public class TestAppointment {
 	
 	@Before
 	public void emptyDb() throws IOException, SQLException{
-		String query = "TRUNCATE TABLE Appointment";
-		System.out.println("Truncating Appointment-table.");
-		Execute.executeUpdate(query);
+		String[] tablesToTruncate = {"Appointment", "User"};
+		String query = "TRUNCATE TABLE %s";
+		for(String table: tablesToTruncate){
+			Execute.executeUpdate(String.format(query, table));
+		}
 	}
 	
 	@Test
 	public void testSaveAndFetch() throws IOException {	
-		Person p = new Person();
-		Appointment app = new Appointment("tannlege", 
-				new Date(System.currentTimeMillis()), 
-				new Date(System.currentTimeMillis()+2700), false, null, false);
+		Date start = new Date(System.currentTimeMillis()); 
+		Date end = new Date(System.currentTimeMillis()+2700);
+		Person creator = new Person("john", "locke", "lol@post", null, "");
+		Appointment app = new Appointment("tannlege", start, end, false, null, creator);
 		Appointment dbApp = Appointment.getAppointment(app.getAppId());
+		System.out.println("sammenligner *********************************");
 		assertEquals("Objektene skal være like!", app, dbApp);
+		System.out.println("ferdig! **************************************");
 	}
 	
 	@Test
 	public void testGetAll() throws IOException{
-		Person john = new Person("john", "high", "lol", "komtek", "banan", false);
+		Person john = new Person("john", "high", "lol", "komtek", "banan");
 		Date date = new Date(System.currentTimeMillis());
-		Appointment a1 = new Appointment("tannlege", date, date, false, null, john, false);
-		Appointment a2 = new Appointment("trening", date, date, false, null, john, false);
+		Appointment a1 = new Appointment("tannlege", date, date, false, null, john);
+		Appointment a2 = new Appointment("trening", date, date, false, null, john);
 		List<Appointment> all = Appointment.getAll();
 		assertEquals("Skal være to objekter i databasen", 2, all.size());
-		System.out.println(all.get(0).equals(a1));
-		System.out.println(all.get(1).equals(a1));
 		assertTrue("Begge objektene skal være lagt i databasen", all.contains(a1));
 		assertTrue("Begge objektene skal være lagt i databasen", all.contains(a2));
 	}

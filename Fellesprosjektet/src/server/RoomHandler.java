@@ -15,12 +15,7 @@ public class RoomHandler {
 		
 		String query =
 				"INSERT INTO Room(name, capacity) VALUES('%s', %d)";
-		try {
-			Execute.executeUpdate(String.format(query, name, capacity));
-		} catch (SQLException e) {
-			e.printStackTrace();
-			throw new RuntimeException("SQLFeil");
-		}
+		Execute.executeUpdate(String.format(query, name, capacity));
 	}
 		
 	public static List<Room> getAllRooms() throws IOException{

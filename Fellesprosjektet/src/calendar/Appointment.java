@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 import no.ntnu.fp.model.Person;
 import server.AppointmentHandler;
@@ -29,37 +30,167 @@ public class Appointment implements Serializable {
 	private Map<Person, Boolean> participants;
 	private String room_name;
 	
+	/**
+	 * Creates an appointment and saves the object to the database.
+	 * @param title
+	 * @param startTime
+	 * @param endTime
+	 * @param isPrivate
+	 * @param participants
+	 * @param creator
+	 * @throws IOException
+	 */
 	public Appointment(String title, Date startTime, Date endTime, boolean isPrivate, 
-			Map<Person, Boolean> participants, boolean recreation) throws IOException {
-		this.title = title;
-		this.startTime = RoundTime.roundTime(startTime);
-		this.endTime = RoundTime.roundTime(endTime);
-		this.isPrivate = isPrivate;
-		if (participants == null)
-			this.participants = new HashMap<Person, Boolean>();
-		else
-			this.participants = participants;
-		this.description = new String();
-		if(!recreation){
-			AppointmentHandler.createAppointment(this);
-		}
-	}
-	
-	public Appointment(String title, Date startTime, Date endTime, boolean isPrivate, 
-			Map<Person, Boolean> participants, Person creator, boolean recreation) throws IOException {
+			Map<Person, Boolean> participants, Person creator) throws IOException {
 		this.title = title;
 		this.creator = creator;
 		this.startTime = RoundTime.roundTime(startTime);
 		this.endTime = RoundTime.roundTime(endTime);
 		this.isPrivate = isPrivate;
-		if (participants == null)
-			this.participants = new HashMap<Person, Boolean>();
-		else
-			this.participants = participants;
+		this.participants = participants != null ? participants : new HashMap<Person, Boolean>();
 		this.description = new String();
-		if(!recreation){
-			AppointmentHandler.createAppointment(this);
+		this.daysAppearing = new TreeSet<Day>();
+		AppointmentHandler.createAppointment(this);
+	}
+	
+	private Appointment(long appId){
+		this.appId = appId;
+	}
+	
+	public static Appointment recreateAppointment(long appId, String title, Date startTime, Date endTime, boolean isPrivate, 
+			Map<Person, Boolean> participants, Person creator) throws IOException{
+		Appointment app = new Appointment(appId);
+		app.setTitle(title);
+		app.setStartTime(startTime);
+		app.setEndTime(endTime);
+		app.setPrivate(isPrivate);
+		app.setParticipants(participants);
+		app.setCreator(creator);
+		return app;
+	}
+
+	public void acceptInvite(Person user, Boolean answer){
+		participants.put(user, answer);
+	}
+	
+	public void save() throws IOException{
+		AppointmentHandler.updateAppointment(this);
+	}
+	
+	public void updateParticipants(HashMap<Person, Boolean> participants){
+		this.participants = participants;
+	}
+	
+	public void setAppId(long appId) {
+		this.appId = appId;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+	public void setCreator(Person creator) throws IOException {
+		this.creator = creator;
+	}
+
+	public long getAppId() {
+		if (appId == null){
+			throw new IllegalStateException("AppId ikke satt enda!");
 		}
+		return appId;
+	}
+	public String getTitle() {
+		return title;
+	}
+	public String getPlace() {
+		return place;
+	}
+	public void setPlace(String place) throws IOException {
+		this.place = place;
+	}
+	public String getDescription() {
+		return description;
+	}
+	public void setDescription(String description) throws IOException {
+		this.description = description;
+	}
+	public Date getStartTime() {
+		return startTime;
+	}
+	public void setStartTime(Date startTime) throws IOException {
+		this.startTime = startTime;
+	}
+	public Date getEndTime() {
+		return endTime;
+	}
+	public void setEndTime(Date endTime) throws IOException {
+		this.endTime = endTime;
+	}
+	public Set<Day> getDaysAppearing() {
+		return daysAppearing;
+	}
+	public void setDaysAppearing(Set<Day> daysAppearing) throws IOException {
+		this.daysAppearing = daysAppearing;
+	}
+	public Date getEndOfRepeatDate() {
+		return endOfRepeatDate;
+	}
+	public void setEndOfRepeatDate(Date endOfRepeatDate) throws IOException {
+		this.endOfRepeatDate = endOfRepeatDate;
+	}
+	public boolean isPrivate() {
+		return isPrivate;
+	}
+	public void setPrivate(boolean isPrivate) throws IOException {
+		this.isPrivate = isPrivate;
+	}
+	/**
+	 * Server sender ut melding til alle deltakere om at appointment'en er slettet. 
+	 * Deretter blir appointment-objektet slettet.
+	 * @throws IOException 
+	 */
+	public void deleteAppointment() throws IOException {
+		AppointmentHandler.deleteAppointment(this.appId);
+	}
+	
+	public Map<Person, Boolean> getParticipants() {
+		return participants;
+	}
+	
+	public void setParticipants(Map<Person, Boolean> participants) throws IOException {
+		this.participants = participants;
+	}
+	
+	public String getRoom_name() {
+		return room_name;
+	}
+	
+	public void setRoomName(String room_name) throws IOException {
+		this.room_name = room_name;
+		AppointmentHandler.updateRoomName(this.getAppId(), room_name);
+	}
+	
+	public Person getCreator() {
+		return creator;
+	}
+	
+	public String toString(){
+		String base = "%s (%s)";
+		DateFormat formatter = new SimpleDateFormat("dd.MM HH:mm");
+		String startdate = formatter.format(startTime);
+		return String.format(base, title, startdate);
+	}
+
+	public void setId(long appId) {
+		this.appId = appId;
+	}
+
+	public static Appointment getAppointment(long appId) throws IOException {
+		return AppointmentHandler.getAppointment(appId);
+	}
+
+	public static List<Appointment> getAll() throws IOException {
+		return AppointmentHandler.getAll();
 	}
 
 	@Override
@@ -89,6 +220,7 @@ public class Appointment implements Serializable {
 
 	@Override
 	public boolean equals(Object obj) {
+		System.out.println("Comparing");
 		if (this == obj)
 			return true;
 		if (obj == null)
@@ -101,6 +233,7 @@ public class Appointment implements Serializable {
 				return false;
 		} else if (!appId.equals(other.appId))
 			return false;
+		System.out.println("got here");
 		if (creator == null) {
 			if (other.creator != null)
 				return false;
@@ -156,136 +289,6 @@ public class Appointment implements Serializable {
 		return true;
 	}
 
-	public void acceptInvite(Person user, Boolean answer){
-		participants.put(user, answer);
-	}
-	
-	public void updateParticipants(HashMap<Person, Boolean> participants){
-		this.participants = participants;
-	}
-	
-	public void setAppId(long appId) {
-		this.appId = appId;
-	}
 
-	public void setTitle(String title) {
-		this.title = title;
-	}
 
-	public void setCreator(Person creator) throws IOException {
-		this.creator = creator;
-		AppointmentHandler.updateAppointment(this);
-	}
-
-	public long getAppId() {
-		if (appId == null){
-			throw new IllegalStateException("AppId ikke satt enda!");
-		}
-		return appId;
-	}
-	public String getTitle() {
-		return title;
-	}
-	public String getPlace() {
-		return place;
-	}
-	public void setPlace(String place) throws IOException {
-		this.place = place;
-		AppointmentHandler.updateAppointment(this);
-	}
-	public String getDescription() {
-		return description;
-	}
-	public void setDescription(String description) throws IOException {
-		this.description = description;
-		AppointmentHandler.updateAppointment(this);
-	}
-	public Date getStartTime() {
-		return startTime;
-	}
-	public void setStartTime(Date startTime) throws IOException {
-		this.startTime = startTime;
-		AppointmentHandler.updateAppointment(this);
-	}
-	public Date getEndTime() {
-		return endTime;
-	}
-	public void setEndTime(Date endTime) throws IOException {
-		this.endTime = endTime;
-		AppointmentHandler.updateAppointment(this);
-	}
-	public Set<Day> getDaysAppearing() {
-		return daysAppearing;
-	}
-	public void setDaysAppearing(Set<Day> daysAppearing) throws IOException {
-		this.daysAppearing = daysAppearing;
-		AppointmentHandler.updateAppointment(this);
-	}
-	public Date getEndOfRepeatDate() {
-		return endOfRepeatDate;
-	}
-	public void setEndOfRepeatDate(Date endOfRepeatDate) throws IOException {
-		this.endOfRepeatDate = endOfRepeatDate;
-		AppointmentHandler.updateAppointment(this);
-	}
-	public boolean isPrivate() {
-		return isPrivate;
-	}
-	public void setPrivate(boolean isPrivate) throws IOException {
-		this.isPrivate = isPrivate;
-		AppointmentHandler.updateAppointment(this);
-	}
-	/**
-	 * Server sender ut melding til alle deltakere om at appointment'en er slettet. 
-	 * Deretter blir appointment-objektet slettet.
-	 * @throws IOException 
-	 */
-	public void deleteAppointment() throws IOException {
-		AppointmentHandler.deleteAppointment(this.appId);
-	}
-	public void updateDaysAppearing(Set<Day> days) throws IOException{
-		this.daysAppearing = days;
-		AppointmentHandler.updateAppointment(this);
-	}
-	public void updateDescription(String description) throws IOException{
-		this.description = description;
-		AppointmentHandler.updateAppointment(this);
-	}
-	public Map<Person, Boolean> getParticipants() {
-		return participants;
-	}
-	public void setParticipants(HashMap<Person, Boolean> participants) throws IOException {
-		this.participants = participants;
-		AppointmentHandler.updateAppointment(this);
-	}
-	public String getRoom_name() {
-		return room_name;
-	}
-	public void setRoomName(String room_name) throws IOException {
-		this.room_name = room_name;
-		AppointmentHandler.updateRoomName(this.getAppId(), room_name);
-	}
-	public Person getCreator() {
-		return creator;
-	}
-	
-	public String toString(){
-		String base = "%s (%s)";
-		DateFormat formatter = new SimpleDateFormat("dd.MM HH:mm");
-		String startdate = formatter.format(startTime);
-		return String.format(base, title, startdate);
-	}
-
-	public void setId(long appId) {
-		this.appId = appId;
-	}
-
-	public static Appointment getAppointment(long appId) throws IOException {
-		return AppointmentHandler.getAppointment(appId);
-	}
-
-	public static List<Appointment> getAll() throws IOException {
-		return AppointmentHandler.getAll();
-	}
-	
 }

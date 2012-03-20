@@ -17,7 +17,7 @@ public class TestDay {
 				"Lørdag", "Søndag"};
 		Day[] days = Day.values();
 		for(int i = 0; i < days.length; i++){
-			assertEquals(norwegian[i].toLowerCase(), days[i].getNorwegian());
+			assertEquals(norwegian[i].toLowerCase(), days[i].toString());
 		}
 	}
 	
@@ -46,8 +46,8 @@ public class TestDay {
 		set.add(Day.TUESDAY);
 		String teststring = set.toString();
 		Set<Day> days = Day.fromSetString(teststring);
-		assertEquals("Det skal være to elementer i days etter å ha testet med strengen " +
-				"'MONDAY, TUESDAY'", 2, days.size());
+		String feedback = String.format("Det skal være to elementer i days etter å ha testet med strengen '%s'", teststring);
+		assertEquals(feedback, 2, days.size());
 		assertTrue("Mandag må ligge i settet som returneres", days.contains(Day.MONDAY));
 		assertTrue("Tirsdag må ligge i settet som returneres", days.contains(Day.TUESDAY));
 	}

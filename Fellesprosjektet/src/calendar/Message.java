@@ -1,32 +1,46 @@
 package calendar;
 
 import java.io.IOException;
-import java.sql.SQLException;
 import java.sql.Date;
+import java.util.ArrayList;
+import java.util.List;
 
+import no.ntnu.fp.model.Person;
+import server.Execute;
 import server.MessageHandler;
 import server.RoundTime;
-import no.ntnu.fp.model.Person;
 
-public class Message extends DBObject<Message> {
+public class Message implements Comparable<Message> {
 	
 	private long msgId;
 	private Date dateSent;
 	private String content;
 	private String title;
+	private List<Person> receivers;
 	
-	public Message (String title, String content, Date dateSent, boolean recreation) throws IOException{
+	/**
+	 * Created as Message object and saved it to the database.
+	 * @param title
+	 * @param content
+	 * @throws IOException
+	 */
+	public Message (String title, String content) throws IOException{
 		this.title=title;
 		this.content=content;
-		this.dateSent= RoundTime.roundTime(dateSent);
-		if(!recreation) {
-			MessageHandler.createMessage(this);
-		}
+		this.dateSent= RoundTime.roundTime(new Date(System.currentTimeMillis()));
+		receivers = new ArrayList<Person>();
+		MessageHandler.createMessage(this);
 	}
 	
-	public String showMessage(long msgId, Person user) throws ClassNotFoundException, IOException, SQLException{
-		MessageHandler.hasReadMessage(msgId, user.getId());
-		return MessageHandler.getContentMessage(msgId) ;
+	public static Message recreateMessage(String title, String content, Date dateSent) throws IOException{
+		Message m = new Message(title, content);
+		m.dateSent = dateSent;
+		return m;
+	}
+	
+	public Message showMessage(Person user) throws IOException {
+		MessageHandler.setMessageAsRead(msgId, user.getId());
+		return this;
 	}
 	
 	public long getId() {
@@ -35,6 +49,23 @@ public class Message extends DBObject<Message> {
 
 	public Date getDateSent() {
 		return dateSent;
+	}
+	
+	public void addReceiver(Person p) throws IOException{
+		String query = "INSERT INTO UserMessages(msgId, userId, hasBeenRead) VALUES(%d, %d, null)";
+		Execute.executeUpdate(String.format(query, msgId, p.getId()));
+		receivers.add(p);
+	}
+	
+	// TODO Lagre til databasen i batch, fremfor en og en.
+	public void setReceivers(List<Person> receivers) throws IOException{
+		String deleteQuery = String.format("DELETE FROM UserMessages WHERE msgId=%d", msgId);
+		Execute.executeUpdate(deleteQuery);
+		String query = "INSERT INTO UserMessages(msgId, userId, hasBeenRead) VALUES(%d, %d, false)";
+		for(Person p: receivers){
+			Execute.executeUpdate(String.format(query, msgId, p.getId()));
+		}
+		this.receivers = receivers;
 	}
 
 	public String getContent() {
@@ -45,12 +76,14 @@ public class Message extends DBObject<Message> {
 		return title;
 	}
 
-	public void setTitle(String title) {
-		this.title = title;
-	}
 	public void setId(long msgId) {
 		this.msgId = msgId;
 	}
+	
+	public void setDateSent(Date dateSent){
+		this.dateSent = dateSent;
+	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -91,6 +124,17 @@ public class Message extends DBObject<Message> {
 		} else if (!title.equals(other.title))
 			return false;
 		return true;
+	}
+	
+
+	@Override
+	public int compareTo(Message m) {
+		return dateSent.compareTo(m.dateSent);
+	}
+	
+	@Override
+	public String toString(){
+		return title;
 	}
 
 }
