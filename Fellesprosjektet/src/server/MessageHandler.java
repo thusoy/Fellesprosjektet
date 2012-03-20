@@ -23,12 +23,31 @@ public class MessageHandler {
 		Date dateSent = msg.getDateSent();
 		String content = msg.getContent();
 		String title = msg.getTitle();
-		long msgId = System.currentTimeMillis();
+		long msgId = getUniqueId();
 		msg.setId(msgId);
 		String query = 
 				"INSERT INTO Message(msgId, dateSent, content, title) VALUES(%d, '%s', '%s', '%s')";
 			
 		Execute.executeUpdate(String.format(query, msgId, dateSent, content, title));
+	}
+	
+	private static long getUniqueId() throws IOException {
+		long id;
+		do {
+			id = System.currentTimeMillis();
+		} while(idInDb(id));
+		return id;
+	}
+	
+	private static boolean idInDb(long id) throws IOException {
+		String query = String.format("SELECT * FROM Message WHERE appId=%d", id);
+		try {
+			ResultSet rs = Execute.getResultSet(query);
+			return rs.next();
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new RuntimeException("Feil i SQL!");
+		}
 	}
 	
 	public static void sendMessageToUser(long msgId, long userId) throws IOException {

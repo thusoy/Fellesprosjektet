@@ -1,7 +1,6 @@
 package server;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
@@ -9,7 +8,6 @@ import java.sql.Date;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import no.ntnu.fp.model.Person;
 
@@ -37,7 +35,6 @@ public class TestAppointment {
 		Appointment app = new Appointment("tannlege", start, end, false, null, creator);
 		Appointment dbApp = Appointment.getAppointment(app.getAppId());
 		System.out.println("sammenligner *********************************");
-		System.out.println("app: " + dbApp.getCreator().getDepartment().length());
 		assertEquals("Objektene skal være like!", app, dbApp);
 		System.out.println("ferdig! **************************************");
 	}

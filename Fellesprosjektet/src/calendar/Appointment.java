@@ -220,7 +220,6 @@ public class Appointment implements Serializable {
 
 	@Override
 	public boolean equals(Object obj) {
-		System.out.println("Comparing");
 		if (this == obj)
 			return true;
 		if (obj == null)
@@ -234,7 +233,6 @@ public class Appointment implements Serializable {
 		} else if (!appId.equals(other.appId))
 			return false;
 		if (creator == null) {
-			System.out.println("got here");
 			if (other.creator != null)
 				return false;
 		} else if (!creator.equals(other.creator))

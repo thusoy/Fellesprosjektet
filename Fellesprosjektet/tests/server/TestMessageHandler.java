@@ -4,17 +4,18 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
-import java.sql.Date;
-
-import server.PersonHandler;
 
 import no.ntnu.fp.model.Person;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import calendar.Message;
 
 public class TestMessageHandler {
+	
+	@Before
+	
 	
 	@Test
 	public void testSaveAndFetch() throws IOException {
@@ -30,7 +31,7 @@ public class TestMessageHandler {
 		//Create message to send
 		Message msg = new Message("Overskrift", "Innhold");
 		//Send message to user
-		MessageHandler.sendMessageToUser(msg, p);
+		MessageHandler.sendMessageToUser(msg.getId(), p.getId());
 		//setMessageToHasBeenRead
 		MessageHandler.setMessageAsRead(msg.getId(), p.getId());
 		assertTrue("hasReadMessage skal v¾re true", MessageHandler.getHasBeenRead(msg.getId(), p.getId()));
