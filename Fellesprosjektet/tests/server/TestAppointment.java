@@ -60,5 +60,14 @@ public class TestAppointment {
 		
 		
 	}
+	@Test
+	public void testUpdateAppointment() throws IOException {
+		Person john = new Person("john", "high", "lol", "komtek", "banan");
+		Date date = new Date(System.currentTimeMillis());
+		Appointment a1 = new Appointment("tannlege", date, date, false, null, john);
+		a1.setTitle("handletur");
+		AppointmentHandler.updateAppointment(a1);
+		assertTrue("Tittel skal v¾re lik", a1.getTitle().equals("handletur"));
+	}
 	
 }

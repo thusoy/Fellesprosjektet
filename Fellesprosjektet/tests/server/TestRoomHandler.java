@@ -63,9 +63,10 @@ public class TestRoomHandler {
 	
 	@Test
 	public void testAvailableRooms() throws IOException{
-		Date start = new Date(System.currentTimeMillis());
-		Date end = new Date(System.currentTimeMillis()+10000000);
+		Date start = new Date(System.currentTimeMillis()-20000000);
+		Date end = new Date(System.currentTimeMillis()-10000000);
 		List<Room> roomsAvaiable = RoomHandler.availableRooms(start, end, 6);
+		
 		for (Room room: roomsAvaiable) {
 			System.out.println(room.getName());
 		}
