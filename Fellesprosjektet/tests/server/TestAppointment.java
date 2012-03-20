@@ -35,6 +35,7 @@ public class TestAppointment {
 		Appointment app = new Appointment("tannlege", start, end, false, null, creator);
 		Appointment dbApp = Appointment.getAppointment(app.getAppId());
 		System.out.println("sammenligner *********************************");
+		System.out.println("app: " + dbApp.getCreator().getDepartment().length());
 		assertEquals("Objektene skal være like!", app, dbApp);
 		System.out.println("ferdig! **************************************");
 	}

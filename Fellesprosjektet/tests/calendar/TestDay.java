@@ -3,6 +3,7 @@ package calendar;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.sql.Date;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -78,5 +79,15 @@ public class TestDay {
 		String teststring = null;
 		Set<Day> days = Day.fromSetString(teststring);
 		assertEquals("Med null-input skal settet være tomt!", 0, days.size());
+	}
+	
+	@Test
+	public void testDayFromDate(){
+		Day[] allDays = Day.values();
+		for(int i = 0; i < 7; i++){
+			Date date = new Date(112, 3, 19+i);
+			Day day = Day.fromDate(date);
+			assertEquals("Skal hente ut riktig dag!", allDays[i], day);
+		}
 	}
 }

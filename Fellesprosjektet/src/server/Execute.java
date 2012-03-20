@@ -188,11 +188,17 @@ public class Execute {
 	 * @throws IOException
 	 * @throws SQLException
 	 */
-	public static long executeGetLong(String query) throws IOException, SQLException{
+	public static long executeGetLong(String query) throws IOException{
 		Statement stmt = getStatement();
-		ResultSet rs = stmt.executeQuery(query);
-		rs.next();
-		return rs.getLong(1);
+		ResultSet rs;
+		try {
+			rs = stmt.executeQuery(query);
+			rs.next();
+			return rs.getLong(1);
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new RuntimeException("Feil i SQL!");
+		}
 	}
 	
 	/**
@@ -204,13 +210,19 @@ public class Execute {
 	 * @throws IOException
 	 * @throws SQLException
 	 */
-	public static String executeGetString(String query) throws IOException, SQLException{
+	public static String executeGetString(String query) throws IOException{
 		Statement stmt = getStatement();
-		ResultSet rs = stmt.executeQuery(query);
-		if (rs.next())
-			return rs.getString(1);
-		else
-			throw new RuntimeException("Empty resultset!");
+		ResultSet rs;
+		try {
+			rs = stmt.executeQuery(query);
+			if (rs.next())
+				return rs.getString(1);
+			else
+				throw new RuntimeException("Empty resultset!");
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new RuntimeException("Feil i SQL");
+		}
 	}
 	
 	/**

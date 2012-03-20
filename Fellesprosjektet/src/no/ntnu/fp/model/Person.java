@@ -49,13 +49,17 @@ public class Person {
 		
 	}
 	
-	public static Person recreatePerson(String firstname, String lastname, String email, String department, String passwordHash) throws IOException{
+	public static Person recreatePerson(long id, String firstname, String lastname, String email, String department, String passwordHash) throws IOException{
 		Person p = new Person();
 		p.setFirstname(firstname);
 		p.setLastname(lastname);
 		p.setEmail(email);
 		p.setDepartment(department);
 		p.setPasswordHash(passwordHash);
+		p.setId(id);
+		String query = String.format("SELECT salt FROM User WHERE userId=%d", id);
+		String salt = Execute.executeGetString(query);
+		p.salt = salt;
 		return p;
 	}
 
@@ -135,6 +139,8 @@ public class Person {
 		return passwordHash;
 	}
 
+
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -149,22 +155,25 @@ public class Person {
 				+ ((lastname == null) ? 0 : lastname.hashCode());
 		result = prime * result
 				+ ((passwordHash == null) ? 0 : passwordHash.hashCode());
+		result = prime * result + ((salt == null) ? 0 : salt.hashCode());
 		return result;
 	}
 
 	@Override
 	public boolean equals(Object obj) {
+		System.out.println("sammligner users!");
 		if (this == obj)
 			return true;
 		if (obj == null)
 			return false;
-		
 		if (getClass() != obj.getClass())
-			return false;		
-		Person other = (Person) obj;		
+			return false;
+		Person other = (Person) obj;
 		if (department == null) {
 			if (other.department != null)
-				return false;		
+				System.out.println("kom hiiiiiiiiiiiiiit");
+			System.out.println("other dep: " + other.department);
+				return false;
 		} else if (!department.equals(other.department))
 			return false;
 		if (email == null) {
@@ -176,7 +185,7 @@ public class Person {
 			if (other.firstname != null)
 				return false;
 		} else if (!firstname.equals(other.firstname))
-			return false;	
+			return false;
 		if (id != other.id)
 			return false;
 		if (lastname == null) {
@@ -188,6 +197,11 @@ public class Person {
 			if (other.passwordHash != null)
 				return false;
 		} else if (!passwordHash.equals(other.passwordHash))
+			return false;
+		if (salt == null) {
+			if (other.salt != null)
+				return false;
+		} else if (!salt.equals(other.salt))
 			return false;
 		return true;
 	}

@@ -44,8 +44,8 @@ public class Appointment implements Serializable {
 			Map<Person, Boolean> participants, Person creator) throws IOException {
 		this.title = title;
 		this.creator = creator;
-		this.startTime = RoundTime.roundTime(startTime);
-		this.endTime = RoundTime.roundTime(endTime);
+		setStartTime(startTime);
+		setEndTime(endTime);
 		this.isPrivate = isPrivate;
 		this.participants = participants != null ? participants : new HashMap<Person, Boolean>();
 		this.description = new String();
@@ -118,13 +118,13 @@ public class Appointment implements Serializable {
 		return startTime;
 	}
 	public void setStartTime(Date startTime) throws IOException {
-		this.startTime = startTime;
+		this.startTime = RoundTime.roundTime(startTime);
 	}
 	public Date getEndTime() {
 		return endTime;
 	}
 	public void setEndTime(Date endTime) throws IOException {
-		this.endTime = endTime;
+		this.endTime = RoundTime.roundTime(endTime);
 	}
 	public Set<Day> getDaysAppearing() {
 		return daysAppearing;
@@ -233,8 +233,8 @@ public class Appointment implements Serializable {
 				return false;
 		} else if (!appId.equals(other.appId))
 			return false;
-		System.out.println("got here");
 		if (creator == null) {
+			System.out.println("got here");
 			if (other.creator != null)
 				return false;
 		} else if (!creator.equals(other.creator))

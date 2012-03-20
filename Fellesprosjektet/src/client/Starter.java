@@ -4,6 +4,7 @@ import static hashtools.Hash.createHash;
 
 import java.io.IOException;
 import java.sql.Date;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -17,8 +18,8 @@ import no.ntnu.fp.model.Person;
 import server.AppointmentHandler;
 import server.Execute;
 import server.PersonHandler;
-import sun.misc.Perf.GetPerfAction;
 import calendar.Appointment;
+import calendar.Day;
 
 public class Starter {
 	
@@ -44,11 +45,11 @@ public class Starter {
 				Person user = authenticateUser();
 				this.user = user;
 				System.out.println("Auth OK!");
-				run(user);
 			} catch(IllegalArgumentException e){
 				System.out.println("Ugyldig kombinasjon av passord og brukernavn, prøv igjen.");
 			}
 		} while (user == null);
+		run(user);
 	}
 
 	private void run(Person user) throws IOException{
@@ -65,6 +66,7 @@ public class Starter {
 				break;
 			}
 			run(cf);
+			showWeek();
 		}
 		System.out.println("Ha en fortsatt fin dag!");
 	}
@@ -75,6 +77,7 @@ public class Starter {
 	}
 
 	public void run(CalendarFunction func) throws IOException{
+		System.out.println("Running func:" + func);
 		switch(func){
 		case ADD_APPOINTMENT:
 			addNewAppointment();
@@ -91,11 +94,18 @@ public class Starter {
 		case FOLLOW_CALENDAR:
 			followCalendar();
 			break;
+		case SHOW_NEXT_WEEK:
+			weekNum++;
+			break;
+		case SHOW_PREVIOUS_WEEK:
+			weekNum--;
+			break;
 		}
 	}
 	
 	private void getAndShowWeek() throws IOException {
 		Scanner scn = new Scanner(System.in);
+		System.out.print("Skriv inn en uke du vil vise: ");
 		int weekNum =  scn.nextInt();
 		this.weekNum = weekNum;
 		showWeek();
@@ -118,19 +128,26 @@ public class Starter {
 	
 	private static boolean isValidEmail(String email) throws IOException{
 		String query = "SELECT * FROM User WHERE email='%s'";
+		ResultSet rs = Execute.getResultSet(String.format(query, email));
 		try {
-			return Execute.getResultSet(String.format(query, email)).next();
+			return rs.next();
 		} catch (SQLException e) {
 			e.printStackTrace();
-			throw new RuntimeException("Feil i SQL!");
+			throw new RuntimeException("Feil i sQL!");
 		}
 	}
 
 	private void showWeek() throws IOException {
 		
 		List<Appointment> appointments = AppointmentHandler.getWeekAppointments(user.getId(), weekNum);
+		Day previous = null;
 		for(Appointment app: appointments){
+			Day thisDay = Day.fromDate(app.getStartTime());
+			if (thisDay != previous){
+				System.out.println(thisDay);
+			}
 			System.out.println(app);
+			previous = thisDay;
 		}
 	}
 
@@ -142,27 +159,37 @@ public class Starter {
 		
 	}
 
-	private void addNewAppointment() {
+	private void addNewAppointment() throws IOException {
 		String dateTimeFormat = "dd-MM-yyyy HH:mm";
 		Scanner scanner = new Scanner(System.in);
 		System.out.print("Skriv inn tittel: ");
 		String title = scanner.nextLine();
 		Date startdate = parseDate(dateTimeFormat, String.format("Startdato (%s): ", dateTimeFormat));
 		Date enddate = parseDate(dateTimeFormat, String.format("Sluttdato (%s): ", dateTimeFormat));
-		System.out.println("Hvis avtalen er privat, skriv 'ja'. Hvis ikke, trykk på enter.");
+		System.out.print("Hvis avtalen er privat, skriv 'ja'. Hvis ikke, trykk på enter. ");
 		boolean isPrivate = scanner.nextLine().isEmpty();
 		Map<Person, Boolean> participants = getParticipants();
-//		Appointment app = new Appointment();
+		new Appointment(title, startdate, enddate, isPrivate, participants, user);
 	}
 	
-	private Map<Person, Boolean> getParticipants(){
+	private Map<Person, Boolean> getParticipants() throws IOException{
 		Map<Person, Boolean> map = new HashMap<Person, Boolean>();
-		String email;
 		Scanner scanner = new Scanner(System.in);
-		do {
+		String email;
+		while (true) {
+			System.out.print("Enter email to invite to the event: ");
 			email = scanner.nextLine();
-			Person p = getPersonFromEmail(email);
+			if (email.isEmpty()){
+				break;
+			} else if (isValidEmail(email)){
+				Person p = getPersonFromEmail(email);
+				map.put(p, null);
+				System.out.printf("%s added to participants!", email);
+			} else {
+				System.out.println("Invalid email!");
+			}
 		}
+		return map;
 	}
 	
 	private Date parseDate(String format, String inputText){
@@ -171,21 +198,18 @@ public class Starter {
 		while (true) {
 			System.out.print(inputText);
 			try {
-				Date date = (Date) sdf.parse(scanner.nextLine());
+				Date date = new Date(sdf.parse(scanner.nextLine()).getTime());
 				return date;
-			} catch (ParseException e) {}
+			} catch (ParseException e) {
+				System.out.println("Klarte ikke lese datoen din, vennligst prøv på nytt.");
+			}
 		}
 	}
 
 	private static void setUp() throws IOException{
 		String query = "TRUNCATE TABLE User";
-		try {
-			Execute.executeUpdate(query);
-		} catch (SQLException e){
-			e.printStackTrace();
-			throw new RuntimeException("Feil i SQL");
-		}
-		new Person("tarjei", "husøy", "tarjei@roms.no", "komtek", "lol", false);
+		Execute.executeUpdate(query);
+		new Person("tarjei", "husøy", "tarjei@roms.no", "komtek", "lol");
 	}
 	
 	private static Person authenticateUser() throws IOException {
@@ -218,24 +242,14 @@ public class Starter {
 	private static long getUserIdFromEmail(String email) throws IOException{
 		String query = "SELECT userId FROM User WHERE email='%s'";
 		long id;
-		try {
-			id = Execute.executeGetLong(String.format(query, email));
-			return id;
-		} catch (SQLException e) {
-			e.printStackTrace();
-			throw new RuntimeException("Feil i SQL!");
-		}
+		id = Execute.executeGetLong(String.format(query, email));
+		return id;
 	}
 	
 	private static String getSalt(String email) throws IOException{
 		String query = "SELECT salt FROM User WHERE email='%s'";
 		String salt;
-		try {
-			salt = Execute.executeGetString(String.format(query, email));
-		} catch (SQLException e) {
-			e.printStackTrace();
-			throw new RuntimeException("Feil i SQL!");
-		}
+		salt = Execute.executeGetString(String.format(query, email));
 		return salt;
 	}
 	

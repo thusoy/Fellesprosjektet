@@ -74,10 +74,11 @@ public class PersonHandler {
 				String lastname = rs.getString("lastname");
 				String email = rs.getString("email");
 				String department = rs.getString("department");
+				if (department != null && department.equals("null"))
+					System.out.println("OBSOBS! Fant null!");
+					System.out.println(rs.ge);
 				String passwordHash = rs.getString("passwordHash");
-				Person p = recreatePerson(firstname, lastname, email, department, "");
-				p.setPasswordHash(passwordHash);
-				p.setId(id);
+				Person p = recreatePerson(id, firstname, lastname, email, department, passwordHash);
 				list.add(p);
 			}
 		} catch (SQLException e) {

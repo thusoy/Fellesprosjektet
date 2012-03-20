@@ -4,9 +4,10 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 public class Hash {
-	private static final int rounds = 70000;
+	private static final int rounds = 10000;
 	
 	public static String SHA512(String rawtext){
+		long startTime = System.currentTimeMillis();
 		MessageDigest md;
 		try {
 			md = MessageDigest.getInstance("SHA-512");
@@ -20,6 +21,12 @@ public class Hash {
 			md.update(bytes);
 			bytes = md.digest();
 			localrounds--;
+		}
+		long timeTakenInMs = System.currentTimeMillis() - startTime;
+		if (timeTakenInMs < 100){
+			try {
+				Thread.sleep(100-timeTakenInMs);
+			} catch (InterruptedException e) { }
 		}
 		return convertToHex(bytes);
 	}

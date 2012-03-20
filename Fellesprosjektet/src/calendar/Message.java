@@ -32,9 +32,17 @@ public class Message implements Comparable<Message> {
 		MessageHandler.createMessage(this);
 	}
 	
-	public static Message recreateMessage(String title, String content, Date dateSent) throws IOException{
-		Message m = new Message(title, content);
+	private Message(long id){
+		this.msgId = id;
+	}
+	
+	public static Message recreateMessage(long msgId, String title, String content, Date dateSent) throws IOException{
+		Message m = new Message(msgId);
 		m.dateSent = dateSent;
+		m.msgId = msgId;
+		m.content = content;
+		m.title = title;
+		m.receivers = new ArrayList<Person>();
 		return m;
 	}
 	

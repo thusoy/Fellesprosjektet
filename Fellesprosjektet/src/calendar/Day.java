@@ -1,7 +1,9 @@
 package calendar;
 
+import java.sql.Date;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.Calendar;
 
 public enum Day{
 	
@@ -41,5 +43,12 @@ public enum Day{
 	
 	public String toString(){
 		return norwegian;
+	}
+
+	public static Day fromDate(Date date) {
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(date);
+		int dayNum = cal.get(Calendar.DAY_OF_WEEK);
+		return Day.values()[ (dayNum+2)%7 ];
 	}
 }

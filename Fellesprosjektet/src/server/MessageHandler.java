@@ -52,7 +52,7 @@ public class MessageHandler {
 				String content = rs.getString("content");
 				long id = rs.getLong("msgId");
 				Date dateSent = rs.getDate("dateSent");
-				msg = recreateMessage(title, content, dateSent);
+				msg = recreateMessage(id, title, content, dateSent);
 				msg.setId(id);
 			} else {
 				throw new IllegalArgumentException("No such message!");
