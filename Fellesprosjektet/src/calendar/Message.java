@@ -92,6 +92,9 @@ public class Message implements Comparable<Message> {
 		this.dateSent = dateSent;
 	}
 	
+
+	
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -100,6 +103,8 @@ public class Message implements Comparable<Message> {
 		result = prime * result
 				+ ((dateSent == null) ? 0 : dateSent.hashCode());
 		result = prime * result + (int) (msgId ^ (msgId >>> 32));
+		result = prime * result
+				+ ((receivers == null) ? 0 : receivers.hashCode());
 		result = prime * result + ((title == null) ? 0 : title.hashCode());
 		return result;
 	}
@@ -121,10 +126,14 @@ public class Message implements Comparable<Message> {
 		if (dateSent == null) {
 			if (other.dateSent != null)
 				return false;
-		} else if (!dateSent.equals(other.dateSent)){
+		} else if (!dateSent.equals(other.dateSent))
 			return false;
-		}
 		if (msgId != other.msgId)
+			return false;
+		if (receivers == null) {
+			if (other.receivers != null)
+				return false;
+		} else if (!receivers.equals(other.receivers))
 			return false;
 		if (title == null) {
 			if (other.title != null)
@@ -133,7 +142,6 @@ public class Message implements Comparable<Message> {
 			return false;
 		return true;
 	}
-	
 
 	@Override
 	public int compareTo(Message m) {

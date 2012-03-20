@@ -40,7 +40,7 @@ public class MessageHandler {
 	}
 	
 	private static boolean idInDb(long id) throws IOException {
-		String query = String.format("SELECT * FROM Message WHERE appId=%d", id);
+		String query = String.format("SELECT * FROM Message WHERE msgId=%d", id);
 		try {
 			ResultSet rs = Execute.getResultSet(query);
 			return rs.next();

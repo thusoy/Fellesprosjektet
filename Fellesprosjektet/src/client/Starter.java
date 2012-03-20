@@ -199,6 +199,8 @@ public class Starter {
 			System.out.print(inputText);
 			try {
 				Date date = new Date(sdf.parse(scanner.nextLine()).getTime());
+				System.out.println(date);
+				System.out.println(Day.fromDate(date));
 				return date;
 			} catch (ParseException e) {
 				System.out.println("Klarte ikke lese datoen din, vennligst prøv på nytt.");

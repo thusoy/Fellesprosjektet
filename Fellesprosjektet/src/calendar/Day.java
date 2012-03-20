@@ -49,6 +49,6 @@ public enum Day{
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(date);
 		int dayNum = cal.get(Calendar.DAY_OF_WEEK);
-		return Day.values()[ (dayNum+2)%7 ];
+		return Day.values()[ (dayNum+1)%7 ];
 	}
 }

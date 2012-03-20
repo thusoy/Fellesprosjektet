@@ -85,7 +85,7 @@ public class TestDay {
 	public void testDayFromDate(){
 		Day[] allDays = Day.values();
 		for(int i = 0; i < 7; i++){
-			Date date = new Date(112, 3, 19+i);
+			Date date = new Date(1332111600 + i*1000*60*60*24);
 			Day day = Day.fromDate(date);
 			assertEquals("Skal hente ut riktig dag!", allDays[i], day);
 		}

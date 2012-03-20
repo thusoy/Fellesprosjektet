@@ -34,9 +34,7 @@ public class TestAppointment {
 		Person creator = new Person("john", "locke", "lol@post", null, "");
 		Appointment app = new Appointment("tannlege", start, end, false, null, creator);
 		Appointment dbApp = Appointment.getAppointment(app.getAppId());
-		System.out.println("sammenligner *********************************");
 		assertEquals("Objektene skal være like!", app, dbApp);
-		System.out.println("ferdig! **************************************");
 	}
 	
 	@Test
@@ -91,6 +89,7 @@ public class TestAppointment {
 		assertTrue("John kommmer pŒ m¿tet", AppointmentHandler.getInviteStatusOnUser(a1.getAppId(), john.getId()));
 		a1.deleteAppointment();
 	}
+	
 	@Test
 	public void testInviteAppointment() throws IOException {
 		Person john = new Person("john", "high", "lol@2.no", "komtek", "banan");

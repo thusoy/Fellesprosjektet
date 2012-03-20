@@ -173,7 +173,6 @@ public class Person {
 				return false;
 		} else if (!department.equals(other.department))
 			return false;
-		System.out.println("Never got here!");
 		if (email == null) {
 			if (other.email != null)
 				return false;
