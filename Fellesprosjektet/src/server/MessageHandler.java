@@ -7,11 +7,14 @@ import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 import sun.reflect.ReflectionFactory.GetReflectionFactoryAction;
 
 import no.ntnu.fp.model.Person;
+import calendar.Appointment;
 import calendar.Message;
 
 public class MessageHandler {
@@ -28,14 +31,17 @@ public class MessageHandler {
 		Execute.executeUpdate(String.format(query, msgId, dateSent, content, title));
 	}
 	
-	public static void sendMessageToUser(Message msg, Person user) throws IOException {
-		long msgId = msg.getId();
-		long userId = user.getId();
+	public static void sendMessageToUser(long msgId, long userId) throws IOException {
 		String query = 
 				"INSERT INTO UserMessages(userId, msgId, hasBeenRead) VALUES(%d, %d, %b)";
 		Execute.executeUpdate(String.format(query, userId, msgId, false));
 	}
-	
+	public static void sendMessageToAllParticipants(Appointment app, String title,
+			String content) throws IOException {
+			Set<Person> participants = app.getParticipants().keySet();
+			Message msg = new Message(title, content);
+			msg.setReceivers(Arrays.asList(participants.toArray(new Person[0])));	
+		}
 	public static void setMessageAsRead(long msgId, long userId) throws IOException {
 		String query =
 				"UPDATE UserMessages SET hasBeenRead=%b WHERE msgId=%d AND userId=%d";

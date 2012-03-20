@@ -77,7 +77,7 @@ public class Appointment implements Serializable {
 		AppointmentHandler.updateAppointment(this);
 	}
 	
-	public void updateParticipants(HashMap<Person, Boolean> participants){
+	public void updateParticipants(HashMap<Person, Boolean> participants) throws IOException{
 		this.participants = participants;
 	}
 	

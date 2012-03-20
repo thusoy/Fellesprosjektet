@@ -234,12 +234,12 @@ public class Execute {
 	 * @throws IOException
 	 * @throws SQLException
 	 */
-	public static Map<Integer, Boolean> executeGetHashMap(String query) throws IOException, SQLException{
+	public static Map<Long, Boolean> executeGetHashMap(String query) throws IOException, SQLException{
 		Statement stmt = getStatement();
 		ResultSet rs = stmt.executeQuery(query);
-		Map<Integer, Boolean> output = new HashMap<Integer, Boolean>();
+		Map<Long, Boolean> output = new HashMap<Long, Boolean>();
 		while(rs.next()){
-			output.put(rs.getInt(1), rs.getBoolean(2));	
+			output.put(rs.getLong(1), rs.getBoolean(2));	
 		}
 		return output;
 	}

@@ -7,7 +7,9 @@ import static org.junit.Assert.assertTrue;
 import java.io.IOException;
 import java.sql.Date;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import no.ntnu.fp.model.Person;
 
@@ -20,7 +22,7 @@ public class TestAppointment {
 	
 	@Before
 	public void emptyDb() throws IOException, SQLException{
-		String[] tablesToTruncate = {"Appointment", "User"};
+		String[] tablesToTruncate = {"Appointment", "User", "UserAppointments", "UserMessages"};
 		String query = "TRUNCATE TABLE %s";
 		for(String table: tablesToTruncate){
 			Execute.executeUpdate(String.format(query, table));
@@ -64,7 +66,7 @@ public class TestAppointment {
 	}
 	@Test
 	public void testUpdateAppointment() throws IOException {
-		Person john = new Person("john", "high", "lol", "komtek", "banan");
+		Person john = new Person("john", "high", "lol@1.no", "komtek", "banan");
 		Date date = new Date(System.currentTimeMillis());
 		Appointment a1 = new Appointment("tannlege", date, date, false, null, john);
 		a1.setTitle("handletur");
@@ -73,10 +75,35 @@ public class TestAppointment {
 	}
 	
 	@Test
-	public void testInviteAppointment() throws IOException {
-		Person john = new Person("john", "high", "lol", "komtek", "banan");
+	public void testAcceptInviteAppointment() throws IOException {
+		Person john = new Person("john", "high", "lol@3.no", "komtek", "banan");
 		Date date = new Date(System.currentTimeMillis());
 		Appointment a1 = new Appointment("tannlege", date, date, false, null, john);
 		AppointmentHandler.addUserToAppointment(a1.getAppId(), john.getId());
+		AppointmentHandler.updateUserAppointment(a1.getAppId(), john.getId(), true);
+		assertTrue("John kommmer på møtet", AppointmentHandler.getInviteStatusOnUser(a1.getAppId(), john.getId()));
+	}
+	
+	@Test
+	public void testDeleteAppointment() throws IOException {
+		Person john = new Person("john", "high", "lol@4.no", "komtek", "banan");
+		Date date = new Date(System.currentTimeMillis());
+		Appointment a1 = new Appointment("tannlege", date, date, false, null, john);
+		AppointmentHandler.addUserToAppointment(a1.getAppId(), john.getId());
+		AppointmentHandler.updateUserAppointment(a1.getAppId(), john.getId(), true);
+		assertTrue("John kommmer på møtet", AppointmentHandler.getInviteStatusOnUser(a1.getAppId(), john.getId()));
+		a1.deleteAppointment();
+	}
+	@Test
+	public void testInviteAppointment() throws IOException {
+		Person john = new Person("john", "high", "lol@2.no", "komtek", "banan");
+		Person jo = new Person("jo", "high", "lol@22.no", "komtek", "banan");
+		Date date = new Date(System.currentTimeMillis());
+		Appointment a1 = new Appointment("tannlege", date, date, false, null, john);
+		HashMap<Person, Boolean> participants = new HashMap<Person, Boolean>();
+		participants.put(jo, null);
+		a1.updateParticipants(participants);
+		a1.save();
+		AppointmentHandler.sendMessageUserHasDenied(a1.getAppId(), jo.getId());
 	}
 }
