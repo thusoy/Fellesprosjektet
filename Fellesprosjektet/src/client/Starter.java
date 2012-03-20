@@ -210,10 +210,12 @@ public class Starter {
 		while (true) {
 			System.out.print(inputText);
 			try {
-				Date date = new Date(sdf.parse(scanner.nextLine()).getTime());
-				System.out.println(date);
-				System.out.println(Day.fromDate(date));
-				return date;
+				java.util.Date date = sdf.parse(scanner.nextLine());
+				System.out.println(date.getTime());
+				Date otherDate = new Date(date.getTime());
+				System.out.println(otherDate.getTime());
+				System.out.println(Day.fromDate(otherDate));
+				return otherDate;
 			} catch (ParseException e) {
 				System.out.println("Klarte ikke lese datoen din, vennligst prøv på nytt.");
 			}
@@ -224,6 +226,9 @@ public class Starter {
 		String query = "TRUNCATE TABLE User";
 		Execute.executeUpdate(query);
 		new Person("tarjei", "husøy", "tarjei@roms.no", "komtek", "lol");
+		new Person("silje", "mauseth", "silje.h.m@hotmail.com", "indøk", "silje");
+		new Person("Haakon", "møøøøørk", "haakon@haakon", "komtech", "klabb");
+		new Person("Trine", "Myklebust", "trine@gmail.com", "indøch", "trine");
 	}
 	
 	private static Person authenticateUser() throws IOException {
@@ -277,14 +282,14 @@ public class Starter {
 		Scanner scanner = new Scanner(System.in);
 		System.out.print("Skriv inn e-post: ");
 		String email = scanner.nextLine();
-		return "tarjei@roms.no"; //email;
+		return email;
 	}
 	
 	private static String getPassword(){
 		Scanner scanner = new Scanner(System.in);
 		System.out.print("Skriv inn passord: ");
 		String password = scanner.nextLine();
-		return "lol"; //password;
+		return password;
 	}
 
 }
