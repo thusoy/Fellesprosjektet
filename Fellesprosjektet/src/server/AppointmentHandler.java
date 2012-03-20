@@ -231,8 +231,8 @@ public class AppointmentHandler {
 	
 	public static List<Appointment> getAllCreated(long userId) throws IOException {
 		String query = "SELECT appId, title, place, startTime, endTime, description, " +
-				"daysAppearing, endOfRepeatDate, roomName, isPrivate, creatorId FROM Appointment " + 
-				"ORDER BY startTime WHERE creatorId=%d";
+				"daysAppearing, endOfRepeatDate, roomName, isPrivate, creatorId FROM Appointment WHERE creatorId=%d " + 
+				"ORDER BY startTime";
 		ResultSet rs = Execute.getResultSet(String.format(query, userId));
 		return getListFromResultSet(rs);
 	}
