@@ -103,5 +103,6 @@ public class TestAppointment {
 		participants.put(jo, null);
 		a1.updateParticipants(participants);
 		a1.save();
+		AppointmentHandler.sendMessageUserHasDenied(a1.getAppId(), jo.getId());
 	}
 }

@@ -125,17 +125,26 @@ public class AppointmentHandler {
 		}
 	}
 	
-	public static void sendAppointmentInvite(long appId) throws IOException{
+	public static void sendMessageAppointmentInvite(long appId) throws IOException{
 		Appointment ap = getAppointment(appId);
 		Message msg = new Message("Ny avtale: "+ap.getTitle(),"Du er blitt lagt til i avtalen: "+ ap.getTitle() + ". Beskrivelse: " + ap.getDescription());
 		for (Person user: ap.getParticipants().keySet()) {
 			MessageHandler.sendMessageToUser(msg.getId(), user.getId());
 		}
 	}
-	public static void sendUpdateInfo(long appId) throws IOException {
+	public static void sendMessageUpdateInfo(long appId) throws IOException {
 		Appointment ap = getAppointment(appId);
 		Message msg = new Message("Endring i avtalen: "+ap.getTitle(),
 				"Denne avtalen har blitt endret. Starttidspunkt: "+ap.getStartTime()+" Sluttidspunkt: "+ap.getEndTime());
+		for (Person user: ap.getParticipants().keySet()) {
+			MessageHandler.sendMessageToUser(msg.getId(), user.getId());
+		}
+	}
+	public static void sendMessageUserHasDenied(long appId, long userId) throws IOException {
+		Appointment ap = getAppointment(appId);
+		Person person = PersonHandler.getPerson(userId);
+		Message msg = new Message("Avslag på avtale",
+				person.getFirstname()+" "+person.getLastname()+" har avlsatt avtalen: "+ap.getTitle());
 		for (Person user: ap.getParticipants().keySet()) {
 			MessageHandler.sendMessageToUser(msg.getId(), user.getId());
 		}
