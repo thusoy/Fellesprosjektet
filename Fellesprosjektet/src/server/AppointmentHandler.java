@@ -93,6 +93,7 @@ public class AppointmentHandler {
 		String daysAppearing = rawText != null ? rawText : null;
 		Date endOfRepeat = app.getEndOfRepeatDate();
 		String roomName = app.getRoom_name();
+		Map<Person, Boolean> participants = app.getParticipants();
 		boolean isPrivate = app.isPrivate();
 		long appId = app.getAppId();
 		long creatorId = app.getCreator() != null ? app.getCreator().getId() : 0;
@@ -117,22 +118,26 @@ public class AppointmentHandler {
 			e1.printStackTrace();
 			throw new RuntimeException("Feil i SQL!");
 		}
+		for (Person user: participants.keySet()) {
+			AppointmentHandler.addUserToAppointment(appId, user.getId());
+			Message msg = new Message("Ny avtale: "+title,"Du er blitt lagt til i avtalen: "+ title + ". Beskrivelse: " + description);
+			MessageHandler.sendMessageToUser(msg.getId(), user.getId());
+		}
 	}
 	
 	public static void deleteAppointment(long appId) throws IOException {
 		Appointment app = getAppointment(appId);
-		sendMessageToAllParticipants(app, "Avtale slettet.", "Denne avtalen er blitt slettet");
+		MessageHandler.sendMessageToAllParticipants(app, "Avtale: "+app.getTitle(), "Denne avtalen er blitt slettet");
 		String query = "DELETE FROM Appointment WHERE appId=%d";
 		Execute.executeUpdate(String.format(query, appId));
 	}
 	
-	public static void updateUserAppointment(long appId, Person person, Boolean bool) throws IOException {
-		long personId = person.getId();
-		String query = "UPDATE UserAppointments SET hasAccepted=%b WHERE userId=%d AND msgId=%d";
-		Execute.executeUpdate(String.format(query, bool, personId, appId));
+	public static void updateUserAppointment(long appId, long userId, Boolean bool) throws IOException {
+		String query = "UPDATE UserAppointments SET hasAccepted=%b WHERE userId=%d AND appId=%d";
+		Execute.executeUpdate(String.format(query, bool, userId, appId));
 	}
 	
-	public static Map<Integer, Boolean> getParticipants(long appId) throws IOException {
+	public static Map<Long, Boolean> getParticipants(long appId) throws IOException {
 		String query =
 				"SELECT userId, hasAccepted FROM UserAppointments" +
 				" WHERE appId=%d";
@@ -140,13 +145,25 @@ public class AppointmentHandler {
 		try {
 			return Execute.executeGetHashMap(String.format(query, appId));
 		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new RuntimeException("Feil i SQL!");
+		}
+	}
+	public static Boolean getInviteStatusOnUser(long appId, long userId) throws IOException {
+		String query =
+				"SELECT hasAccepted FROM UserAppointments" +
+				" WHERE appId=%d AND userId=%d";
+		
+		try {
+			return Execute.executeGetBoolean(String.format(query, appId, userId));
+		} catch (SQLException e) {
 			throw new RuntimeException("Feil i SQL!");
 		}
 	}
 	
 	public static void addUserToAppointment(long appId, long userId) throws IOException {
-		String query = "INSERT INTO UserAppointments(appId, userId, hasAccepted) VALUES(%d, %d, %b)";
-		Execute.executeUpdate(String.format(query, appId, userId, null));
+		String query = "INSERT INTO UserAppointments(appId, userId, hasAccepted) VALUES(%d, %d, null)";
+		Execute.executeUpdate(String.format(query, appId, userId));
 	}
 	
 	public static void deleteUserFromAppointment(long appId) throws IOException {
@@ -154,20 +171,6 @@ public class AppointmentHandler {
 				"DELETE FROM UserAppoinments WHERE userId=%d AND msgId=%d";
 		
 		Execute.executeUpdate(String.format(query, appId));
-	}
-	
-	private static void sendMessageToAllParticipants(Appointment app, String title,
-		String content) throws IOException {
-		Set<Person> participants = app.getParticipants().keySet();
-		Message msg = new Message(title, content);
-		long msgId = msg.getId();
-		msg.setReceivers(Arrays.asList(participants.toArray(new Person[0])));
-		String query = 
-				"INSERT INTO UserMessages(userId, msgId, hasBeenRead) VALUES(%d, %d, %b)";
-		for (Person user: participants) {
-			long userId = user.getId();
-			Execute.executeUpdate(String.format(query, userId, msgId, false));
-		}		
 	}
 	
 	public static void updateRoomName(long appId, String name) throws IOException {
@@ -186,9 +189,9 @@ public class AppointmentHandler {
 		return getListFromResultSet(rs).get(0);
 	}
 	
-	private static Map<Person, Boolean> convertIdsToPersons(Map<Integer, Boolean> participants) throws IOException{
+	private static Map<Person, Boolean> convertIdsToPersons(Map<Long, Boolean> participants) throws IOException{
 		Map<Person, Boolean> out = new HashMap<Person, Boolean>();
-		for (Integer i: participants.keySet()){
+		for (Long i: participants.keySet()){
 			out.put(PersonHandler.getPerson(i), participants.get(i));
 		}
 		return out;
