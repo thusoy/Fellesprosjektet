@@ -155,8 +155,20 @@ public class Starter {
 		
 	}
 
-	private void deleteAppointment() {
-		
+	private void deleteAppointment() throws IOException {
+		long userId = user.getId();
+		List<Appointment> appointments = AppointmentHandler.getAllCreated(userId);
+		for (Appointment app: AppointmentHandler.getAllInvited(userId)) {
+			appointments.add(app);
+		}
+		for (int i=0; i<appointments.size(); i++) {
+			System.out.println(i+". "+appointments.get(i));
+		}
+		System.out.println("Velg hvilken avtale du vil slette: ");
+		Scanner scanner = new Scanner(System.in);
+		int delete = scanner.nextInt();
+		long appId = appointments.get(delete).getAppId();
+		AppointmentHandler.getAppointment(appId).deleteAppointment();
 	}
 
 	private void addNewAppointment() throws IOException {
