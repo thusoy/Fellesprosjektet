@@ -241,7 +241,7 @@ public class AppointmentHandler {
 		List<Long> appIdList = new ArrayList<Long>();
 		List<Appointment> appointments = new ArrayList<Appointment>();
 		try {
-			appIdList = Execute.executeGetLongList(query);
+			appIdList = Execute.executeGetLongList(String.format(query, userId));
 		} catch (SQLException e) {
 			e.printStackTrace();
 			throw new RuntimeException("SQL feil");
