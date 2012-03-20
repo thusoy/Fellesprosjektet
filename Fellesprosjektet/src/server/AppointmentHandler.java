@@ -58,6 +58,11 @@ public class AppointmentHandler {
 			e1.printStackTrace();
 			throw new RuntimeException("Feil i SQL!");
 		}
+		if (participants != null) {
+			for (Person user: participants.keySet()) {
+				AppointmentHandler.addUserToAppointment(appId, user.getId());
+			}
+		}
 	}
 	
 	private static long getUniqueId() throws IOException {
@@ -231,19 +236,21 @@ public class AppointmentHandler {
 	
 	public static List<Appointment> getAllCreated(long userId) throws IOException {
 		String query = "SELECT appId, title, place, startTime, endTime, description, " +
-				"daysAppearing, endOfRepeatDate, roomName, isPrivate, creatorId FROM Appointment WHERE creatorId=%d " + 
-				"ORDER BY startTime";
-		ResultSet rs = Execute.getResultSet(String.format(query, userId));
-		return getListFromResultSet(rs);
-	}
 	public static List<Appointment> getAllInvited(long userId) throws IOException {
 		String query = "SELECT appId FROM UserAppointments WHERE userId=%d";
 		List<Long> appIdList = new ArrayList<Long>();
 		List<Appointment> appointments = new ArrayList<Appointment>();
 		try {
-			appIdList = Execute.executeGetLongList(query);
+			appIdList = Execute.executeGetLongList(String.format(query, userId));
 		} catch (SQLException e) {
 			e.printStackTrace();
+			throw new RuntimeException("SQL feil");
+		}
+		for (long appId: appIdList) {
+			appointments.add(getAppointment(appId));
+		}
+		return appointments;
+	}
 			throw new RuntimeException("SQL feil");
 		}
 		for (long appId: appIdList) {
