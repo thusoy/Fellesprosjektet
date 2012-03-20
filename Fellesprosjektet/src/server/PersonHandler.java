@@ -1,7 +1,9 @@
 package server;
 
 import static no.ntnu.fp.model.Person.recreatePerson;
+
 import java.io.IOException;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -22,10 +24,16 @@ public class PersonHandler {
 
 		String query =
 				"INSERT INTO User(userId, email, firstname, lastname, department, passwordHash, salt) " +
-				"VALUES(%d, '%s', '%s', '%s', '%s', '%s', '%s')";
+				"VALUES(%d, '%s', '%s', '%s', ?, '%s', '%s')";
 
-		Execute.executeUpdate(String.format(query, userId, email, firstname, 
-				lastname, department, passwordHash, salt));
+		try {
+			PreparedStatement ps = Execute.getPreparedStatement(String.format(query, userId, email, firstname, 
+					lastname, passwordHash, salt));
+			ps.setString(1, department);
+			ps.execute();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 
 	}
 	public static void updateUser(Person person) throws IOException {
@@ -74,9 +82,6 @@ public class PersonHandler {
 				String lastname = rs.getString("lastname");
 				String email = rs.getString("email");
 				String department = rs.getString("department");
-				if (department != null && department.equals("null"))
-					System.out.println("OBSOBS! Fant null!");
-					System.out.println(rs.ge);
 				String passwordHash = rs.getString("passwordHash");
 				Person p = recreatePerson(id, firstname, lastname, email, department, passwordHash);
 				list.add(p);

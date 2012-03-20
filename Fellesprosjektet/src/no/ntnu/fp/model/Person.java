@@ -161,7 +161,6 @@ public class Person {
 
 	@Override
 	public boolean equals(Object obj) {
-		System.out.println("sammligner users!");
 		if (this == obj)
 			return true;
 		if (obj == null)
@@ -171,8 +170,6 @@ public class Person {
 		Person other = (Person) obj;
 		if (department == null) {
 			if (other.department != null)
-				System.out.println("kom hiiiiiiiiiiiiiit");
-			System.out.println("other dep: " + other.department);
 				return false;
 		} else if (!department.equals(other.department))
 			return false;

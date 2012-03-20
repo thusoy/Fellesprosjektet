@@ -1,7 +1,6 @@
 package server;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
@@ -9,7 +8,6 @@ import java.sql.Date;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import no.ntnu.fp.model.Person;
 
@@ -36,10 +34,7 @@ public class TestAppointment {
 		Person creator = new Person("john", "locke", "lol@post", null, "");
 		Appointment app = new Appointment("tannlege", start, end, false, null, creator);
 		Appointment dbApp = Appointment.getAppointment(app.getAppId());
-		System.out.println("sammenligner *********************************");
-		System.out.println("app: " + dbApp.getCreator().getDepartment().length());
 		assertEquals("Objektene skal være like!", app, dbApp);
-		System.out.println("ferdig! **************************************");
 	}
 	
 	@Test
@@ -94,6 +89,7 @@ public class TestAppointment {
 		assertTrue("John kommmer pŒ m¿tet", AppointmentHandler.getInviteStatusOnUser(a1.getAppId(), john.getId()));
 		a1.deleteAppointment();
 	}
+	
 	@Test
 	public void testInviteAppointment() throws IOException {
 		Person john = new Person("john", "high", "lol@2.no", "komtek", "banan");
