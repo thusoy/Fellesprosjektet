@@ -45,7 +45,7 @@ public class Starter {
 				Person user = authenticateUser();
 				this.user = user;
 				System.out.println("Auth OK!");
-			} catch(IllegalArgumentException e){
+			} catch(RuntimeException e){
 				System.out.println("Ugyldig kombinasjon av passord og brukernavn, prøv igjen.");
 			}
 		} while (user == null);
@@ -77,7 +77,6 @@ public class Starter {
 	}
 
 	public void run(CalendarFunction func) throws IOException{
-		System.out.println("Running func:" + func);
 		switch(func){
 		case ADD_APPOINTMENT:
 			addNewAppointment();
@@ -138,9 +137,9 @@ public class Starter {
 	}
 
 	private void showWeek() throws IOException {
-		
 		List<Appointment> appointments = AppointmentHandler.getWeekAppointments(user.getId(), weekNum);
 		Day previous = null;
+		System.out.printf("************* UKE %d ********************\n", weekNum);
 		for(Appointment app: appointments){
 			Day thisDay = Day.fromDate(app.getStartTime());
 			if (thisDay != previous){
@@ -149,6 +148,7 @@ public class Starter {
 			System.out.println(app);
 			previous = thisDay;
 		}
+		System.out.println("****************************************");
 	}
 
 	private void changeAppointment() {
@@ -196,7 +196,7 @@ public class Starter {
 			} else if (isValidEmail(email)){
 				Person p = getPersonFromEmail(email);
 				map.put(p, null);
-				System.out.printf("%s added to participants!", email);
+				System.out.printf("%s added to participants!\n", email);
 			} else {
 				System.out.println("Invalid email!");
 			}
@@ -211,10 +211,7 @@ public class Starter {
 			System.out.print(inputText);
 			try {
 				java.util.Date date = sdf.parse(scanner.nextLine());
-				System.out.println(date.getTime());
 				Date otherDate = new Date(date.getTime());
-				System.out.println(otherDate.getTime());
-				System.out.println(Day.fromDate(otherDate));
 				return otherDate;
 			} catch (ParseException e) {
 				System.out.println("Klarte ikke lese datoen din, vennligst prøv på nytt.");

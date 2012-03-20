@@ -28,7 +28,7 @@ public class Appointment implements Serializable {
 	private boolean isPrivate;
 	private Person creator;
 	private Map<Person, Boolean> participants;
-	private String room_name;
+	private String roomName;
 	
 	/**
 	 * Creates an appointment and saves the object to the database.
@@ -161,12 +161,12 @@ public class Appointment implements Serializable {
 		this.participants = participants;
 	}
 	
-	public String getRoom_name() {
-		return room_name;
+	public String getRoomName() {
+		return roomName;
 	}
 	
 	public void setRoomName(String room_name) throws IOException {
-		this.room_name = room_name;
+		this.roomName = room_name;
 		AppointmentHandler.updateRoomName(this.getAppId(), room_name);
 	}
 	
@@ -211,7 +211,7 @@ public class Appointment implements Serializable {
 				+ ((participants == null) ? 0 : participants.hashCode());
 		result = prime * result + ((place == null) ? 0 : place.hashCode());
 		result = prime * result
-				+ ((room_name == null) ? 0 : room_name.hashCode());
+				+ ((roomName == null) ? 0 : roomName.hashCode());
 		result = prime * result
 				+ ((startTime == null) ? 0 : startTime.hashCode());
 		result = prime * result + ((title == null) ? 0 : title.hashCode());
@@ -269,10 +269,10 @@ public class Appointment implements Serializable {
 				return false;
 		} else if (!place.equals(other.place))
 			return false;
-		if (room_name == null) {
-			if (other.room_name != null)
+		if (roomName == null) {
+			if (other.roomName != null)
 				return false;
-		} else if (!room_name.equals(other.room_name))
+		} else if (!roomName.equals(other.roomName))
 			return false;
 		if (startTime == null) {
 			if (other.startTime != null)

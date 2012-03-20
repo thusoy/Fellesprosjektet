@@ -31,7 +31,7 @@ public class AppointmentHandler {
 		String rawText = app.getDaysAppearing() != null ? app.getDaysAppearing().toString() : null;
 		String daysAppearing = rawText != null ? rawText.substring(1, rawText.length()-1) : null;
 		Date endOfRepeat = app.getEndOfRepeatDate();
-		String roomName = app.getRoom_name();
+		String roomName = app.getRoomName();
 		boolean isPrivate = app.isPrivate();
 		long creatorId = app.getCreator() != null ? app.getCreator().getId() : 0;
 		long appId = getUniqueId();
@@ -91,7 +91,7 @@ public class AppointmentHandler {
 		String rawText = app.getDaysAppearing() != null ? app.getDaysAppearing().toString() : null;
 		String daysAppearing = rawText != null ? rawText : null;
 		Date endOfRepeat = app.getEndOfRepeatDate();
-		String roomName = app.getRoom_name();
+		String roomName = app.getRoomName();
 		Map<Person, Boolean> participants = app.getParticipants();
 		boolean isPrivate = app.isPrivate();
 		long appId = app.getAppId();
