@@ -1,6 +1,7 @@
 package server;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
@@ -70,4 +71,11 @@ public class TestAppointment {
 		assertTrue("Tittel skal v¾re lik", a1.getTitle().equals("handletur"));
 	}
 	
+	@Test
+	public void testInviteAppointment() throws IOException {
+		Person john = new Person("john", "high", "lol", "komtek", "banan");
+		Date date = new Date(System.currentTimeMillis());
+		Appointment a1 = new Appointment("tannlege", date, date, false, null, john);
+		AppointmentHandler.addUserToAppointment(a1.getAppId(), john.getId());
+	}
 }

@@ -144,9 +144,9 @@ public class AppointmentHandler {
 		}
 	}
 	
-	public static void addUserToAppointment(long appId) throws IOException {
-		String query = "INSERT INTO UserAppointments VALUES(%d, %d, %b)";
-		Execute.executeUpdate(String.format(query, appId));
+	public static void addUserToAppointment(long appId, long userId) throws IOException {
+		String query = "INSERT INTO UserAppointments(appId, userId, hasAccepted) VALUES(%d, %d, %b)";
+		Execute.executeUpdate(String.format(query, appId, userId, null));
 	}
 	
 	public static void deleteUserFromAppointment(long appId) throws IOException {
