@@ -180,6 +180,25 @@ public class Execute {
 	}
 	
 	/**
+	 * A wrapper for the database calls. Returns all the ints returned by the query as 
+	 * a List<long>.
+	 * @param query
+	 * @return
+	 * @throws ClassNotFoundException
+	 * @throws IOException
+	 * @throws SQLException
+	 */
+	public static List<Long> executeGetLongList(String query) throws IOException, SQLException{
+		Statement stmt = getStatement();
+		ResultSet rs = stmt.executeQuery(query);
+		List<Long> output = new ArrayList<Long>();
+		while(rs.next()){
+			output.add(rs.getLong(1));
+		}
+		return output;
+	}
+	
+	/**
 	 * A wrapper for the database calls. Returns the first value in the first column of 'query' as
 	 * a long.
 	 * @param query
