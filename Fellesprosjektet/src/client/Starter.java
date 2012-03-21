@@ -16,6 +16,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.Set;
+import java.util.TreeSet;
 
 import no.ntnu.fp.model.Person;
 import server.AppointmentHandler;
@@ -175,10 +177,8 @@ public class Starter {
 	}
 	
 	private void answerInvite(Appointment appointment) throws IOException {
-		System.out.print("Hva vil du svare? ('ja', 'nei', eller enter for å utsette) ");
-		Scanner scanner = new Scanner(System.in);
 		while(true){
-			String input = scanner.nextLine();
+			String input = getString("Hva vil du svare? ('ja', 'nei', eller enter for å utsette) ");
 			if (input.equalsIgnoreCase("ja")){
 				appointment.acceptInvite(user, true);
 				System.out.printf("Du har bekreftet avtalen %s.\n", appointment);
@@ -192,8 +192,7 @@ public class Starter {
 			}
 			System.out.println("Beklager, jeg skjønte ikke svaret ditt. Prøv igjen.");
 		}
-		System.out.println("Trykk enter for å gå videre.");
-		scanner.nextLine();
+		getString("Trykk enter for å gå videre.");
 	}
 
 
@@ -211,10 +210,9 @@ public class Starter {
 	}
 
 	private static String getValidEmail() throws IOException {
-		Scanner scn = new Scanner(System.in);
 		String email;
 		do {
-			email = scn.nextLine();
+			email = getString("Skriv inn e-postadresse: ");
 		} while (!isValidEmail(email));
 		return email;
 	}
@@ -254,17 +252,18 @@ public class Starter {
 		Collections.sort(appointments);		
 		return appointments;
 	}
+	
 	private List<Appointment> getAllAppointments() throws IOException{
-		List<Appointment> appointments = AppointmentHandler.getAllCreated(user.getId());
-		List<Appointment> app = AppointmentHandler.getAllInvited(user.getId());		
-		List<Appointment> apps = PersonHandler.getFollowAppointments(user.getId());
-		appointments.addAll(apps);
-		appointments.addAll(app);
-		Collections.sort(appointments);
-		for (int i=0; i<appointments.size(); i++) {
-			System.out.println(i+". "+appointments.get(i));
-		}
-		return appointments;
+		List<Appointment> created = AppointmentHandler.getAllCreated(user.getId());
+		List<Appointment> invited = AppointmentHandler.getAllInvited(user.getId());		
+		List<Appointment> follows = PersonHandler.getFollowAppointments(user.getId());
+		created.addAll(follows);
+		created.addAll(invited);
+		Set<Appointment> sortedUnique = new TreeSet<Appointment>();
+		sortedUnique.addAll(created);
+		List<Appointment> unique = new ArrayList<Appointment>(sortedUnique);
+		Collections.sort(unique);
+		return unique;
 	}
 	
 	private void showAppointment() throws IOException {
@@ -307,41 +306,19 @@ public class Starter {
 	}
 	
 	public void changeAppointment(Appointment app) throws IOException{
-		Scanner scanner = new Scanner(System.in);
 		String dateTimeFormat = "dd-MM-yyyy HH:mm";
-		System.out.print("Skriv inn tittel: ");
-		String title = scanner.nextLine();
 		Date startdate = parseDate(dateTimeFormat, String.format("Startdato (%s): ", dateTimeFormat));
 		Date enddate = parseDate(dateTimeFormat, String.format("Sluttdato (%s): ", dateTimeFormat));
-		System.out.print("Hvis avtalen er privat, skriv 'ja'. Hvis ikke, trykk på enter. ");
-		boolean isPrivate = !scanner.nextLine().isEmpty();
-		Map<Person, Boolean> participants = getParticipants();
-		System.out.println("Skriv inn beskrivelse: ");
-		String description = scanner.nextLine();
+		boolean isPrivate = !getString("Hvis avtalen er privat, skriv 'ja'. Hvis ikke, trykk på enter. ").isEmpty();
 		
-		app.setTitle(title);
+		app.setTitle(getString("Skriv inn tittel: "));
 		app.setStartTime(startdate);
 		app.setEndTime(enddate);
 		app.setPrivate(isPrivate);
-		app.setParticipants(participants);
-		app.setDescription(description);
+		app.setParticipants(getParticipants());
+		app.setDescription(getString("Skriv inn beskrivelse: "));
+		setRoomOrPlace(app);
 		
-		if (participants != null){
-			System.out.println("Vil du reservere m¿terom? (ja/nei): ");
-			String reserve = scanner.nextLine();
-			if (reserve.equalsIgnoreCase("ja")){
-				String roomName = reserveRoom(startdate, enddate, participants);
-				app.setRoomName(roomName);
-			} else {
-				System.out.println("Skriv inn sted: ");
-				String place = scanner.nextLine();
-				app.setPlace(place);
-			}
-		} else {
-			System.out.println("Skriv inn sted: ");
-			String place = scanner.nextLine();
-			app.setPlace(place);
-		}
 		app.save();
 		System.out.println("Avtalen er endret.");
 	}
@@ -349,12 +326,10 @@ public class Starter {
 	private void deleteAppointment() throws IOException {
 		long userId = user.getId();
 		List<Appointment> appointments = getAllAppointmentsInvolved(userId);
-		System.out.println("Velg hvilken avtale du vil slette: ");
-		Scanner scanner = new Scanner(System.in);
-		int delete = scanner.nextInt();
+		int delete = getValidNum(appointments.size()-1);
 		long appId = appointments.get(delete).getAppId();
-		Appointment ap = AppointmentHandler.getAppointment(appId);
-		deleteAppointment(ap);
+		Appointment app = AppointmentHandler.getAppointment(appId);
+		deleteAppointment(app);
 	}
 	
 	public void deleteAppointment(Appointment app) throws IOException{
@@ -370,64 +345,53 @@ public class Starter {
 		List<Appointment> appointments = AppointmentHandler.getAllCreated(userId);
 		List<Appointment> app = AppointmentHandler.getAllInvited(userId);
 		appointments.addAll(app);
-		for (int i=0; i<appointments.size(); i++) {
-			System.out.println(i+". "+appointments.get(i));
-		}
-		
 		return appointments;
 	}
+	
 	private void addNewAppointment() throws IOException {
 		String dateTimeFormat = "dd-MM-yyyy HH:mm";
-		Scanner scanner = new Scanner(System.in);
-		System.out.print("Skriv inn tittel: ");
-		String title = scanner.nextLine();
+		String title = getString("Skriv inn tittel: ");
 		Date startdate = parseDate(dateTimeFormat, String.format("Startdato (%s): ", dateTimeFormat));
 		Date enddate = parseDate(dateTimeFormat, String.format("Sluttdato (%s): ", dateTimeFormat));
-		System.out.print("Hvis avtalen er privat, skriv 'ja'. Hvis ikke, trykk på enter. ");
-		boolean isPrivate = scanner.nextLine().isEmpty();
+		boolean isPrivate = !getString("Hvis avtalen er privat, skriv 'ja'. Hvis ikke, trykk på enter. ").isEmpty();
 		Map<Person, Boolean> participants = getParticipants();
 		
-		Appointment ap = new Appointment(title, startdate, enddate, isPrivate, participants, user);
-		if (participants != null){
-			System.out.println("Vil du reservere m¿terom? (ja/nei): ");
-			String reserve = scanner.nextLine();
-			if(reserve.equalsIgnoreCase("ja")){
-				String roomName = reserveRoom(startdate, enddate, participants);
-				ap.setRoomName(roomName);
-			}else{
-				System.out.println("Skriv inn sted: ");
-				String place = scanner.nextLine();
-				ap.setPlace(place);
-			}
-		}else{
-			System.out.println("Skriv inn sted: ");
-			String place = scanner.nextLine();
-			ap.setPlace(place);
-		}
-		ap.save();
+		Appointment app = new Appointment(title, startdate, enddate, isPrivate, participants, user);
+		setRoomOrPlace(app);
+		app.save();
 		System.out.println("Ny avtale lagret!");
+	}
+	
+	private void setRoomOrPlace(Appointment app) throws IOException{
+		if (app.getParticipants() != null){
+			String reserve = getString("Vil du reservere m¿terom? (ja/nei): ");
+			if (reserve.equalsIgnoreCase("ja")){
+				String roomName = reserveRoom(app.getStartTime(), app.getEndTime(), app.getParticipants());
+				app.setRoomName(roomName);
+			} else {
+				String place = getString("Skriv inn sted: ");
+				app.setPlace(place);
+			}
+		} else {
+			String place = getString("Skriv inn sted: ");
+			app.setPlace(place);
+		}
 	}
 	
 	private String reserveRoom(Date startdate, Date enddate, Map<Person, Boolean> participants) throws IOException {
 		List<Room> rooms = RoomHandler.availableRooms(startdate, enddate, participants.size());
-		int i = 0;
 		System.out.println("Reserver m¿terom: ");
-		for (Room room: rooms) {
-			System.out.println(i+" "+room.getName());
-			i++;
+		for (int i = 0; i < rooms.size(); i++) {
+			System.out.printf("%d. %s\n", i+1, rooms.get(i).getName());
 		}
-		Scanner scanner = new Scanner(System.in);
-		int choosenRoom = scanner.nextInt();
+		int choosenRoom = getValidNum(rooms.size()-1);
 		return rooms.get(choosenRoom).getName();
 	}
 	
 	private Map<Person, Boolean> getParticipants() throws IOException{
 		Map<Person, Boolean> map = new HashMap<Person, Boolean>();
-		Scanner scanner = new Scanner(System.in);
-		String email;
 		while (true) {
-			System.out.print("Enter email to invite to the event: ");
-			email = scanner.nextLine();
+			String email = getString("Enter email to invite to the event: ");
 			if (email.isEmpty()){
 				break;
 			} else if (isValidEmail(email) && !email.equalsIgnoreCase(user.getEmail())){
@@ -443,11 +407,9 @@ public class Starter {
 	
 	private Date parseDate(String format, String inputText){
 		SimpleDateFormat sdf = new SimpleDateFormat(format);
-		Scanner scanner = new Scanner(System.in);
 		while (true) {
-			System.out.print(inputText);
 			try {
-				java.util.Date date = sdf.parse(scanner.nextLine());
+				java.util.Date date = sdf.parse(getString(inputText));
 				Date otherDate = new Date(date.getTime());
 				return otherDate;
 			} catch (ParseException e) {
@@ -485,15 +447,13 @@ public class Starter {
 	
 	private static long getUserIdFromEmail(String email) throws IOException{
 		String query = "SELECT userId FROM User WHERE email='%s'";
-		long id;
-		id = Execute.executeGetLong(String.format(query, email));
+		long id = Execute.executeGetLong(String.format(query, email));
 		return id;
 	}
 	
 	private static String getSalt(String email) throws IOException{
 		String query = "SELECT salt FROM User WHERE email='%s'";
-		String salt;
-		salt = Execute.executeGetString(String.format(query, email));
+		String salt = Execute.executeGetString(String.format(query, email));
 		return salt;
 	}
 	
@@ -504,17 +464,17 @@ public class Starter {
 	}
 	
 	private static String getEmail(){
-		Scanner scanner = new Scanner(System.in);
-		System.out.print("Skriv inn e-post: ");
-		String email = scanner.nextLine();
-		return email;
+		return getString("Skriv inn e-post: ");
 	}
 	
 	private static String getPassword(){
+		return getString("Skriv inn passord: ");
+	}
+	
+	private static String getString(String display){
 		Scanner scanner = new Scanner(System.in);
-		System.out.print("Skriv inn passord: ");
-		String password = scanner.nextLine();
-		return password;
+		System.out.print(display);
+		return scanner.nextLine();
 	}
 
 }
