@@ -9,6 +9,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import calendar.Appointment;
+
 import no.ntnu.fp.model.Person;
 
 public class PersonHandler {
@@ -71,6 +73,13 @@ public class PersonHandler {
 		} else {
 			throw new IllegalArgumentException("Fant ikke person med den id-en!");
 		}
+	}
+	
+	public static List<Appointment> getFollowAppointments(long userId) throws IOException, SQLException {
+		String query =
+				"SELECT userId FROM UserCalendars WHERE followsUserId=%d";
+		Execute.executeGetLongList(String.format(query, userId));
+		AppointmentHandler.
 	}
 	
 	private static List<Person> getListFromResultSet(ResultSet rs) throws IOException {

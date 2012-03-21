@@ -195,6 +195,7 @@ public class Starter {
 
 	private void showWeek() throws IOException {
 		List<Appointment> appointments = AppointmentHandler.getWeekAppointments(user.getId(), weekNum);
+		
 		Day previous = null;
 		System.out.printf("************* UKE %d ********************\n", weekNum);
 		for(Appointment app: appointments){
@@ -233,7 +234,7 @@ public class Starter {
 			}else{
 				answerString = answer ? "kommer" : "kommer ikke";
 			}
-			System.out.printf("%s %s %s.", user.getFirstname(), user.getLastname(), answerString);
+			System.out.printf("%s %s %s.\n", user.getFirstname(), user.getLastname(), answerString);
 		}
 	}
 	private void changeAppointment() throws IOException {
