@@ -10,7 +10,6 @@ import java.net.UnknownHostException;
 
 import server.CalendarProtocol;
 import server.ServerController;
-import calendar.DBObject;
 
 public class ClientController extends Thread {
 
@@ -71,39 +70,39 @@ public class ClientController extends Thread {
 //		System.out.println("Session done!");
 	}
 	
-	public static long saveObjectAndGetId(DBObject obj){
-		client = getClient();
-		long id;
-		int tries = 3;
-		while(tries > 0){
-			try {
-				id = client.saveObjectAndGetIdHelper(obj);
-				return id;
-			} catch (IOException e) {
-				System.err.println("Failed to connect to database, retrying...");
-				tries--;
-			}
-		}
-		throw new RuntimeException("Cant connect to server after several attemps!");
-	}
-	
-	private long saveObjectAndGetIdHelper(DBObject obj) throws IOException{
-		CalendarProtocol protocol = new CalendarProtocol();
-		String response = protocol.getResponse(null);
-		String input;
-		System.out.println("waiting for server opening..");
-		out.println(response);
-		String[] responses = {"hey", "zup", "orly", "omg", "kthxbye!"};
-		int index = 0;
-		out.flush();
-		out.println(responses[index]);
-		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		while(true){
-			input = br.readLine();
-			out.println(input);
-		}
-//		String hash = 
-	}
+//	public static long saveObjectAndGetId(DBObject obj){
+//		client = getClient();
+//		long id;
+//		int tries = 3;
+//		while(tries > 0){
+//			try {
+//				id = client.saveObjectAndGetIdHelper(obj);
+//				return id;
+//			} catch (IOException e) {
+//				System.err.println("Failed to connect to database, retrying...");
+//				tries--;
+//			}
+//		}
+//		throw new RuntimeException("Cant connect to server after several attemps!");
+//	}
+//	
+//	private long saveObjectAndGetIdHelper(DBObject obj) throws IOException{
+//		CalendarProtocol protocol = new CalendarProtocol();
+//		String response = protocol.getResponse(null);
+//		String input;
+//		System.out.println("waiting for server opening..");
+//		out.println(response);
+//		String[] responses = {"hey", "zup", "orly", "omg", "kthxbye!"};
+//		int index = 0;
+//		out.flush();
+//		out.println(responses[index]);
+//		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+//		while(true){
+//			input = br.readLine();
+//			out.println(input);
+//		}
+////		String hash = 
+//	}
 	
 	public static ClientController getClient(){
 		if (client != null){
