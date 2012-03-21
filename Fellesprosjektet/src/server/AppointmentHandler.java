@@ -319,17 +319,17 @@ public class AppointmentHandler {
 		List<Appointment> finalList = new ArrayList<Appointment>();
 		try {
 			while (rs.next()){
-				long id = rs.getLong(1);
-				String title = rs.getString(2);
-				String place = rs.getString(3);
-				Date startTime = new Date(rs.getTimestamp(4).getTime());
-				Date endTime = new Date(rs.getTimestamp(5).getTime());
-				String description = rs.getString(6);
-				String daysAppearing = rs.getString(7);
-				Date endOfRepeat = rs.getDate(8);
-				String roomName = rs.getString(9);
-				boolean isPrivate = rs.getBoolean(10);
-				long creatorId = rs.getLong(11);
+				long id = rs.getLong("appId");
+				String title = rs.getString("title");
+				String place = rs.getString("place");
+				Date startTime = new Date(rs.getTimestamp("startTime").getTime());
+				Date endTime = new Date(rs.getTimestamp("endTime").getTime());
+				String description = rs.getString("description");
+				String daysAppearing = rs.getString("daysAppearing");
+				Date endOfRepeat = rs.getDate("endOfRepeatDate");
+				String roomName = rs.getString("roomName");
+				boolean isPrivate = rs.getBoolean("isPrivate");
+				long creatorId = rs.getLong("creatorId");
 				Person creator = PersonHandler.getPerson(creatorId);
 				Map<Person, Boolean> participants = convertIdsToPersons(getParticipants(id));
 				Appointment a = recreateAppointment(id, title, startTime, endTime, isPrivate, participants, creator);
