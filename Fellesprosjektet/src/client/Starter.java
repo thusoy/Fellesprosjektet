@@ -135,7 +135,7 @@ public class Starter {
 			System.out.printf("%d. %s\n", i+1, m);
 		}
 		System.out.print("Hvilken melding vil du lese? ");
-		int userInput = getValidNum(unreadMessages.size()-1);
+		int userInput = getValidNum(unreadMessages.size());
 		Message selected = unreadMessages.get(userInput-1);
 		System.out.println(selected.showMessage(user).getContent());
 		if (selected instanceof RejectedMessage){
@@ -150,8 +150,8 @@ public class Starter {
 		for(int i = 0; i < allInvited.size(); i++){
 			System.out.printf("%d. %s\n", i + 1, allInvited.get(i));
 		}
-		System.out.print("Vil du svare på en innkalling? Tast inn nummeret: ");
-		int userNum = getValidNum(allInvited.size()-1);
+		System.out.print("Hvilken innkalling vil du svare på? ");
+		int userNum = getValidNum(allInvited.size());
 		answerInvite(allInvited.get(userNum-1));
 	}
 	
@@ -166,7 +166,7 @@ public class Starter {
 			try {
 				System.out.print("Gjør et valg: ");
 				input = scanner.nextInt();
-				if (input > 1 && input <= upperInclusiveBound){
+				if (1 <= input && input <= upperInclusiveBound){
 					break;
 				}
 			} catch (Exception e){ 
@@ -300,7 +300,7 @@ public class Starter {
 		for (int i=0; i<appointments.size(); i++) {
 			System.out.printf("%d. %s\n", i+1, appointments.get(i));
 		}
-		int change = getValidNum(appointments.size()-1);
+		int change = getValidNum(appointments.size());
 		Appointment app = appointments.get(change-1);
 		changeAppointment(app);
 	}
@@ -326,7 +326,7 @@ public class Starter {
 	private void deleteAppointment() throws IOException {
 		long userId = user.getId();
 		List<Appointment> appointments = getAllAppointmentsInvolved(userId);
-		int delete = getValidNum(appointments.size()-1);
+		int delete = getValidNum(appointments.size());
 		long appId = appointments.get(delete).getAppId();
 		Appointment app = AppointmentHandler.getAppointment(appId);
 		deleteAppointment(app);
@@ -384,7 +384,7 @@ public class Starter {
 		for (int i = 0; i < rooms.size(); i++) {
 			System.out.printf("%d. %s\n", i+1, rooms.get(i).getName());
 		}
-		int choosenRoom = getValidNum(rooms.size()-1);
+		int choosenRoom = getValidNum(rooms.size());
 		return rooms.get(choosenRoom).getName();
 	}
 	
