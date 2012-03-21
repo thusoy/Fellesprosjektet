@@ -246,17 +246,32 @@ public class AppointmentHandler {
 	public static List<Appointment> getAllInvited(long userId) throws IOException {
 		String query = "SELECT appId FROM UserAppointments WHERE userId=%d";
 		List<Long> appIdList = new ArrayList<Long>();
-		List<Appointment> appointments = new ArrayList<Appointment>();
 		try {
 			appIdList = Execute.executeGetLongList(String.format(query, userId));
 		} catch (SQLException e) {
 			e.printStackTrace();
 			throw new RuntimeException("SQL feil");
 		}
-		for (long appId: appIdList) {
-			appointments.add(getAppointment(appId));
+		return idsToApps(appIdList);
+	}
+	
+	private static List<Appointment> idsToApps(List<Long> ids) throws IOException{
+		List<Appointment> apps = new ArrayList<Appointment>();
+		for(long appId: ids){
+			apps.add(getAppointment(appId));
 		}
-		return appointments;
+		return apps;
+	}
+	
+	public static List<Appointment> getAllUnansweredInvites(long userId) throws IOException{
+		String query = "SELECT appId FROM UserAppointments WHERE userId=%d AND hasAccepted=NULL";
+		try {
+			List<Long> allIds = Execute.executeGetLongList(String.format(query, userId));
+			return idsToApps(allIds);
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new RuntimeException("Feil i SQL");
+		}
 	}
 
 	public static List<Appointment> getWeekAppointments(long userId, int weekNum) throws IOException {
