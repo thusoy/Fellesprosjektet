@@ -135,6 +135,9 @@ public class Starter {
 		int userInput = scanner.nextInt();
 		Message selected = unreadMessages.get(userInput-1);
 		System.out.println(selected.getContent());
+		if (selected.getTitle().contains("har avslått avtalen")){
+			
+		}
 	}
 
 	private void showInvites() throws IOException {
