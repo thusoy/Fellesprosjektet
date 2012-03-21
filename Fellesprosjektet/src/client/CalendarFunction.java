@@ -8,6 +8,7 @@ public enum CalendarFunction {
 	CHANGE_APPOINTMENT ("Endre avtale"),
 	SHOW_WEEK ("Vis uke"),
 	FOLLOW_CALENDAR ("Følg annen kalender"),
+	SHOW_APPOINTMENT ("Vis avtale"),
 	SHOW_NEXT_WEEK ("Vis neste uke"),
 	SHOW_PREVIOUS_WEEK ("Vis forrige uke"),
 	SHOW_INVITES ("Vis møteinnkallinger"),

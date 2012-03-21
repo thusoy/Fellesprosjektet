@@ -98,6 +98,9 @@ public class Starter {
 		case CHANGE_APPOINTMENT:
 			changeAppointment();
 			break;
+		case SHOW_APPOINTMENT:
+			showAppointment();
+			break;
 		case SHOW_WEEK:
 			getAndShowWeek();
 			break;
@@ -204,6 +207,26 @@ public class Starter {
 		System.out.println("****************************************");
 	}
 	
+	private void showAppointment() throws IOException {
+		long userId = user.getId();
+		List<Appointment> appointments = getAllAppointmentsInvolved(userId);
+		Scanner scanner = new Scanner(System.in);
+		System.out.println("Hvilken avtale vil du se? ");
+		int appointmentNo = scanner.nextInt();
+		Appointment app = appointments.get(appointmentNo);
+		System.out.println("Tittel: "+app.getTitle());
+		System.out.println("Sted: "+app.getPlace());
+		System.out.println("Start: "+app.getStartTime());
+		System.out.println("Slutt: "+app.getEndTime());
+		System.out.println("Beskrivelse: "+app.getDescription());
+		System.out.println("Rom: "+app.getRoomName());
+		System.out.println("Privat: "+app.isPrivate());
+		System.out.println("Deltakere: ");
+		Map<Person, Boolean> participants = app.getParticipants();
+		for (Person user: participants.keySet()) {
+			System.out.printf("%s %s. Status: %s.", user.getFirstname(), user.getLastname(), participants.get(user));
+		}
+	}
 	private void changeAppointment() throws IOException {
 		long userId = user.getId();
 		List<Appointment> appointments = AppointmentHandler.getAllCreated(userId);
