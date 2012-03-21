@@ -28,7 +28,7 @@ public class Starter {
 	
 	public static void main(String[] args) {
 		try {
-			recreateDb();
+//			recreateDb();
 			(new Starter()).initAndLogin();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -116,6 +116,9 @@ public class Starter {
 			getAndShowWeek();
 			showWeek();
 			break;
+		case SHOW_INVITES:
+			showInvites();
+			break;
 		case FOLLOW_CALENDAR:
 			followCalendar();
 			break;
@@ -128,6 +131,36 @@ public class Starter {
 		}
 	}
 	
+	private void showInvites() throws IOException {
+		List<Appointment> allInvited = AppointmentHandler.getAllUnansweredInvites(user.getId());
+		for(int i = 0; i < allInvited.size(); i++){
+			System.out.printf("%d. %s\n", i + 1, allInvited.get(i));
+		}
+		System.out.print("Vil du svare på en innkalling? Tast inn nummeret: ");
+		Scanner scanner = new Scanner(System.in);
+		int userNum = scanner.nextInt();
+		answerInvite(allInvited.get(userNum-1));
+	}
+	
+	private void answerInvite(Appointment appointment) throws IOException {
+		System.out.print("Hva vil du svare? ('ja', 'nei', eller enter for å utsette) ");
+		Scanner scanner = new Scanner(System.in);
+		while(true){
+			String input = scanner.nextLine();
+			if (input.equalsIgnoreCase("ja")){
+				appointment.acceptInvite(user, true);
+				break;
+			} else if (input.equalsIgnoreCase("nei")){
+				appointment.acceptInvite(user, false);
+				break;
+			} else if (input.isEmpty()){
+				break;
+			}
+			System.out.println("Beklager, jeg skjønte ikke svaret ditt. Prøv igjen.");
+		}
+	}
+
+
 	private void getAndShowWeek() throws IOException {
 		Scanner scn = new Scanner(System.in);
 		System.out.print("Skriv inn en uke du vil vise: ");

@@ -272,9 +272,10 @@ public class AppointmentHandler {
 	}
 	
 	public static List<Appointment> getAllUnansweredInvites(long userId) throws IOException{
-		String query = "SELECT appId FROM UserAppointments WHERE userId=%d AND hasAccepted=NULL";
+		String query = "SELECT appId FROM UserAppointments WHERE userId=%d AND hasAccepted IS NULL";
 		try {
-			List<Long> allIds = Execute.executeGetLongList(String.format(query, userId));
+			String formatted = String.format(query, userId);
+			List<Long> allIds = Execute.executeGetLongList(formatted);
 			return idsToApps(allIds);
 		} catch (SQLException e) {
 			e.printStackTrace();

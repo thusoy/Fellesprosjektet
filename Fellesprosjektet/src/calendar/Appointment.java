@@ -13,6 +13,7 @@ import java.util.TreeSet;
 
 import no.ntnu.fp.model.Person;
 import server.AppointmentHandler;
+import server.Execute;
 import server.RoundTime;
 
 public class Appointment implements Serializable {
@@ -69,8 +70,13 @@ public class Appointment implements Serializable {
 		return app;
 	}
 
-	public void acceptInvite(Person user, Boolean answer){
+	public void acceptInvite(Person user, Boolean answer) throws IOException{
 		participants.put(user, answer);
+		String query = "UPDATE UserAppointments SET hasAccepted=%b WHERE userId=%d AND appId=%s";
+		Execute.executeUpdate(String.format(query, answer, user.getId(), appId));
+		if (answer == false){
+			AppointmentHandler.sendMessageUserHasDenied(appId, user.getId());
+		}
 	}
 	
 	public void save() throws IOException{
@@ -170,7 +176,6 @@ public class Appointment implements Serializable {
 	
 	public void setRoomName(String room_name) throws IOException {
 		this.roomName = room_name;
-		AppointmentHandler.updateRoomName(this.getAppId(), room_name);
 	}
 	
 	public Person getCreator() {
