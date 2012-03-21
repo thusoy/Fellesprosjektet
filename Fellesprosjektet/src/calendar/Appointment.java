@@ -74,6 +74,9 @@ public class Appointment implements Serializable {
 		participants.put(user, answer);
 		String query = "UPDATE UserAppointments SET hasAccepted=%b WHERE userId=%d AND appId=%d";
 		Execute.executeUpdate(String.format(query, answer, user.getId(), appId));
+		if (answer == false){
+			AppointmentHandler.sendMessageUserHasDenied(appId, user.getId());
+		}
 	}
 	
 	public void save() throws IOException{

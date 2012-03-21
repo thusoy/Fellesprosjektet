@@ -147,12 +147,14 @@ public class AppointmentHandler {
 	}
 	public static void sendMessageUserHasDenied(long appId, long userId) throws IOException {
 		Appointment ap = getAppointment(appId);
-		Person person = PersonHandler.getPerson(userId);
-		Message msg = new Message("Avslag på avtale",
-				person.getFirstname()+" "+person.getLastname()+" har avlsatt avtalen: "+ap.getTitle());
+		Person p = PersonHandler.getPerson(userId);
+		String content = "%s %s har avslÂtt avtalen '%s'.";
+		String formatted = String.format(content, p.getFirstname(), p.getLastname(), ap.getTitle());
+		Message msg = new Message("Avslag på avtale", formatted);
 		for (Person user: ap.getParticipants().keySet()) {
 			MessageHandler.sendMessageToUser(msg.getId(), user.getId());
 		}
+		MessageHandler.sendMessageToUser(msg.getId(), ap.getCreator().getId());
 	}
 	
 	public static void deleteAppointment(long appId) throws IOException {
