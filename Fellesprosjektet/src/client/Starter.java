@@ -231,7 +231,14 @@ public class Starter {
 		System.out.println("Deltakere: ");
 		Map<Person, Boolean> participants = app.getParticipants();
 		for (Person user: participants.keySet()) {
-			System.out.printf("%s %s. Status: %s.", user.getFirstname(), user.getLastname(), participants.get(user));
+			Boolean answer = participants.get(user);
+			String answerString = null;
+			if (answer == null){
+				answerString = "har ikke svart";
+			}else{
+				answerString = answer ? "kommer" : "kommer ikke";
+			}
+			System.out.printf("%s %s %s.", user.getFirstname(), user.getLastname(), answerString);
 		}
 	}
 	private void changeAppointment() throws IOException {
