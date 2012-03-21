@@ -219,12 +219,12 @@ public class Starter {
 	}
 
 	private static void setUpDb() throws IOException{
-		String query = "TRUNCATE TABLE User";
-		Execute.executeUpdate(query);
-		new Person("tarjei", "husøy", "tarjei@roms.no", "komtek", "lol");
-		new Person("silje", "mauseth", "silje.h.m@hotmail.com", "indøk", "silje");
-		new Person("Haakon", "møøøøørk", "haakon@haakon", "komtech", "klabb");
-		new Person("Trine", "Myklebust", "trine@gmail.com", "indøch", "trine");
+//		String query = "TRUNCATE TABLE User";
+//		Execute.executeUpdate(query);
+//		new Person("tarjei", "husøy", "tarjei@roms.no", "komtek", "lol");
+//		new Person("silje", "mauseth", "silje.h.m@hotmail.com", "indøk", "silje");
+//		new Person("Haakon", "møøøøørk", "haakon@haakon", "komtech", "klabb");
+//		new Person("Trine", "Myklebust", "trine@gmail.com", "indøch", "trine");
 	}
 	
 	private static Person authenticateUser() throws IOException {
