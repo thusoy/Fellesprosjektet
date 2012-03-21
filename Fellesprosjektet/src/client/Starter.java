@@ -13,8 +13,10 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 import calendar.RejectedMessage;
 
@@ -150,9 +152,25 @@ public class Starter {
 			System.out.printf("%d. %s\n", i + 1, allInvited.get(i));
 		}
 		System.out.print("Vil du svare på en innkalling? Tast inn nummeret: ");
-		Scanner scanner = new Scanner(System.in);
 		int userNum = scanner.nextInt();
 		answerInvite(allInvited.get(userNum-1));
+	}
+	
+	private int getValidNum(int upperInclusiveBound){
+		Scanner scanner = new Scanner(System.in);
+		int input;
+		while(true){
+			try {
+				System.out.print("Gjør et valg: ");
+				input = scanner.nextInt();
+				if (input > 1 && input <= upperInclusiveBound){
+					break;
+				}
+			} catch (Exception e){ 
+				System.out.println("Beklager, det du skrev inn er ikke et gyldig valg. Prøv igjen.");
+			}
+		}
+		return input;
 	}
 	
 	private void answerInvite(Appointment appointment) throws IOException {
@@ -173,6 +191,8 @@ public class Starter {
 			}
 			System.out.println("Beklager, jeg skjønte ikke svaret ditt. Prøv igjen.");
 		}
+		System.out.println("Trykk enter for å gå videre.");
+		scanner.nextLine();
 	}
 
 
