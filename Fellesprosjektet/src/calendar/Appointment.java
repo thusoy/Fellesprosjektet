@@ -170,7 +170,6 @@ public class Appointment implements Serializable {
 	
 	public void setRoomName(String room_name) throws IOException {
 		this.roomName = room_name;
-		AppointmentHandler.updateRoomName(this.getAppId(), room_name);
 	}
 	
 	public Person getCreator() {
