@@ -200,8 +200,13 @@ public class AppointmentHandler {
 	}
 	
 	public static void addUserToAppointment(long appId, long userId) throws IOException {
-		String query = "INSERT INTO UserAppointments(appId, userId, hasAccepted) VALUES(%d, %d, null)";
-		Execute.executeUpdate(String.format(query, appId, userId));
+		try {
+			getInviteStatusOnUser(appId, userId);
+		} catch (RuntimeException e){
+			// Empty resultset
+			String query = "INSERT INTO UserAppointments(appId, userId, hasAccepted) VALUES(%d, %d, null)";
+			Execute.executeUpdate(String.format(query, appId, userId));
+		}
 	}
 	
 	public static void deleteUserFromAppointment(long appId) throws IOException {
