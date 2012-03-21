@@ -20,7 +20,7 @@ public class TestAppointment {
 	
 	@Before
 	public void emptyDb() throws IOException, SQLException{
-		String[] tablesToTruncate = {"Appointment", "User", "UserAppointments", "UserMessages"};
+		String[] tablesToTruncate = {"UserMessages"};
 		String query = "TRUNCATE TABLE %s";
 		for(String table: tablesToTruncate){
 			Execute.executeUpdate(String.format(query, table));
@@ -35,6 +35,8 @@ public class TestAppointment {
 		Appointment app = new Appointment("tannlege", start, end, false, null, creator);
 		Appointment dbApp = Appointment.getAppointment(app.getAppId());
 		assertEquals("Objektene skal være like!", app, dbApp);
+		Appointment dbApp2 = Appointment.getAppointment(app.getAppId());
+		assertEquals("Objektene skal fortsatt være like!", app, dbApp2);
 	}
 	
 	@Test

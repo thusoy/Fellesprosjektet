@@ -29,12 +29,32 @@ public class Starter {
 	
 	public static void main(String[] args) {
 		try {
+			recreateDb();
 			(new Starter()).initAndLogin();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 	
+	private static void recreateDb() throws IOException {
+		String query = "SELECT * FROM User WHERE email IN ('trine@gmail', 'tarjei@roms.no', 'haakon@haakon', 'silje@gmail.com')";
+		ResultSet rs = Execute.getResultSet(query);
+		int countRows = 0;
+		try {
+			while(rs.next()){
+				countRows++;
+			}
+		} catch (SQLException e){
+			e.printStackTrace();
+		}
+		if (countRows != 4){
+			new Person("tarjei", "husøy", "tarjei@roms.no", null, "lol");
+			new Person("haakon", "mork", "haakon@haakon", null, "klabb");
+			new Person("silje", "mauseth", "silje@gmail.com", null, "silje");
+			new Person("trine", "myklebust", "trine@gmail.com", null, "trine");
+		}
+	}
+
 	private Starter(){
 		weekNum = getCurrentWeekNum();
 	}
@@ -71,8 +91,8 @@ public class Starter {
 			if (cf == CalendarFunction.QUIT){
 				break;
 			}
-			run(cf);
-			showWeek();
+			runFunc(cf);
+//			showWeek();
 		}
 		System.out.println("Ha en fortsatt fin dag!");
 	}
@@ -82,7 +102,7 @@ public class Starter {
 		return cal.get(Calendar.WEEK_OF_YEAR);
 	}
 
-	public void run(CalendarFunction func) throws IOException{
+	public void runFunc(CalendarFunction func) throws IOException{
 		switch(func){
 		case ADD_APPOINTMENT:
 			addNewAppointment();
@@ -95,6 +115,7 @@ public class Starter {
 			break;
 		case SHOW_WEEK:
 			getAndShowWeek();
+			showWeek();
 			break;
 		case FOLLOW_CALENDAR:
 			followCalendar();
@@ -154,8 +175,9 @@ public class Starter {
 			previous = thisDay;
 		}
 		System.out.println("****************************************");
+		System.out.println(appointments);
 	}
-
+	
 	private void changeAppointment() throws IOException {
 		long userId = user.getId();
 		List<Appointment> appointments = getAllAppointmentsInvolved(userId);
