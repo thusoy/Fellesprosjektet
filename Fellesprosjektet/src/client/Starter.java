@@ -8,6 +8,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
@@ -18,8 +19,10 @@ import no.ntnu.fp.model.Person;
 import server.AppointmentHandler;
 import server.Execute;
 import server.PersonHandler;
+import server.RoomHandler;
 import calendar.Appointment;
 import calendar.Day;
+import calendar.Room;
 
 public class Starter {
 	
