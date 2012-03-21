@@ -95,7 +95,7 @@ public class Starter {
 				break;
 			}
 			runFunc(cf);
-//			showWeek();
+			showWeek();
 		}
 		System.out.println("Ha en fortsatt fin dag!");
 	}
