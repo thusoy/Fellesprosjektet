@@ -93,6 +93,24 @@ public class PersonHandler {
 		}
 		return apps;
 	}
+	public static List<Appointment> getFollowAppointments(long userId) throws IOException {
+		String query =
+				"SELECT followsUserId FROM UserCalendars WHERE userId=%d";
+		List<Long> ids = new ArrayList<Long>();
+		try {
+			ids = Execute.executeGetLongList(String.format(query, userId));
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new RuntimeException("SQL feil");
+		}
+		List<Appointment> apps = new ArrayList<Appointment>();
+		for (long id: ids) {
+			apps.addAll(AppointmentHandler.getAllCreated(id));
+			apps.addAll(AppointmentHandler.getAllInvited(id));
+			System.out.println(id);
+		}
+		return apps;
+	}
 	
 	private static List<Person> getListFromResultSet(ResultSet rs) throws IOException {
 		List<Person> list = new ArrayList<Person>();

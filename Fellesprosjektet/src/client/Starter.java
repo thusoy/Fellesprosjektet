@@ -231,10 +231,7 @@ public class Starter {
 	}
 
 	private void showWeek() throws IOException {
-		List<Appointment> appointments = AppointmentHandler.getWeekAppointments(user.getId(), weekNum);
-		List<Appointment> apps = PersonHandler.getFollowAppointments(user.getId(), weekNum);
-		appointments.addAll(apps);
-		Collections.sort(appointments);
+		List<Appointment> appointments = getWeekAppointments();
 		Day previous = null;
 		System.out.printf("************* UKE %d ********************\n", weekNum);
 		for(Appointment app: appointments){
@@ -248,14 +245,34 @@ public class Starter {
 		System.out.println("****************************************");
 	}
 	
+	private List<Appointment> getWeekAppointments() throws IOException{
+		List<Appointment> appointments = AppointmentHandler.getWeekAppointments(user.getId(), weekNum);
+		List<Appointment> apps = PersonHandler.getFollowAppointments(user.getId(), weekNum);
+		appointments.addAll(apps);
+		Collections.sort(appointments);		
+		return appointments;
+	}
+	private List<Appointment> getAllAppointments() throws IOException{
+		List<Appointment> appointments = AppointmentHandler.getAllCreated(user.getId());
+		List<Appointment> app = AppointmentHandler.getAllInvited(user.getId());		
+		List<Appointment> apps = PersonHandler.getFollowAppointments(user.getId());
+		appointments.addAll(apps);
+		appointments.addAll(app);
+		Collections.sort(appointments);
+		for (int i=0; i<appointments.size(); i++) {
+			System.out.println(i+". "+appointments.get(i));
+		}
+		return appointments;
+	}
+	
 	private void showAppointment() throws IOException {
 		DateFormat df = new SimpleDateFormat("dd-MM-yyyy HH:mm");		
-		long userId = user.getId();
-		List<Appointment> appointments = getAllAppointmentsInvolved(userId);
+		List<Appointment> appointments =  getAllAppointments();
 		Scanner scanner = new Scanner(System.in);
 		System.out.println("Hvilken avtale vil du se? ");
 		int appointmentNo = scanner.nextInt();
 		Appointment app = appointments.get(appointmentNo);
+		System.out.printf("Eier av avtalen: %s %s \n", app.getCreator().getFirstname(), app.getCreator().getLastname());
 		System.out.println("Tittel: "+app.getTitle());
 		System.out.println("Sted: "+app.getPlace());
 		System.out.println("Start: "+df.format(app.getStartTime()));
@@ -348,11 +365,9 @@ public class Starter {
 	}
 	
 	private List<Appointment> getAllAppointmentsInvolved(long userId) throws IOException {
-		List<Appointment> appointments = new ArrayList<Appointment>();
-		appointments = AppointmentHandler.getAllCreated(userId);
-		for (Appointment app: AppointmentHandler.getAllInvited(userId)) {
-			appointments.add(app);
-		}
+		List<Appointment> appointments = AppointmentHandler.getAllCreated(userId);
+		List<Appointment> app = AppointmentHandler.getAllInvited(userId);
+		appointments.addAll(app);
 		for (int i=0; i<appointments.size(); i++) {
 			System.out.println(i+". "+appointments.get(i));
 		}
