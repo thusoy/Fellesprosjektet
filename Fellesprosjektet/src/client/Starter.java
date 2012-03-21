@@ -11,6 +11,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -211,6 +212,10 @@ public class Starter {
 
 	private void showWeek() throws IOException {
 		List<Appointment> appointments = AppointmentHandler.getWeekAppointments(user.getId(), weekNum);
+		List<Appointment> apps = PersonHandler.getFollowAppointments(user.getId(), weekNum);
+		for (Appointment ap: apps) System.out.println("hei");
+		appointments.addAll(apps);
+		Collections.sort(appointments);
 		Day previous = null;
 		System.out.printf("************* UKE %d ********************\n", weekNum);
 		for(Appointment app: appointments){
@@ -249,7 +254,7 @@ public class Starter {
 			}else{
 				answerString = answer ? "kommer" : "kommer ikke";
 			}
-			System.out.printf("%s %s %s.", user.getFirstname(), user.getLastname(), answerString);
+			System.out.printf("%s %s %s.\n", user.getFirstname(), user.getLastname(), answerString);
 		}
 	}
 	
@@ -333,7 +338,6 @@ public class Starter {
 		appointments = AppointmentHandler.getAllCreated(userId);
 		for (Appointment app: AppointmentHandler.getAllInvited(userId)) {
 			appointments.add(app);
-			System.out.println("kom hit");
 		}
 		for (int i=0; i<appointments.size(); i++) {
 			System.out.println(i+". "+appointments.get(i));
@@ -351,7 +355,6 @@ public class Starter {
 		System.out.print("Hvis avtalen er privat, skriv 'ja'. Hvis ikke, trykk på enter. ");
 		boolean isPrivate = scanner.nextLine().isEmpty();
 		Map<Person, Boolean> participants = getParticipants();
-		System.out.println("Skriv inn sted: ");
 		
 		Appointment ap = new Appointment(title, startdate, enddate, isPrivate, participants, user);
 		if (participants != null){

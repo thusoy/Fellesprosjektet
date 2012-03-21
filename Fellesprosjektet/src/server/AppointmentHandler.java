@@ -274,10 +274,53 @@ public class AppointmentHandler {
 		return idsToApps(appIdList);
 	}
 	
+	public static List<Appointment> getAllCreated(long userId, int weekNum) throws IOException {
+		Date startOfWeek = getStartOfWeek(weekNum);
+		Date endOfWeek = getEndOfWeek(weekNum);
+		String query = "SELECT appId, title, place, startTime, endTime, description, " +
+				"daysAppearing, endOfRepeatDate, roomName, isPrivate, creatorId FROM Appointment WHERE creatorId=%d " + 
+				"AND startTime > ? AND endTime < ? ORDER BY startTime";
+		List<Appointment> appointments = null;
+		try {
+			PreparedStatement ps = Execute.getPreparedStatement(String.format(query, userId));
+			ps.setDate(1, startOfWeek);
+			ps.setDate(2, endOfWeek);
+			ResultSet rs = ps.executeQuery();
+			appointments = getListFromResultSet(rs);
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new RuntimeException("Feil i SQL, stoopid!");
+		}
+		return appointments;
+	}
+	public static List<Appointment> getAllInvited(long userId, int weekNum) throws IOException {
+		String query = "SELECT appId FROM UserAppointments WHERE userId=%d";
+		List<Long> appIdList = new ArrayList<Long>();
+		try {
+			appIdList = Execute.executeGetLongList(String.format(query, userId));
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new RuntimeException("SQL feil");
+		}
+		return idsToApps(appIdList, weekNum);
+	}
+	
 	public static List<Appointment> idsToApps(List<Long> ids) throws IOException{
 		List<Appointment> apps = new ArrayList<Appointment>();
 		for(long appId: ids){
 			apps.add(getAppointment(appId));
+		}
+		return apps;
+	}
+	public static List<Appointment> idsToApps(List<Long> ids, int weekNum) throws IOException{
+		List<Appointment> apps = new ArrayList<Appointment>();
+		Date startOfWeek = getStartOfWeek(weekNum);
+		Date endOfWeek = getEndOfWeek(weekNum);
+		for(long appId: ids){
+			Appointment ap = getAppointment(appId);
+			if (ap.getStartTime().after(startOfWeek) && ap.getEndTime().before(endOfWeek)){
+					apps.add(ap);
+			}
 		}
 		return apps;
 	}

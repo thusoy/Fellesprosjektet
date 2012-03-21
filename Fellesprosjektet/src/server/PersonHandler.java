@@ -9,6 +9,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import calendar.Appointment;
+
 import no.ntnu.fp.model.Person;
 
 public class PersonHandler {
@@ -71,6 +73,25 @@ public class PersonHandler {
 		} else {
 			throw new IllegalArgumentException("Fant ikke person med den id-en!");
 		}
+	}
+	
+	public static List<Appointment> getFollowAppointments(long userId, int weekNum) throws IOException {
+		String query =
+				"SELECT followsUserId FROM UserCalendars WHERE userId=%d";
+		List<Long> ids = new ArrayList<Long>();
+		try {
+			ids = Execute.executeGetLongList(String.format(query, userId));
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new RuntimeException("SQL feil");
+		}
+		List<Appointment> apps = new ArrayList<Appointment>();
+		for (long id: ids) {
+			apps.addAll(AppointmentHandler.getAllCreated(id, weekNum));
+			apps.addAll(AppointmentHandler.getAllInvited(id, weekNum));
+			
+		}
+		return apps;
 	}
 	
 	private static List<Person> getListFromResultSet(ResultSet rs) throws IOException {
