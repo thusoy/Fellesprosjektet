@@ -258,7 +258,8 @@ public class Execute {
 		ResultSet rs = stmt.executeQuery(query);
 		Map<Long, Boolean> output = new HashMap<Long, Boolean>();
 		while(rs.next()){
-			output.put(rs.getLong(1), rs.getBoolean(2));	
+			Boolean answer = rs.getObject(2) != null ? rs.getBoolean(2) : null;
+			output.put(rs.getLong(1), answer);	
 		}
 		return output;
 	}
