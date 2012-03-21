@@ -213,49 +213,54 @@ public class Starter {
 	
 	private void changeAppointment() throws IOException {
 		long userId = user.getId();
-		List<Appointment> appointments = getAllAppointmentsInvolved(userId);
-		System.out.println("Velg hvilken avtale du vil endre: ");
-		Scanner scannerInt = new Scanner(System.in);
-		int change = scannerInt.nextInt();
-		Appointment ap = appointments.get(change);
-		
-		Scanner scanner = new Scanner(System.in);
-		String dateTimeFormat = "dd-MM-yyyy HH:mm";
-		System.out.print("Skriv inn tittel: ");
-		String title = scanner.nextLine();
-		Date startdate = parseDate(dateTimeFormat, String.format("Startdato (%s): ", dateTimeFormat));
-		Date enddate = parseDate(dateTimeFormat, String.format("Sluttdato (%s): ", dateTimeFormat));
-		System.out.print("Hvis avtalen er privat, skriv 'ja'. Hvis ikke, trykk på enter. ");
-		boolean isPrivate = scanner.nextLine().isEmpty();
-		Map<Person, Boolean> participants = getParticipants();
-		System.out.println("Skriv inn beskrivelse: ");
-		String description = scanner.nextLine();
-		
-		ap.setTitle(title);
-		ap.setStartTime(startdate);
-		ap.setEndTime(enddate);
-		ap.setPrivate(isPrivate);
-		ap.setParticipants(participants);
-		ap.setDescription(description);
-		
-		if (participants != null){
-			System.out.println("Vil du reservere m¿terom? (ja/nei): ");
-			String reserve = scanner.nextLine();
-			if (reserve.equalsIgnoreCase("ja")){
-				String roomName = reserveRoom(startdate, enddate, participants);
-				ap.setRoomName(roomName);
+		List<Appointment> appointments = AppointmentHandler.getAllCreated(userId);
+		if (appointments != null){
+			for (int i=0; i<appointments.size(); i++) {
+				System.out.println(i+". "+appointments.get(i));
+			}
+			System.out.println("Velg hvilken avtale du vil endre: ");
+			Scanner scannerInt = new Scanner(System.in);
+			int change = scannerInt.nextInt();
+			Appointment ap = appointments.get(change);
+			
+			Scanner scanner = new Scanner(System.in);
+			String dateTimeFormat = "dd-MM-yyyy HH:mm";
+			System.out.print("Skriv inn tittel: ");
+			String title = scanner.nextLine();
+			Date startdate = parseDate(dateTimeFormat, String.format("Startdato (%s): ", dateTimeFormat));
+			Date enddate = parseDate(dateTimeFormat, String.format("Sluttdato (%s): ", dateTimeFormat));
+			System.out.print("Hvis avtalen er privat, skriv 'ja'. Hvis ikke, trykk på enter. ");
+			boolean isPrivate = scanner.nextLine().isEmpty();
+			Map<Person, Boolean> participants = getParticipants();
+			System.out.println("Skriv inn beskrivelse: ");
+			String description = scanner.nextLine();
+			
+			ap.setTitle(title);
+			ap.setStartTime(startdate);
+			ap.setEndTime(enddate);
+			ap.setPrivate(isPrivate);
+			ap.setParticipants(participants);
+			ap.setDescription(description);
+			
+			if (participants != null){
+				System.out.println("Vil du reservere m¿terom? (ja/nei): ");
+				String reserve = scanner.nextLine();
+				if (reserve.equalsIgnoreCase("ja")){
+					String roomName = reserveRoom(startdate, enddate, participants);
+					ap.setRoomName(roomName);
+				} else {
+					System.out.println("Skriv inn sted: ");
+					String place = scanner.nextLine();
+					ap.setPlace(place);
+				}
 			} else {
 				System.out.println("Skriv inn sted: ");
 				String place = scanner.nextLine();
 				ap.setPlace(place);
 			}
-		} else {
-			System.out.println("Skriv inn sted: ");
-			String place = scanner.nextLine();
-			ap.setPlace(place);
+			ap.save();
+			System.out.println("Avtalen er endret.");
 		}
-		ap.save();
-		System.out.println("Avtalen er endret.");
 	}
 
 	private void deleteAppointment() throws IOException {
