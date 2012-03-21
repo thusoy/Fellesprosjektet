@@ -19,8 +19,10 @@ import no.ntnu.fp.model.Person;
 import server.AppointmentHandler;
 import server.Execute;
 import server.PersonHandler;
+import server.RoomHandler;
 import calendar.Appointment;
 import calendar.Day;
+import calendar.Room;
 
 public class Starter {
 	
@@ -29,7 +31,7 @@ public class Starter {
 	
 	public static void main(String[] args) {
 		try {
-			recreateDb();
+			//recreateDb();
 			(new Starter()).initAndLogin();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -182,10 +184,11 @@ public class Starter {
 		long userId = user.getId();
 		List<Appointment> appointments = getAllAppointmentsInvolved(userId);
 		System.out.println("Velg hvilken avtale du vil endre: ");
-		Scanner scanner = new Scanner(System.in);
-		int change = scanner.nextInt();
+		Scanner scannerInt = new Scanner(System.in);
+		int change = scannerInt.nextInt();
 		Appointment ap = appointments.get(change);
 		
+		Scanner scanner = new Scanner(System.in);
 		String dateTimeFormat = "dd-MM-yyyy HH:mm";
 		System.out.print("Skriv inn tittel: ");
 		String title = scanner.nextLine();
@@ -194,14 +197,21 @@ public class Starter {
 		System.out.print("Hvis avtalen er privat, skriv 'ja'. Hvis ikke, trykk på enter. ");
 		boolean isPrivate = scanner.nextLine().isEmpty();
 		Map<Person, Boolean> participants = getParticipants();
+		System.out.println("Skriv inn sted: ");
+		String place = scanner.nextLine();
+		System.out.println("Skriv inn beskrivelse: ");
+		String description = scanner.nextLine();
 		
 		ap.setTitle(title);
 		ap.setStartTime(startdate);
 		ap.setEndTime(enddate);
 		ap.setPrivate(isPrivate);
 		ap.setParticipants(participants);
+		ap.setPlace(place);
+		ap.setDescription(description);
 		
 		AppointmentHandler.updateAppointment(ap);
+		System.out.println("Avtalen er endret.");
 	}
 
 	private void deleteAppointment() throws IOException {
@@ -217,6 +227,7 @@ public class Starter {
 		}else {
 			ap.deleteAppointmentInvitet();
 		}
+		System.out.println("Avtalen er slettet");
 	}
 	private List<Appointment> getAllAppointmentsInvolved(long userId) throws IOException {
 		List<Appointment> appointments = new ArrayList<Appointment>();
@@ -241,7 +252,25 @@ public class Starter {
 		System.out.print("Hvis avtalen er privat, skriv 'ja'. Hvis ikke, trykk på enter. ");
 		boolean isPrivate = scanner.nextLine().isEmpty();
 		Map<Person, Boolean> participants = getParticipants();
-		new Appointment(title, startdate, enddate, isPrivate, participants, user);
+		
+		Appointment ap = new Appointment(title, startdate, enddate, isPrivate, participants, user);
+		if (participants != null){
+			String roomName = reserveRoom(startdate, enddate, participants);
+			ap.setRoomName(roomName);
+		}
+	}
+	
+	private String reserveRoom(Date startdate, Date enddate, Map<Person, Boolean> participants) throws IOException {
+		List<Room> rooms = RoomHandler.availableRooms(startdate, enddate, participants.size());
+		int i = 0;
+		System.out.println("Reserver m¿terom: ");
+		for (Room room: rooms) {
+			System.out.println(i+" "+room.getName());
+			i++;
+		}
+		Scanner scanner = new Scanner(System.in);
+		int choosenRoom = scanner.nextInt();
+		return rooms.get(choosenRoom).getName();
 	}
 	
 	private Map<Person, Boolean> getParticipants() throws IOException{
