@@ -150,12 +150,42 @@ public class Starter {
 		System.out.println("****************************************");
 	}
 
-	private void changeAppointment() {
+	private void changeAppointment() throws IOException {
+		long userId = user.getId();
+		List<Appointment> appointments = getAllAppointmentsInvolved(userId);
+		System.out.println("Velg hvilken avtale du vil endre: ");
+		Scanner scanner = new Scanner(System.in);
+		int change = scanner.nextInt();
+		Appointment ap = appointments.get(change);
 		
+		String dateTimeFormat = "dd-MM-yyyy HH:mm";
+		System.out.print("Skriv inn tittel: ");
+		String title = scanner.nextLine();
+		Date startdate = parseDate(dateTimeFormat, String.format("Startdato (%s): ", dateTimeFormat));
+		Date enddate = parseDate(dateTimeFormat, String.format("Sluttdato (%s): ", dateTimeFormat));
+		System.out.print("Hvis avtalen er privat, skriv 'ja'. Hvis ikke, trykk på enter. ");
+		boolean isPrivate = scanner.nextLine().isEmpty();
+		Map<Person, Boolean> participants = getParticipants();
+		
+		ap.setTitle(title);
+		ap.setStartTime(startdate);
+		ap.setEndTime(enddate);
+		ap.setPrivate(isPrivate);
+		ap.setParticipants(participants);
+		
+		AppointmentHandler.updateAppointment(ap);
 	}
 
 	private void deleteAppointment() throws IOException {
 		long userId = user.getId();
+		List<Appointment> appointments = getAllAppointmentsInvolved(userId);
+		System.out.println("Velg hvilken avtale du vil slette: ");
+		Scanner scanner = new Scanner(System.in);
+		int delete = scanner.nextInt();
+		long appId = appointments.get(delete).getAppId();
+		AppointmentHandler.getAppointment(appId).deleteAppointment();
+	}
+	private List<Appointment> getAllAppointmentsInvolved(long userId) throws IOException {
 		List<Appointment> appointments = AppointmentHandler.getAllCreated(userId);
 		for (Appointment app: AppointmentHandler.getAllInvited(userId)) {
 			appointments.add(app);
@@ -163,13 +193,8 @@ public class Starter {
 		for (int i=0; i<appointments.size(); i++) {
 			System.out.println(i+". "+appointments.get(i));
 		}
-		System.out.println("Velg hvilken avtale du vil slette: ");
-		Scanner scanner = new Scanner(System.in);
-		int delete = scanner.nextInt();
-		long appId = appointments.get(delete).getAppId();
-		AppointmentHandler.getAppointment(appId).deleteAppointment();
+		return appointments;
 	}
-
 	private void addNewAppointment() throws IOException {
 		String dateTimeFormat = "dd-MM-yyyy HH:mm";
 		Scanner scanner = new Scanner(System.in);
