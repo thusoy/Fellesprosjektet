@@ -135,7 +135,7 @@ public class Starter {
 		Scanner scanner = new Scanner(System.in);
 		int userInput = scanner.nextInt();
 		Message selected = unreadMessages.get(userInput-1);
-		System.out.println(selected.showMessage(user));
+		System.out.println(selected.showMessage(user).getContent());
 		if (selected instanceof RejectedMessage){
 			RejectedMessage m = (RejectedMessage) selected;
 			System.out.println("Hva vil du gjøre?");

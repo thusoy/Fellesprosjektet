@@ -25,7 +25,12 @@ public class MessageHandler {
 		String title = msg.getTitle();
 		long msgId = getUniqueId();
 		msg.setId(msgId);
-		Long appId = msg instanceof RejectedMessage ? ((RejectedMessage) msg).getApp().getAppId() : null;
+		Long appId = null;
+		if (msg instanceof RejectedMessage){
+			RejectedMessage rm = (RejectedMessage) msg;
+			appId = rm.getApp().getAppId();
+		}
+//		Long appId = msg instanceof RejectedMessage ? ((RejectedMessage) msg).getApp().getAppId() : null;
 		String query = "INSERT INTO Message(msgId, dateSent, content, title, appointment) " + 
 						"VALUES(%d, '%s', ?, '%s', ?)";
 		try {
