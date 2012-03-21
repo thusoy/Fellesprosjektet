@@ -160,6 +160,14 @@ public class AppointmentHandler {
 		MessageHandler.sendMessageToAllParticipants(app, "Avtale: "+app.getTitle(), "Denne avtalen er blitt slettet");
 		String query = "DELETE FROM Appointment WHERE appId=%d";
 		Execute.executeUpdate(String.format(query, appId));
+		String query2 = "DELETE FROM UserAppointments WHERE appId=%d";
+		Execute.executeUpdate(String.format(query2, appId));
+	}
+	public static void deleteAppointmentInvited(long appId) throws IOException {
+		Appointment app = getAppointment(appId);
+		MessageHandler.sendMessageToAllParticipants(app, "Avslag: "+app.getTitle(), "En person har avlått møtet");
+		String query = "DELETE FROM UserAppointments WHERE appId=%d";
+		Execute.executeUpdate(String.format(query, appId));
 	}
 	
 	public static void updateUserAppointment(long appId, long userId, Boolean bool) throws IOException {

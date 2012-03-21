@@ -183,7 +183,12 @@ public class Starter {
 		Scanner scanner = new Scanner(System.in);
 		int delete = scanner.nextInt();
 		long appId = appointments.get(delete).getAppId();
-		AppointmentHandler.getAppointment(appId).deleteAppointment();
+		Appointment ap = AppointmentHandler.getAppointment(appId);
+		if (user.getId() == ap.getCreator().getId()){
+			ap.deleteAppointment();
+		}else {
+			ap.deleteAppointmentInvitet();
+		}
 	}
 	private List<Appointment> getAllAppointmentsInvolved(long userId) throws IOException {
 		List<Appointment> appointments = AppointmentHandler.getAllCreated(userId);
