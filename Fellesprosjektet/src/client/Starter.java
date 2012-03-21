@@ -230,9 +230,9 @@ public class Starter {
 		Date enddate = parseDate(dateTimeFormat, String.format("Sluttdato (%s): ", dateTimeFormat));
 		System.out.print("Hvis avtalen er privat, skriv 'ja'. Hvis ikke, trykk på enter. ");
 		boolean isPrivate = scanner.nextLine().isEmpty();
-		Map<Person, Boolean> participants = getParticipants();
 		System.out.println("Skriv inn sted: ");
 		String place = scanner.nextLine();
+		Map<Person, Boolean> participants = getParticipants();
 		System.out.println("Skriv inn beskrivelse: ");
 		String description = scanner.nextLine();
 		
@@ -245,6 +245,10 @@ public class Starter {
 		ap.setDescription(description);
 		
 		AppointmentHandler.updateAppointment(ap);
+		if (participants != null){
+			String roomName = reserveRoom(startdate, enddate, participants);
+			ap.setRoomName(roomName);
+		}
 		System.out.println("Avtalen er endret.");
 	}
 
@@ -286,6 +290,7 @@ public class Starter {
 		System.out.print("Hvis avtalen er privat, skriv 'ja'. Hvis ikke, trykk på enter. ");
 		boolean isPrivate = scanner.nextLine().isEmpty();
 		Map<Person, Boolean> participants = getParticipants();
+		System.out.println("Skriv inn sted: ");
 		
 		Appointment ap = new Appointment(title, startdate, enddate, isPrivate, participants, user);
 		if (participants != null){
