@@ -244,11 +244,11 @@ public class Starter {
 		ap.setPlace(place);
 		ap.setDescription(description);
 		
-		AppointmentHandler.updateAppointment(ap);
 		if (participants != null){
 			String roomName = reserveRoom(startdate, enddate, participants);
 			ap.setRoomName(roomName);
 		}
+		AppointmentHandler.updateAppointment(ap);
 		System.out.println("Avtalen er endret.");
 	}
 
