@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -208,6 +209,7 @@ public class Starter {
 	}
 	
 	private void showAppointment() throws IOException {
+		DateFormat df = new SimpleDateFormat("dd-MM-yyyy HH:mm");		
 		long userId = user.getId();
 		List<Appointment> appointments = getAllAppointmentsInvolved(userId);
 		Scanner scanner = new Scanner(System.in);
@@ -216,8 +218,8 @@ public class Starter {
 		Appointment app = appointments.get(appointmentNo);
 		System.out.println("Tittel: "+app.getTitle());
 		System.out.println("Sted: "+app.getPlace());
-		System.out.println("Start: "+app.getStartTime());
-		System.out.println("Slutt: "+app.getEndTime());
+		System.out.println("Start: "+df.format(app.getStartTime()));
+		System.out.println("Slutt: "+df.format(app.getEndTime()));
 		System.out.println("Beskrivelse: "+app.getDescription());
 		System.out.println("Rom: "+app.getRoomName());
 		System.out.println("Privat: "+app.isPrivate());
