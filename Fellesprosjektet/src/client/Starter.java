@@ -8,6 +8,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
@@ -196,13 +197,16 @@ public class Starter {
 		}
 	}
 	private List<Appointment> getAllAppointmentsInvolved(long userId) throws IOException {
-		List<Appointment> appointments = AppointmentHandler.getAllCreated(userId);
+		List<Appointment> appointments = new ArrayList<Appointment>();
+		appointments = AppointmentHandler.getAllCreated(userId);
 		for (Appointment app: AppointmentHandler.getAllInvited(userId)) {
 			appointments.add(app);
+			System.out.println("kom hit");
 		}
 		for (int i=0; i<appointments.size(); i++) {
 			System.out.println(i+". "+appointments.get(i));
 		}
+		
 		return appointments;
 	}
 	private void addNewAppointment() throws IOException {
