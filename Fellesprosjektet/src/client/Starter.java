@@ -242,8 +242,20 @@ public class Starter {
 		ap.setDescription(description);
 		
 		if (participants != null){
-			String roomName = reserveRoom(startdate, enddate, participants);
-			ap.setRoomName(roomName);
+			System.out.println("Vil du reservere m¿terom? (ja/nei): ");
+			String reserve = scanner.nextLine();
+			if(reserve.equals("ja")){
+				String roomName = reserveRoom(startdate, enddate, participants);
+				ap.setRoomName(roomName);
+			}else{
+				System.out.println("Skriv inn sted: ");
+				String place = scanner.nextLine();
+				ap.setPlace(place);
+			}
+		}else{
+			System.out.println("Skriv inn sted: ");
+			String place = scanner.nextLine();
+			ap.setPlace(place);
 		}
 		AppointmentHandler.updateAppointment(ap);
 		System.out.println("Avtalen er endret.");
@@ -291,9 +303,22 @@ public class Starter {
 		
 		Appointment ap = new Appointment(title, startdate, enddate, isPrivate, participants, user);
 		if (participants != null){
-			String roomName = reserveRoom(startdate, enddate, participants);
-			ap.setRoomName(roomName);
+			System.out.println("Vil du reservere m¿terom? (ja/nei): ");
+			String reserve = scanner.nextLine();
+			if(reserve.equals("ja")){
+				String roomName = reserveRoom(startdate, enddate, participants);
+				ap.setRoomName(roomName);
+			}else{
+				System.out.println("Skriv inn sted: ");
+				String place = scanner.nextLine();
+				ap.setPlace(place);
+			}
+		}else{
+			System.out.println("Skriv inn sted: ");
+			String place = scanner.nextLine();
+			ap.setPlace(place);
 		}
+		AppointmentHandler.updateAppointment(ap);
 		System.out.println("Ny avtale lagret!");
 	}
 	
