@@ -226,9 +226,11 @@ public class Starter {
 	}
 	
 	private List<Appointment> getWeekAppointments() throws IOException{
-		List<Appointment> appointments = AppointmentHandler.getWeekAppointments(user.getId(), weekNum);
+		List<Appointment> appointments = AppointmentHandler.getAllCreated(user.getId(), weekNum);
+		List<Appointment> app = AppointmentHandler.getAllInvited(user.getId(), weekNum);	
 		List<Appointment> apps = PersonHandler.getFollowAppointments(user.getId(), weekNum);
 		appointments.addAll(apps);
+		appointments.addAll(app);
 		Collections.sort(appointments);		
 		return appointments;
 	}
