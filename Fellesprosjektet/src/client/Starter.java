@@ -23,6 +23,7 @@ import server.PersonHandler;
 import server.RoomHandler;
 import calendar.Appointment;
 import calendar.Day;
+import calendar.Message;
 import calendar.Room;
 
 public class Starter {
@@ -122,8 +123,17 @@ public class Starter {
 		}
 	}
 	
-	private void showMessages() {
-		
+	private void showMessages() throws IOException {
+		List<Message> unreadMessages = MessageHandler.getUnreadMessagesForUser(user);
+		for(int i = 0; i < unreadMessages.size(); i++){
+			Message m = unreadMessages.get(i);
+			System.out.printf("%d. %s\n", i+1, m);
+		}
+		System.out.print("Hvilken melding vil du lese? ");
+		Scanner scanner = new Scanner(System.in);
+		int userInput = scanner.nextInt();
+		Message selected = unreadMessages.get(userInput-1);
+		System.out.println(selected.getContent());
 	}
 
 	private void showInvites() throws IOException {
@@ -362,7 +372,7 @@ public class Starter {
 			email = scanner.nextLine();
 			if (email.isEmpty()){
 				break;
-			} else if (isValidEmail(email)){
+			} else if (isValidEmail(email) && !email.equalsIgnoreCase(user.getEmail())){
 				Person p = getPersonFromEmail(email);
 				map.put(p, null);
 				System.out.printf("%s added to participants!\n", email);

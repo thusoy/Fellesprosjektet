@@ -4,14 +4,13 @@ import static calendar.Message.recreateMessage;
 
 import java.io.IOException;
 import java.sql.Date;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
-
-import sun.reflect.ReflectionFactory.GetReflectionFactoryAction;
 
 import no.ntnu.fp.model.Person;
 import calendar.Appointment;
@@ -25,10 +24,17 @@ public class MessageHandler {
 		String title = msg.getTitle();
 		long msgId = getUniqueId();
 		msg.setId(msgId);
-		String query = 
-				"INSERT INTO Message(msgId, dateSent, content, title) VALUES(%d, '%s', '%s', '%s')";
-			
-		Execute.executeUpdate(String.format(query, msgId, dateSent, content, title));
+		System.out.println("Content: " + content);
+		System.out.println("Title: " + title);
+		String query = "INSERT INTO Message(msgId, dateSent, content, title) " + 
+						"VALUES(%d, '%s', ?, '%s')";
+		try {
+			PreparedStatement ps = Execute.getPreparedStatement(String.format(query, msgId, dateSent, title));
+			ps.setString(1, content);
+			ps.execute();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	private static long getUniqueId() throws IOException {
@@ -54,7 +60,9 @@ public class MessageHandler {
 		String query = 
 				"INSERT INTO UserMessages(userId, msgId, hasBeenRead) VALUES(%d, %d, %b)";
 		Execute.executeUpdate(String.format(query, userId, msgId, false));
+		System.out.printf("Sent message %d to user %d!\n", msgId, userId);
 	}
+	
 	public static void sendMessageToAllParticipants(Appointment app, String title,
 			String content) throws IOException {
 			Set<Person> participants = app.getParticipants().keySet();
