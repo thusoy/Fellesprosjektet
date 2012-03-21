@@ -31,8 +31,6 @@ public class Starter {
 	
 	public static void main(String[] args) {
 		try {
-			//recreateDb();
-//			recreateDb();
 			(new Starter()).initAndLogin();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -77,11 +75,11 @@ public class Starter {
 	}
 
 	private void run() throws IOException{
-		showWeek();
 		CalendarFunction[] allFunc = CalendarFunction.values();
-		int numUnansweredMeetings = AppointmentHandler.getAllUnansweredInvites(user.getId()).size();
-		System.out.println("Hva vil du gjøre?");
 		while(true){
+			showWeek();
+			int numUnansweredMeetings = AppointmentHandler.getAllUnansweredInvites(user.getId()).size();
+			System.out.println("Hva vil du gjøre?");
 			for(int i = 0; i < allFunc.length; i++){
 				CalendarFunction cf = allFunc[i];
 				if (cf == CalendarFunction.SHOW_INVITES && numUnansweredMeetings > 0){
@@ -95,7 +93,6 @@ public class Starter {
 				break;
 			}
 			runFunc(cf);
-			showWeek();
 		}
 		System.out.println("Ha en fortsatt fin dag!");
 	}
@@ -118,7 +115,6 @@ public class Starter {
 			break;
 		case SHOW_WEEK:
 			getAndShowWeek();
-			showWeek();
 			break;
 		case SHOW_INVITES:
 			showInvites();
@@ -207,13 +203,12 @@ public class Starter {
 		for(Appointment app: appointments){
 			Day thisDay = Day.fromDate(app.getStartTime());
 			if (thisDay != previous){
-				System.out.println(thisDay);
+				System.out.println("-----" + thisDay + "-----");
 			}
 			System.out.println(app);
 			previous = thisDay;
 		}
 		System.out.println("****************************************");
-		System.out.println(appointments);
 	}
 	
 	private void changeAppointment() throws IOException {
@@ -299,6 +294,7 @@ public class Starter {
 			String roomName = reserveRoom(startdate, enddate, participants);
 			ap.setRoomName(roomName);
 		}
+		System.out.println("Ny avtale lagret!");
 	}
 	
 	private String reserveRoom(Date startdate, Date enddate, Map<Person, Boolean> participants) throws IOException {
