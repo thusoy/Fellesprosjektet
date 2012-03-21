@@ -75,11 +75,23 @@ public class PersonHandler {
 		}
 	}
 	
-	public static List<Appointment> getFollowAppointments(long userId) throws IOException, SQLException {
+	public static List<Appointment> getFollowAppointments(long userId, int weekNum) throws IOException {
 		String query =
-				"SELECT userId FROM UserCalendars WHERE followsUserId=%d";
-		Execute.executeGetLongList(String.format(query, userId));
-		AppointmentHandler.
+				"SELECT followsUserId FROM UserCalendars WHERE userId=%d";
+		List<Long> ids = new ArrayList<Long>();
+		try {
+			ids = Execute.executeGetLongList(String.format(query, userId));
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new RuntimeException("SQL feil");
+		}
+		List<Appointment> apps = new ArrayList<Appointment>();
+		for (long id: ids) {
+			apps.addAll(AppointmentHandler.getAllCreated(id, weekNum));
+			apps.addAll(AppointmentHandler.getAllInvited(id, weekNum));
+			
+		}
+		return apps;
 	}
 	
 	private static List<Person> getListFromResultSet(ResultSet rs) throws IOException {
