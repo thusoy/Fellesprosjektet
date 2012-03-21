@@ -152,6 +152,9 @@ public class Appointment implements Serializable {
 	public void deleteAppointment() throws IOException {
 		AppointmentHandler.deleteAppointment(this.appId);
 	}
+	public void deleteAppointmentInvitet() throws IOException {
+		AppointmentHandler.deleteAppointmentInvited(this.appId);
+	}
 	
 	public Map<Person, Boolean> getParticipants() {
 		return participants;
