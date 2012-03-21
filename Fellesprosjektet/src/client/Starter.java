@@ -18,6 +18,7 @@ import java.util.Scanner;
 import no.ntnu.fp.model.Person;
 import server.AppointmentHandler;
 import server.Execute;
+import server.MessageHandler;
 import server.PersonHandler;
 import server.RoomHandler;
 import calendar.Appointment;
@@ -37,25 +38,6 @@ public class Starter {
 		}
 	}
 	
-	private static void recreateDb() throws IOException {
-		String query = "SELECT * FROM User WHERE email IN ('trine@gmail', 'tarjei@roms.no', 'haakon@haakon', 'silje@gmail.com')";
-		ResultSet rs = Execute.getResultSet(query);
-		int countRows = 0;
-		try {
-			while(rs.next()){
-				countRows++;
-			}
-		} catch (SQLException e){
-			e.printStackTrace();
-		}
-		if (countRows != 4){
-			new Person("tarjei", "husøy", "tarjei@roms.no", null, "lol");
-			new Person("haakon", "mork", "haakon@haakon", null, "klabb");
-			new Person("silje", "mauseth", "silje@gmail.com", null, "silje");
-			new Person("trine", "myklebust", "trine@gmail.com", null, "trine");
-		}
-	}
-
 	private Starter(){
 		weekNum = getCurrentWeekNum();
 	}
@@ -79,11 +61,14 @@ public class Starter {
 		while(true){
 			showWeek();
 			int numUnansweredMeetings = AppointmentHandler.getAllUnansweredInvites(user.getId()).size();
+			int numNewMessages = MessageHandler.getUnreadMessagesForUser(user).size();
 			System.out.println("Hva vil du gjøre?");
 			for(int i = 0; i < allFunc.length; i++){
 				CalendarFunction cf = allFunc[i];
 				if (cf == CalendarFunction.SHOW_INVITES && numUnansweredMeetings > 0){
 					System.out.printf("%d. %s (%d)\n", i + 1, cf.description, numUnansweredMeetings);
+				} else if (cf == CalendarFunction.SHOW_MESSAGES && numNewMessages > 0){
+					System.out.printf("%d. %s (%d)\n", i + 1, cf.description, numNewMessages);
 				} else {
 					System.out.printf("%d. %s\n", i + 1, cf.description);
 				}
@@ -128,12 +113,19 @@ public class Starter {
 		case SHOW_NEXT_WEEK:
 			weekNum++;
 			break;
+		case SHOW_MESSAGES:
+			showMessages();
+			break;
 		case SHOW_PREVIOUS_WEEK:
 			weekNum--;
 			break;
 		}
 	}
 	
+	private void showMessages() {
+		
+	}
+
 	private void showInvites() throws IOException {
 		List<Appointment> allInvited = AppointmentHandler.getAllUnansweredInvites(user.getId());
 		for(int i = 0; i < allInvited.size(); i++){
@@ -174,6 +166,7 @@ public class Starter {
 	}
 
 	private void followCalendar() throws IOException {
+		System.out.print("Skriv inn e-postadressen til personen du vil følge: ");
 		String email = getValidEmail();
 		long otherUserId = getUserIdFromEmail(email);
 		user.followPerson(otherUserId);
