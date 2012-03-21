@@ -1,5 +1,6 @@
 package server;
 
+import calendar.RejectedMessage;
 import static calendar.Message.recreateMessage;
 
 import java.io.IOException;
@@ -24,13 +25,13 @@ public class MessageHandler {
 		String title = msg.getTitle();
 		long msgId = getUniqueId();
 		msg.setId(msgId);
-		System.out.println("Content: " + content);
-		System.out.println("Title: " + title);
-		String query = "INSERT INTO Message(msgId, dateSent, content, title) " + 
-						"VALUES(%d, '%s', ?, '%s')";
+		Long appId = msg instanceof RejectedMessage ? ((RejectedMessage) msg).getApp().getAppId() : null;
+		String query = "INSERT INTO Message(msgId, dateSent, content, title, appointment) " + 
+						"VALUES(%d, '%s', ?, '%s', ?)";
 		try {
 			PreparedStatement ps = Execute.getPreparedStatement(String.format(query, msgId, dateSent, title));
 			ps.setString(1, content);
+			ps.setLong(2, appId);
 			ps.execute();
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -76,7 +77,7 @@ public class MessageHandler {
 	}
 	
 	public static Message getMessage(long msgId) throws IOException {
-		String query = "SELECT msgId, title, content, dateSent FROM Message WHERE msgId=%d";
+		String query = "SELECT msgId, title, content, dateSent, appointment FROM Message WHERE msgId=%d";
 		ResultSet rs = Execute.getResultSet(String.format(query, msgId));
 		Message msg;
 		try {
@@ -85,8 +86,13 @@ public class MessageHandler {
 				String content = rs.getString("content");
 				long id = rs.getLong("msgId");
 				Date dateSent = rs.getDate("dateSent");
-				msg = recreateMessage(id, title, content, dateSent);
-				msg.setId(id);
+				Long appId = rs.getObject("appointment") == null ? null : rs.getLong("appointment");
+				if (appId == null){
+					msg = recreateMessage(id, title, content, dateSent);
+				} else {
+					Appointment app = AppointmentHandler.getAppointment(appId);
+					msg = RejectedMessage.recreateRejectedMessage(id, title, content, dateSent, app);
+				}
 			} else {
 				throw new IllegalArgumentException("No such message!");
 			}

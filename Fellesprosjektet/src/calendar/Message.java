@@ -12,10 +12,10 @@ import server.RoundTime;
 
 public class Message implements Comparable<Message> {
 	
-	private long msgId;
+	protected long msgId;
 	private Date dateSent;
-	private String content;
-	private String title;
+	protected String content;
+	protected String title;
 	private List<Person> receivers;
 	
 	/**
@@ -32,7 +32,7 @@ public class Message implements Comparable<Message> {
 		MessageHandler.createMessage(this);
 	}
 	
-	private Message(long id){
+	protected Message(long id){
 		this.msgId = id;
 	}
 	

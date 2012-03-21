@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import calendar.RejectedMessage;
 
 import no.ntnu.fp.model.Person;
 import server.AppointmentHandler;
@@ -135,9 +136,11 @@ public class Starter {
 		Scanner scanner = new Scanner(System.in);
 		int userInput = scanner.nextInt();
 		Message selected = unreadMessages.get(userInput-1);
-		System.out.println(selected.getContent());
-		if (selected.getTitle().contains("har avslått avtalen")){
-			
+		System.out.println(selected.showMessage(user));
+		if (selected instanceof RejectedMessage){
+			RejectedMessage m = (RejectedMessage) selected;
+			System.out.println("Hva vil du gjøre?");
+			m.getAndExecuteUserResponse(this);
 		}
 	}
 
@@ -254,6 +257,47 @@ public class Starter {
 			System.out.printf("%s %s %s.\n", user.getFirstname(), user.getLastname(), answerString);
 		}
 	}
+	
+	public void changeAppointment(Appointment app) throws IOException{
+		Scanner scanner = new Scanner(System.in);
+		String dateTimeFormat = "dd-MM-yyyy HH:mm";
+		System.out.print("Skriv inn tittel: ");
+		String title = scanner.nextLine();
+		Date startdate = parseDate(dateTimeFormat, String.format("Startdato (%s): ", dateTimeFormat));
+		Date enddate = parseDate(dateTimeFormat, String.format("Sluttdato (%s): ", dateTimeFormat));
+		System.out.print("Hvis avtalen er privat, skriv 'ja'. Hvis ikke, trykk på enter. ");
+		boolean isPrivate = scanner.nextLine().isEmpty();
+		Map<Person, Boolean> participants = getParticipants();
+		System.out.println("Skriv inn beskrivelse: ");
+		String description = scanner.nextLine();
+		
+		app.setTitle(title);
+		app.setStartTime(startdate);
+		app.setEndTime(enddate);
+		app.setPrivate(isPrivate);
+		app.setParticipants(participants);
+		app.setDescription(description);
+		
+		if (participants != null){
+			System.out.println("Vil du reservere m¿terom? (ja/nei): ");
+			String reserve = scanner.nextLine();
+			if (reserve.equalsIgnoreCase("ja")){
+				String roomName = reserveRoom(startdate, enddate, participants);
+				app.setRoomName(roomName);
+			} else {
+				System.out.println("Skriv inn sted: ");
+				String place = scanner.nextLine();
+				app.setPlace(place);
+			}
+		} else {
+			System.out.println("Skriv inn sted: ");
+			String place = scanner.nextLine();
+			app.setPlace(place);
+		}
+		app.save();
+		System.out.println("Avtalen er endret.");
+	}
+	
 	private void changeAppointment() throws IOException {
 		long userId = user.getId();
 		List<Appointment> appointments = AppointmentHandler.getAllCreated(userId);
@@ -264,45 +308,8 @@ public class Starter {
 			System.out.println("Velg hvilken avtale du vil endre: ");
 			Scanner scannerInt = new Scanner(System.in);
 			int change = scannerInt.nextInt();
-			Appointment ap = appointments.get(change);
-			
-			Scanner scanner = new Scanner(System.in);
-			String dateTimeFormat = "dd-MM-yyyy HH:mm";
-			System.out.print("Skriv inn tittel: ");
-			String title = scanner.nextLine();
-			Date startdate = parseDate(dateTimeFormat, String.format("Startdato (%s): ", dateTimeFormat));
-			Date enddate = parseDate(dateTimeFormat, String.format("Sluttdato (%s): ", dateTimeFormat));
-			System.out.print("Hvis avtalen er privat, skriv 'ja'. Hvis ikke, trykk på enter. ");
-			boolean isPrivate = scanner.nextLine().isEmpty();
-			Map<Person, Boolean> participants = getParticipants();
-			System.out.println("Skriv inn beskrivelse: ");
-			String description = scanner.nextLine();
-			
-			ap.setTitle(title);
-			ap.setStartTime(startdate);
-			ap.setEndTime(enddate);
-			ap.setPrivate(isPrivate);
-			ap.setParticipants(participants);
-			ap.setDescription(description);
-			
-			if (participants != null){
-				System.out.println("Vil du reservere m¿terom? (ja/nei): ");
-				String reserve = scanner.nextLine();
-				if (reserve.equalsIgnoreCase("ja")){
-					String roomName = reserveRoom(startdate, enddate, participants);
-					ap.setRoomName(roomName);
-				} else {
-					System.out.println("Skriv inn sted: ");
-					String place = scanner.nextLine();
-					ap.setPlace(place);
-				}
-			} else {
-				System.out.println("Skriv inn sted: ");
-				String place = scanner.nextLine();
-				ap.setPlace(place);
-			}
-			ap.save();
-			System.out.println("Avtalen er endret.");
+			Appointment app = appointments.get(change);
+			changeAppointment(app);
 		}
 	}
 
@@ -314,13 +321,18 @@ public class Starter {
 		int delete = scanner.nextInt();
 		long appId = appointments.get(delete).getAppId();
 		Appointment ap = AppointmentHandler.getAppointment(appId);
-		if (user.getId() == ap.getCreator().getId()){
-			ap.deleteAppointment();
+		deleteAppointment(ap);
+	}
+	
+	public void deleteAppointment(Appointment app) throws IOException{
+		if (user.getId() == app.getCreator().getId()){
+			app.deleteAppointment();
 		}else {
-			ap.deleteAppointmentInvitet();
+			app.deleteAppointmentInvited();
 		}
 		System.out.println("Avtalen er slettet");
 	}
+	
 	private List<Appointment> getAllAppointmentsInvolved(long userId) throws IOException {
 		List<Appointment> appointments = new ArrayList<Appointment>();
 		appointments = AppointmentHandler.getAllCreated(userId);
