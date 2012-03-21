@@ -283,8 +283,7 @@ public class AppointmentHandler {
 			List<Long> allIds = Execute.executeGetLongList(formatted);
 			return idsToApps(allIds);
 		} catch (SQLException e) {
-			// Empty result
-			return new ArrayList<Appointment>();
+			throw new RuntimeException("Feil i SQL!");
 		}
 	}
 
