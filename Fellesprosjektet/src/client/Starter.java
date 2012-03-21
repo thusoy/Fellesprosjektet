@@ -39,27 +39,32 @@ public class Starter {
 	}
 	
 	private void initAndLogin() throws IOException {
-		setUpDb();
+		Person user = null;
 		do {
 			try {
-				Person user = authenticateUser();
-				this.user = user;
+				user = authenticateUser();
 				System.out.println("Auth OK!");
 			} catch(RuntimeException e){
 				System.out.println("Ugyldig kombinasjon av passord og brukernavn, prøv igjen.");
 			}
 		} while (user == null);
-		run(user);
+		this.user = user;
+		run();
 	}
 
-	private void run(Person user) throws IOException{
+	private void run() throws IOException{
 		showWeek();
 		CalendarFunction[] allFunc = CalendarFunction.values();
+		int numUnansweredMeetings = AppointmentHandler.getAllUnansweredInvites(user.getId()).size();
 		System.out.println("Hva vil du gjøre?");
 		while(true){
 			for(int i = 0; i < allFunc.length; i++){
 				CalendarFunction cf = allFunc[i];
-				System.out.println(String.format("%d. %s", i + 1, cf.description));
+				if (cf == CalendarFunction.SHOW_INVITES && numUnansweredMeetings > 0){
+					System.out.printf("%d. %s (%d)\n", i + 1, cf.description, numUnansweredMeetings);
+				} else {
+					System.out.printf("%d. %s\n", i + 1, cf.description);
+				}
 			}
 			CalendarFunction cf = CalendarFunction.getUserFunction();
 			if (cf == CalendarFunction.QUIT){
@@ -248,15 +253,6 @@ public class Starter {
 		}
 	}
 
-	private static void setUpDb() throws IOException{
-//		String query = "TRUNCATE TABLE User";
-//		Execute.executeUpdate(query);
-//		new Person("tarjei", "husøy", "tarjei@roms.no", "komtek", "lol");
-//		new Person("silje", "mauseth", "silje.h.m@hotmail.com", "indøk", "silje");
-//		new Person("Haakon", "møøøøørk", "haakon@haakon", "komtech", "klabb");
-//		new Person("Trine", "Myklebust", "trine@gmail.com", "indøch", "trine");
-	}
-	
 	private static Person authenticateUser() throws IOException {
 		String email = getEmail();
 		String password = getPassword();

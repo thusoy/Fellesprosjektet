@@ -10,6 +10,7 @@ public enum CalendarFunction {
 	FOLLOW_CALENDAR ("Følg annen kalender"),
 	SHOW_NEXT_WEEK ("Vis neste uke"),
 	SHOW_PREVIOUS_WEEK ("Vis forrige uke"),
+	SHOW_INVITES ("Vis møteinnkallinger"),
 	QUIT ("Avslutt");
 	;
 	
