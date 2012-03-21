@@ -16,7 +16,7 @@ import server.AppointmentHandler;
 import server.Execute;
 import server.RoundTime;
 
-public class Appointment implements Serializable {
+public class Appointment implements Serializable, Comparable<Appointment> {
 	private static final long serialVersionUID = -5442910434292395380L;
 	private Long appId = null;
 	private String place;
@@ -295,6 +295,9 @@ public class Appointment implements Serializable {
 		return true;
 	}
 
-
+	@Override
+	public int compareTo(Appointment a) {
+		return startTime.compareTo(a.startTime);
+	}
 
 }

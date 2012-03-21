@@ -270,7 +270,7 @@ public class AppointmentHandler {
 		return idsToApps(appIdList);
 	}
 	
-	private static List<Appointment> idsToApps(List<Long> ids) throws IOException{
+	public static List<Appointment> idsToApps(List<Long> ids) throws IOException{
 		List<Appointment> apps = new ArrayList<Appointment>();
 		for(long appId: ids){
 			apps.add(getAppointment(appId));
