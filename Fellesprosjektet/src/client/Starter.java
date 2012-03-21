@@ -16,7 +16,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
-import calendar.RejectedMessage;
 
 import no.ntnu.fp.model.Person;
 import server.AppointmentHandler;
@@ -27,6 +26,7 @@ import server.RoomHandler;
 import calendar.Appointment;
 import calendar.Day;
 import calendar.Message;
+import calendar.RejectedMessage;
 import calendar.Room;
 
 public class Starter {
@@ -133,8 +133,7 @@ public class Starter {
 			System.out.printf("%d. %s\n", i+1, m);
 		}
 		System.out.print("Hvilken melding vil du lese? ");
-		Scanner scanner = new Scanner(System.in);
-		int userInput = scanner.nextInt();
+		int userInput = getValidNum(unreadMessages.size()-1);
 		Message selected = unreadMessages.get(userInput-1);
 		System.out.println(selected.showMessage(user).getContent());
 		if (selected instanceof RejectedMessage){
@@ -150,9 +149,29 @@ public class Starter {
 			System.out.printf("%d. %s\n", i + 1, allInvited.get(i));
 		}
 		System.out.print("Vil du svare på en innkalling? Tast inn nummeret: ");
-		Scanner scanner = new Scanner(System.in);
-		int userNum = scanner.nextInt();
+		int userNum = getValidNum(allInvited.size()-1);
 		answerInvite(allInvited.get(userNum-1));
+	}
+	
+	/**
+	 * Gets a valid integer from the user, 1 <= num <= upperInclusiveBound.
+	 * @param upperInclusiveBound
+	 */
+	private int getValidNum(int upperInclusiveBound){
+		Scanner scanner = new Scanner(System.in);
+		int input;
+		while(true){
+			try {
+				System.out.print("Gjør et valg: ");
+				input = scanner.nextInt();
+				if (input > 1 && input <= upperInclusiveBound){
+					break;
+				}
+			} catch (Exception e){ 
+				System.out.println("Beklager, det du skrev inn er ikke et gyldig valg. Prøv igjen.");
+			}
+		}
+		return input;
 	}
 	
 	private void answerInvite(Appointment appointment) throws IOException {
@@ -173,13 +192,14 @@ public class Starter {
 			}
 			System.out.println("Beklager, jeg skjønte ikke svaret ditt. Prøv igjen.");
 		}
+		System.out.println("Trykk enter for å gå videre.");
+		scanner.nextLine();
 	}
 
 
 	private void getAndShowWeek() throws IOException {
-		Scanner scn = new Scanner(System.in);
 		System.out.print("Skriv inn en uke du vil vise: ");
-		int weekNum =  scn.nextInt();
+		int weekNum =  getValidNum(52);
 		this.weekNum = weekNum;
 	}
 
@@ -276,6 +296,16 @@ public class Starter {
 		}
 	}
 	
+	private void changeAppointment() throws IOException {
+		List<Appointment> appointments = AppointmentHandler.getAllCreated(user.getId());
+		for (int i=0; i<appointments.size(); i++) {
+			System.out.printf("%d. %s\n", i+1, appointments.get(i));
+		}
+		int change = getValidNum(appointments.size()-1);
+		Appointment app = appointments.get(change-1);
+		changeAppointment(app);
+	}
+	
 	public void changeAppointment(Appointment app) throws IOException{
 		Scanner scanner = new Scanner(System.in);
 		String dateTimeFormat = "dd-MM-yyyy HH:mm";
@@ -284,7 +314,7 @@ public class Starter {
 		Date startdate = parseDate(dateTimeFormat, String.format("Startdato (%s): ", dateTimeFormat));
 		Date enddate = parseDate(dateTimeFormat, String.format("Sluttdato (%s): ", dateTimeFormat));
 		System.out.print("Hvis avtalen er privat, skriv 'ja'. Hvis ikke, trykk på enter. ");
-		boolean isPrivate = scanner.nextLine().isEmpty();
+		boolean isPrivate = !scanner.nextLine().isEmpty();
 		Map<Person, Boolean> participants = getParticipants();
 		System.out.println("Skriv inn beskrivelse: ");
 		String description = scanner.nextLine();
@@ -316,21 +346,6 @@ public class Starter {
 		System.out.println("Avtalen er endret.");
 	}
 	
-	private void changeAppointment() throws IOException {
-		long userId = user.getId();
-		List<Appointment> appointments = AppointmentHandler.getAllCreated(userId);
-		if (appointments != null){
-			for (int i=0; i<appointments.size(); i++) {
-				System.out.println(i+". "+appointments.get(i));
-			}
-			System.out.println("Velg hvilken avtale du vil endre: ");
-			Scanner scannerInt = new Scanner(System.in);
-			int change = scannerInt.nextInt();
-			Appointment app = appointments.get(change);
-			changeAppointment(app);
-		}
-	}
-
 	private void deleteAppointment() throws IOException {
 		long userId = user.getId();
 		List<Appointment> appointments = getAllAppointmentsInvolved(userId);
