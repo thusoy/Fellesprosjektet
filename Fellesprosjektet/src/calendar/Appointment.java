@@ -158,7 +158,7 @@ public class Appointment implements Serializable, Comparable<Appointment> {
 	public void deleteAppointment() throws IOException {
 		AppointmentHandler.deleteAppointment(this.appId);
 	}
-	public void deleteAppointmentInvitet() throws IOException {
+	public void deleteAppointmentInvited() throws IOException {
 		AppointmentHandler.deleteAppointmentInvited(this.appId);
 	}
 	

@@ -2,6 +2,7 @@ package server;
 
 import static calendar.Appointment.recreateAppointment;
 
+import calendar.RejectedMessage;
 import java.io.IOException;
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -150,8 +151,11 @@ public class AppointmentHandler {
 		Person p = PersonHandler.getPerson(userId);
 		String content = "%s %s har avslÂtt avtalen '%s'.";
 		String formatted = String.format(content, p.getFirstname(), p.getLastname(), ap.getTitle());
-		Message msg = new Message("Avslag på avtale", formatted);
+		Message msg = new RejectedMessage("Avslag på avtale", formatted, ap);
 		for (Person user: ap.getParticipants().keySet()) {
+			if (user.getId() == userId){
+				continue;
+			}
 			MessageHandler.sendMessageToUser(msg.getId(), user.getId());
 		}
 		MessageHandler.sendMessageToUser(msg.getId(), ap.getCreator().getId());
