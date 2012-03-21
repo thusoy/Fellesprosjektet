@@ -39,7 +39,7 @@ public class Starter {
 	}
 	
 	private void initAndLogin() throws IOException {
-		setUp();
+		setUpDb();
 		do {
 			try {
 				Person user = authenticateUser();
@@ -107,7 +107,6 @@ public class Starter {
 		System.out.print("Skriv inn en uke du vil vise: ");
 		int weekNum =  scn.nextInt();
 		this.weekNum = weekNum;
-		showWeek();
 	}
 
 	private void followCalendar() throws IOException {
@@ -219,7 +218,7 @@ public class Starter {
 		}
 	}
 
-	private static void setUp() throws IOException{
+	private static void setUpDb() throws IOException{
 		String query = "TRUNCATE TABLE User";
 		Execute.executeUpdate(query);
 		new Person("tarjei", "husøy", "tarjei@roms.no", "komtek", "lol");

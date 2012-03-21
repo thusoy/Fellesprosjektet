@@ -32,6 +32,7 @@ public class AppointmentHandler {
 		String daysAppearing = rawText != null ? rawText.substring(1, rawText.length()-1) : null;
 		Date endOfRepeat = app.getEndOfRepeatDate();
 		String roomName = app.getRoomName();
+		Map<Person, Boolean> participants = app.getParticipants();
 		boolean isPrivate = app.isPrivate();
 		long creatorId = app.getCreator() != null ? app.getCreator().getId() : 0;
 		long appId = getUniqueId();
@@ -236,6 +237,12 @@ public class AppointmentHandler {
 	
 	public static List<Appointment> getAllCreated(long userId) throws IOException {
 		String query = "SELECT appId, title, place, startTime, endTime, description, " +
+				"daysAppearing, endOfRepeatDate, roomName, isPrivate, creatorId FROM Appointment WHERE creatorId=%d " + 
+				"ORDER BY startTime";
+		ResultSet rs = Execute.getResultSet(String.format(query, userId));
+		return getListFromResultSet(rs);
+	}
+	
 	public static List<Appointment> getAllInvited(long userId) throws IOException {
 		String query = "SELECT appId FROM UserAppointments WHERE userId=%d";
 		List<Long> appIdList = new ArrayList<Long>();
@@ -244,13 +251,6 @@ public class AppointmentHandler {
 			appIdList = Execute.executeGetLongList(String.format(query, userId));
 		} catch (SQLException e) {
 			e.printStackTrace();
-			throw new RuntimeException("SQL feil");
-		}
-		for (long appId: appIdList) {
-			appointments.add(getAppointment(appId));
-		}
-		return appointments;
-	}
 			throw new RuntimeException("SQL feil");
 		}
 		for (long appId: appIdList) {
