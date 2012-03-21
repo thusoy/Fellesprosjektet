@@ -153,9 +153,11 @@ public class Starter {
 			String input = scanner.nextLine();
 			if (input.equalsIgnoreCase("ja")){
 				appointment.acceptInvite(user, true);
+				System.out.printf("Du har bekreftet avtalen %s.\n", appointment);
 				break;
 			} else if (input.equalsIgnoreCase("nei")){
 				appointment.acceptInvite(user, false);
+				System.out.printf("Du har takket nei til avtalen %s.\n", appointment);
 				break;
 			} else if (input.isEmpty()){
 				break;
