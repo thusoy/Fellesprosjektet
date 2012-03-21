@@ -215,6 +215,9 @@ public class Starter {
 		long userId = user.getId();
 		List<Appointment> appointments = AppointmentHandler.getAllCreated(userId);
 		if (appointments != null){
+			for (int i=0; i<appointments.size(); i++) {
+				System.out.println(i+". "+appointments.get(i));
+			}
 			System.out.println("Velg hvilken avtale du vil endre: ");
 			Scanner scannerInt = new Scanner(System.in);
 			int change = scannerInt.nextInt();
