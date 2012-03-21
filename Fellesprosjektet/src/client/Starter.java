@@ -232,8 +232,6 @@ public class Starter {
 		Date enddate = parseDate(dateTimeFormat, String.format("Sluttdato (%s): ", dateTimeFormat));
 		System.out.print("Hvis avtalen er privat, skriv 'ja'. Hvis ikke, trykk på enter. ");
 		boolean isPrivate = scanner.nextLine().isEmpty();
-		System.out.println("Skriv inn sted: ");
-		String place = scanner.nextLine();
 		Map<Person, Boolean> participants = getParticipants();
 		System.out.println("Skriv inn beskrivelse: ");
 		String description = scanner.nextLine();
@@ -242,13 +240,24 @@ public class Starter {
 		ap.setStartTime(startdate);
 		ap.setEndTime(enddate);
 		ap.setPrivate(isPrivate);
-		ap.setParticipants(participants);
-		ap.setPlace(place);
+		ap.setParticipants(participants);		
 		ap.setDescription(description);
 		
 		if (participants != null){
-			String roomName = reserveRoom(startdate, enddate, participants);
-			ap.setRoomName(roomName);
+			System.out.println("Vil du reservere m¿terom? (ja/nei): ");
+			String reserve = scanner.nextLine();
+			if(reserve.equals("ja")){
+				String roomName = reserveRoom(startdate, enddate, participants);
+				ap.setRoomName(roomName);
+			}else{
+				System.out.println("Skriv inn sted: ");
+				String place = scanner.nextLine();
+				ap.setPlace(place);
+			}
+		}else{
+			System.out.println("Skriv inn sted: ");
+			String place = scanner.nextLine();
+			ap.setPlace(place);
 		}
 		AppointmentHandler.updateAppointment(ap);
 		System.out.println("Avtalen er endret.");
@@ -296,9 +305,22 @@ public class Starter {
 		
 		Appointment ap = new Appointment(title, startdate, enddate, isPrivate, participants, user);
 		if (participants != null){
-			String roomName = reserveRoom(startdate, enddate, participants);
-			ap.setRoomName(roomName);
+			System.out.println("Vil du reservere m¿terom? (ja/nei): ");
+			String reserve = scanner.nextLine();
+			if(reserve.equals("ja")){
+				String roomName = reserveRoom(startdate, enddate, participants);
+				ap.setRoomName(roomName);
+			}else{
+				System.out.println("Skriv inn sted: ");
+				String place = scanner.nextLine();
+				ap.setPlace(place);
+			}
+		}else{
+			System.out.println("Skriv inn sted: ");
+			String place = scanner.nextLine();
+			ap.setPlace(place);
 		}
+		AppointmentHandler.updateAppointment(ap);
 	}
 	
 	private String reserveRoom(Date startdate, Date enddate, Map<Person, Boolean> participants) throws IOException {
