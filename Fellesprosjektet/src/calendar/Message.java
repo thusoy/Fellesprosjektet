@@ -13,7 +13,7 @@ import server.RoundTime;
 public class Message implements Comparable<Message> {
 	
 	protected long msgId;
-	private Date dateSent;
+	protected Date dateSent;
 	protected String content;
 	protected String title;
 	private List<Person> receivers;

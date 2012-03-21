@@ -7,14 +7,21 @@ import java.util.Scanner;
 
 import no.ntnu.fp.model.Person;
 import client.Starter;
+import server.RoundTime;
+import server.MessageHandler;
+
 
 public class RejectedMessage extends Message {
 	
 	private Appointment app;
 	
 	public RejectedMessage(String title, String content, Appointment app) throws IOException {
-		super(title, content);
+		super(0);
 		this.app = app;
+		this.title = title;
+		this.content = content;
+		this.dateSent = RoundTime.roundTime(new Date(System.currentTimeMillis()));
+		MessageHandler.createMessage(this);
 	}
 	
 	private RejectedMessage(long id){
