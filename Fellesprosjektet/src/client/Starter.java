@@ -1,6 +1,9 @@
 package client;
 
-import static hashtools.Hash.createHash;
+import static ascii.Art.printAsciiArt;
+import static client.helpers.DBHelper.getPersonFromEmail;
+import static client.helpers.DBHelper.getUserIdFromEmail;
+import static client.helpers.AuthHelper.authenticationHelper;
 
 import java.io.IOException;
 import java.sql.Date;
@@ -49,6 +52,7 @@ public class Starter {
 	}
 	
 	private void initAndLogin() throws IOException {
+		printAsciiArt("Velkommen!");
 		Person user = null;
 		do {
 			try {
@@ -65,9 +69,10 @@ public class Starter {
 	private void run() throws IOException{
 		CalendarFunction[] allFunc = CalendarFunction.values();
 		while(true){
-			showWeek();
+			System.out.println(String.format(String.format("%%0%dd", 10), 0).replace("0","\n"));
 			int numUnansweredMeetings = AppointmentHandler.getAllUnansweredInvites(user.getId()).size();
 			int numNewMessages = MessageHandler.getUnreadMessagesForUser(user).size();
+			showWeek();
 			System.out.println("Hva vil du gjøre?");
 			for(int i = 0; i < allFunc.length; i++){
 				CalendarFunction cf = allFunc[i];
@@ -203,16 +208,15 @@ public class Starter {
 	}
 
 	private void followCalendar() throws IOException {
-		System.out.print("Skriv inn e-postadressen til personen du vil følge: ");
-		String email = getValidEmail();
+		String email = getValidEmail("Skriv inn e-postadressen til personen du vil følge: ");
 		long otherUserId = getUserIdFromEmail(email);
 		user.followPerson(otherUserId);
 	}
 
-	private static String getValidEmail() throws IOException {
+	private static String getValidEmail(String display) throws IOException{
 		String email;
 		do {
-			email = getString("Skriv inn e-postadresse: ");
+			email = getString(display);
 		} while (!isValidEmail(email));
 		return email;
 	}
@@ -231,7 +235,7 @@ public class Starter {
 	private void showWeek() throws IOException {
 		List<Appointment> appointments = getWeekAppointments();
 		Day previous = null;
-		System.out.printf("************* UKE %d ********************\n", weekNum);
+		printAsciiArt(String.format("Uke %d", weekNum));
 		for(Appointment app: appointments){
 			Day thisDay = Day.fromDate(app.getStartTime());
 			if (thisDay != previous){
@@ -419,57 +423,13 @@ public class Starter {
 	}
 
 	private static Person authenticateUser() throws IOException {
-		String email = getEmail();
-		String password = getPassword();
+		String email = getString("E-post: ");
+		String password = getString("Passord: ");
 		Person user = authenticationHelper(email, password);
 		return user;
 	}
 	
-	private static Person authenticationHelper(String email, String password) throws IOException{
-		String salt = getSalt(email);
-		String passwordHash = createHash(password, salt);
-		Person user = getUserFromEmailAndPassword(email, passwordHash);
-		return user;
-	}
-	
-	/**
-	 * Kjøres SERVERSIDE!
-	 */
-	private static Person getUserFromEmailAndPassword(String email, String passwordHash) throws IOException{
-		long id = getUserIdFromEmail(email);
-		Person user = PersonHandler.getPerson(id);
-		if (user.getPasswordHash().equals(passwordHash)){
-			return user;
-		} else {
-			throw new IllegalArgumentException("Wrong password!");
-		}
-	}
-	
-	private static long getUserIdFromEmail(String email) throws IOException{
-		String query = "SELECT userId FROM User WHERE email='%s'";
-		long id = Execute.executeGetLong(String.format(query, email));
-		return id;
-	}
-	
-	private static String getSalt(String email) throws IOException{
-		String query = "SELECT salt FROM User WHERE email='%s'";
-		String salt = Execute.executeGetString(String.format(query, email));
-		return salt;
-	}
-	
-	private static Person getPersonFromEmail(String email) throws IOException{
-		long id = getUserIdFromEmail(email);
-		Person p = PersonHandler.getPerson(id);
-		return p;
-	}
-	
-	private static String getEmail(){
-		return getString("Skriv inn e-post: ");
-	}
-	
-	private static String getPassword(){
-		return getString("Skriv inn passord: ");
-	}
+
 	
 	private static String getString(String display){
 		Scanner scanner = new Scanner(System.in);
