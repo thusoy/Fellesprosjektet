@@ -51,7 +51,7 @@ public class AppointmentHelper {
 		return unique;
 	}
 	
-	public void showAppointment(Person user) throws IOException {
+	public static void showAppointment(Person user) throws IOException {
 		DateFormat df = new SimpleDateFormat("dd-MM-yyyy HH:mm");		
 		List<Appointment> appointments =  getAllAppointments(user);
 		Scanner scanner = new Scanner(System.in);
@@ -80,7 +80,7 @@ public class AppointmentHelper {
 		}
 	}
 	
-	public void changeAppointment(Person user) throws IOException {
+	public static void changeAppointment(Person user) throws IOException {
 		List<Appointment> appointments = AppointmentHandler.getAllCreated(user.getId());
 		for (int i=0; i<appointments.size(); i++) {
 			System.out.printf("%d. %s\n", i+1, appointments.get(i));
@@ -90,7 +90,7 @@ public class AppointmentHelper {
 		changeAppointment(user, app);
 	}
 	
-	public void changeAppointment(Person user, Appointment app) throws IOException{
+	public static void changeAppointment(Person user, Appointment app) throws IOException{
 		String dateTimeFormat = "dd-MM-yyyy HH:mm";
 		Date startdate = parseDate(dateTimeFormat, String.format("Startdato (%s): ", dateTimeFormat));
 		Date enddate = parseDate(dateTimeFormat, String.format("Sluttdato (%s): ", dateTimeFormat));
@@ -108,7 +108,7 @@ public class AppointmentHelper {
 		System.out.println("Avtalen er endret.");
 	}
 	
-	public void deleteAppointment(Person user) throws IOException {
+	public static void deleteAppointment(Person user) throws IOException {
 		long userId = user.getId();
 		List<Appointment> appointments = getAllAppointmentsInvolved(userId);
 		for(int i = 0; i < appointments.size(); i++){
@@ -120,7 +120,7 @@ public class AppointmentHelper {
 		deleteAppointment(user, app);
 	}
 	
-	private void deleteAppointment(Person user, Appointment app) throws IOException{
+	private static void deleteAppointment(Person user, Appointment app) throws IOException{
 		if (user.equals(app.getCreator())){
 			app.deleteAppointment();
 		}else {
@@ -129,14 +129,14 @@ public class AppointmentHelper {
 		System.out.println("Avtalen er slettet");
 	}
 	
-	private List<Appointment> getAllAppointmentsInvolved(long userId) throws IOException {
+	private static List<Appointment> getAllAppointmentsInvolved(long userId) throws IOException {
 		List<Appointment> appointments = AppointmentHandler.getAllCreated(userId);
 		List<Appointment> app = AppointmentHandler.getAllInvited(userId);
 		appointments.addAll(app);
 		return appointments;
 	}
 	
-	private void addNewAppointment(Person user) throws IOException {
+	public static void addNewAppointment(Person user) throws IOException {
 		String dateTimeFormat = "dd-MM-yyyy HH:mm";
 		String title = getString("Skriv inn tittel: ");
 		Date startdate = parseDate(dateTimeFormat, String.format("Startdato (%s): ", dateTimeFormat));
@@ -150,7 +150,7 @@ public class AppointmentHelper {
 		System.out.println("Ny avtale lagret!");
 	}
 	
-	private void setRoomOrPlace(Appointment app) throws IOException{
+	private static void setRoomOrPlace(Appointment app) throws IOException{
 		if (app.getParticipants() != null){
 			String reserve = getString("Vil du reservere m¿terom? (ja/nei): ");
 			if (reserve.equalsIgnoreCase("ja")){
@@ -166,7 +166,7 @@ public class AppointmentHelper {
 		}
 	}
 	
-	private String reserveRoom(Date startdate, Date enddate, Map<Person, Boolean> participants) throws IOException {
+	private static String reserveRoom(Date startdate, Date enddate, Map<Person, Boolean> participants) throws IOException {
 		List<Room> rooms = RoomHandler.availableRooms(startdate, enddate, participants.size());
 		System.out.println("Reserver m¿terom: ");
 		for (int i = 0; i < rooms.size(); i++) {
@@ -176,7 +176,7 @@ public class AppointmentHelper {
 		return rooms.get(choosenRoom).getName();
 	}
 	
-	private Map<Person, Boolean> getParticipants(Person user) throws IOException{
+	private static Map<Person, Boolean> getParticipants(Person user) throws IOException{
 		Map<Person, Boolean> map = new HashMap<Person, Boolean>();
 		while (true) {
 			String email = getString("Enter email to invite to the event: ");

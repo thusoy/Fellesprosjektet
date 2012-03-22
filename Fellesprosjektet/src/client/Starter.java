@@ -1,40 +1,30 @@
 package client;
 
-import static client.helpers.AuthHelper.authenticateUser;
-import static client.helpers.IO.getString;
 import static ascii.Art.printAsciiArt;
-import static client.helpers.DBHelper.getPersonFromEmail;
+import static client.helpers.AppointmentHelper.addNewAppointment;
+import static client.helpers.AppointmentHelper.changeAppointment;
+import static client.helpers.AppointmentHelper.deleteAppointment;
+import static client.helpers.AppointmentHelper.getWeekAppointments;
+import static client.helpers.AppointmentHelper.showAppointment;
+import static client.helpers.AuthHelper.authenticateUser;
 import static client.helpers.DBHelper.getUserIdFromEmail;
+import static client.helpers.IO.getString;
+import static client.helpers.IO.getValidEmail;
+import static client.helpers.IO.getValidNum;
 
 import java.io.IOException;
-import java.sql.Date;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
-import java.util.Set;
-import java.util.TreeSet;
 
 import no.ntnu.fp.model.Person;
 import server.AppointmentHandler;
-import server.Execute;
 import server.MessageHandler;
-import server.PersonHandler;
-import server.RoomHandler;
 import calendar.Appointment;
 import calendar.Day;
 import calendar.Message;
 import calendar.RejectedMessage;
-import calendar.Room;
-import static client.helpers.IO.getValidEmail;
 public class Starter {
 	
 	private Person user;
@@ -102,16 +92,16 @@ public class Starter {
 	public void runFunc(CalendarFunction func) throws IOException{
 		switch(func){
 		case ADD_APPOINTMENT:
-			addNewAppointment();
+			addNewAppointment(user);
 			break;
 		case DELETE_APPOINTMENT:
-			deleteAppointment();
+			deleteAppointment(user);
 			break;
 		case CHANGE_APPOINTMENT:
-			changeAppointment();
+			changeAppointment(user);
 			break;
 		case SHOW_APPOINTMENT:
-			showAppointment();
+			showAppointment(user);
 			break;
 		case SHOW_WEEK:
 			getAndShowWeek();
@@ -196,7 +186,7 @@ public class Starter {
 	}
 
 	private void showWeek() throws IOException {
-		List<Appointment> appointments = getWeekAppointments();
+		List<Appointment> appointments = getWeekAppointments(user, weekNum);
 		Day previous = null;
 		String timeFormat = "HH:mm";
 		DateFormat df = new SimpleDateFormat(timeFormat);
