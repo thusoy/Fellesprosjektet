@@ -68,15 +68,15 @@ public class AppointmentHelper {
 		System.out.println("Privat: "+app.isPrivate());
 		System.out.println("Deltakere: ");
 		Map<Person, Boolean> participants = app.getParticipants();
-		for (Person user: participants.keySet()) {
-			Boolean answer = participants.get(user);
+		for (Person p: participants.keySet()) {
+			Boolean answer = participants.get(p);
 			String answerString = null;
 			if (answer == null){
 				answerString = "har ikke svart";
 			}else{
 				answerString = answer ? "kommer" : "kommer ikke";
 			}
-			System.out.printf("%s %s %s.\n", user.getFirstname(), user.getLastname(), answerString);
+			System.out.printf("%s %s %s.\n", p.getFirstname(), p.getLastname(), answerString);
 		}
 	}
 	

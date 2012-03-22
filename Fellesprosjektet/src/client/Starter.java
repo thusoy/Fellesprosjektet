@@ -15,6 +15,7 @@ import static client.helpers.IO.getValidNum;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
@@ -25,8 +26,11 @@ import calendar.Appointment;
 import calendar.Day;
 import calendar.Message;
 import calendar.RejectedMessage;
+import client.helpers.InvalidLoginException;
+
 public class Starter {
 	
+	private static final String emptyLines = String.format(String.format("%%0%dd", 30), 0).replace("0","\n");
 	private Person user;
 	private int weekNum;
 	
@@ -43,24 +47,24 @@ public class Starter {
 	}
 	
 	private void initAndLogin() throws IOException {
-		printAsciiArt("Velkommen!");
+		printAsciiArt("Login");
 		Person user = null;
-		do {
+		while (user == null) {
 			try {
 				user = authenticateUser();
-				System.out.println("Auth OK!");
-			} catch(RuntimeException e){
-				System.out.println("Ugyldig kombinasjon av passord og brukernavn, prøv igjen.");
+			} catch (InvalidLoginException e) {
+				System.out.println(e.getMessage());
 			}
-		} while (user == null);
+		}
 		this.user = user;
+		System.out.println(emptyLines);
+		printAsciiArt("Kalender");
 		run();
 	}
 
 	private void run() throws IOException{
 		CalendarFunction[] allFunc = CalendarFunction.values();
 		while(true){
-			System.out.println(String.format(String.format("%%0%dd", 30), 0).replace("0","\n"));
 			int numUnansweredMeetings = AppointmentHandler.getAllUnansweredInvites(user.getId()).size();
 			int numNewMessages = MessageHandler.getUnreadMessagesForUser(user).size();
 			showWeek();
@@ -171,8 +175,7 @@ public class Starter {
 		}
 		getString("Trykk enter for å gå videre.");
 	}
-
-
+	
 	private void getAndShowWeek() throws IOException {
 		System.out.print("Skriv inn en uke du vil vise: ");
 		int weekNum =  getValidNum(52);
@@ -187,23 +190,101 @@ public class Starter {
 
 	private void showWeek() throws IOException {
 		List<Appointment> appointments = getWeekAppointments(user, weekNum);
+		List<String>[] dayEvents = splitAppointmentsByDay(appointments);
+		printCalendar(dayEvents);
+	}
+	
+	/**
+	 * Splits the appointments given into seven lists.
+	 * @param appointments
+	 */
+	private List<String>[] splitAppointmentsByDay(List<Appointment> appointments){
+		List<String>[] days = (List<String>[]) new ArrayList[7];
+		for(int i = 0; i < Day.values().length; i++){
+			days[i] = new ArrayList<String>();
+		}
 		Day previous = null;
-		String timeFormat = "HH:mm";
+		String timeFormat = "H:mm";
 		DateFormat df = new SimpleDateFormat(timeFormat);
 		printAsciiArt(String.format("Uke %d", weekNum));
+		int index = 0;
 		for(Appointment app: appointments){
 			Day thisDay = Day.fromDate(app.getStartTime());
 			if (thisDay != previous){
-				System.out.println(thisDay);
+				index = thisDay.dayInWeek() - 1;
 			}
-			if (app.getCreator().equals(user)){
-				System.out.printf("\t%s %s\n", df.format(app.getStartTime()), app.getTitle());
-			} else {
-				System.out.printf("\t%s %s (%s)\n", df.format(app.getStartTime()), app.getTitle(), app.getCreator().fullName());
-			}
+			days[index].add(String.format("%s - %s", padLeft(df.format(app.getStartTime()), 5), app.getTitle()));
 			previous = thisDay;
 		}
-		System.out.println("****************************************");
+		return days;
+	}
+	
+	private void printCalendar(List<String>[] dayEvents){
+		int columnWidth = 25;
+		boolean foundMore = true;
+		StringBuilder first = new StringBuilder();
+		for(Day d: Day.values()){
+			first.append(center(d.toString(), columnWidth, '_') + "|");
+		}
+		System.out.println(first);
+		while(foundMore){
+			foundMore = false;
+			StringBuilder line = new StringBuilder();
+			for(List<String> list: dayEvents){
+				if (list.size() > 0){
+					line.append(padRight(list.get(0), columnWidth));
+					list.remove(0);
+					foundMore = true;
+				} else {
+					line.append(repeat(" ", columnWidth));
+				}
+			}
+			System.out.println(line.toString());
+		}
+	}
+	
+	private String center(String input, int width, char fillChar){
+		int length = input.length();
+		if (length < width){
+			int padding = (width - length)/2;
+			String blank = repeat(Character.toString(fillChar), padding);
+			String output = blank + input + blank; 
+			boolean isOdd = width % 2 == 0;
+			return isOdd ? output : output.substring(0, width-1);
+		} else {
+			return input.substring(0, width-3) + "...";
+		}
+	}
+	
+	private String padRight(String input, int width){
+		int length = input.length();
+		if (length <= width){
+			int padding = width - length;
+			String blank = repeat(" ", padding);
+			String output = input + blank; 
+			return output;
+		} else {
+			return input.substring(0, width-4) + "... ";
+		}
+	}
+	
+	private String padLeft(String input, int width){
+		int length = input.length();
+		if (length <= width){
+			int padding = width - length;
+			String blank = repeat(" ", padding);
+			String output = blank + input; 
+			return output;
+		} else {
+			return input.substring(0, width-4) + "... ";
+		}
+	}
+	
+	private String repeat(String input, int times){
+		if (times <= 0){
+			return "";
+		}
+		return String.format(String.format("%%0%dd", times), 0).replace("0", input);
 	}
 	
 }

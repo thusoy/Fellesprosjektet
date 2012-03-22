@@ -1,6 +1,7 @@
 package client.helpers;
 
 import static client.helpers.DBHelper.getUserIdFromEmail;
+import static client.helpers.DBHelper.isValidEmail;
 import static client.helpers.IO.getString;
 import static hashtools.Hash.createHash;
 
@@ -12,18 +13,24 @@ import server.PersonHandler;
 
 public class AuthHelper {
 
-	public static Person authenticateUser() throws IOException {
-		String email = getString("E-post: ");
-		String password = getString("Passord: ");
+	public static Person authenticateUser() throws IOException, InvalidLoginException {
+		String email = "tarjei@roms.no";//getString("E-post: ");
+		String password = "lol";// getString("Passord: ");
 		Person user = authenticationHelper(email, password);
 		return user;
 	}
 	
-	private static Person authenticationHelper(String email, String password) throws IOException{
-		String salt = getSalt(email);
-		String passwordHash = createHash(password, salt);
-		Person user = getUserFromEmailAndPassword(email, passwordHash);
-		return user;
+	private static Person authenticationHelper(String email, String password) throws IOException, InvalidLoginException{
+		if (isValidEmail(email)){
+			String salt = getSalt(email);
+			String passwordHash = createHash(password, salt);
+			Person user = getUserFromEmailAndPassword(email, passwordHash);
+			return user;
+		}
+		try{
+			Thread.sleep(100);
+		} catch (InterruptedException e){ }
+		throw new InvalidLoginException("Ugyldig kombinasjon av brukernavn/passord, prøv igjen!");
 	}
 	
 	private static String getSalt(String email) throws IOException{

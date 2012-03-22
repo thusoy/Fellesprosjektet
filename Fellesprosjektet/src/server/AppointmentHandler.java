@@ -283,8 +283,8 @@ public class AppointmentHandler {
 		List<Appointment> appointments = null;
 		try {
 			PreparedStatement ps = Execute.getPreparedStatement(String.format(query, userId));
-			ps.setDate(1, startOfWeek);
-			ps.setDate(2, endOfWeek);
+			ps.setTimestamp(1, new Timestamp(startOfWeek.getTime()));
+			ps.setTimestamp(2, new Timestamp(endOfWeek.getTime()));
 			ResultSet rs = ps.executeQuery();
 			appointments = getListFromResultSet(rs);
 		} catch (SQLException e) {
@@ -343,23 +343,23 @@ public class AppointmentHandler {
 				"daysAppearing, endOfRepeatDate, roomName, isPrivate, creatorId FROM Appointment " +
 				"WHERE creatorId=%d AND startTime > ? AND endTime < ? " + 
 				"ORDER BY startTime";
-		List<Appointment> appointments = null;
 		try {
 			PreparedStatement ps = Execute.getPreparedStatement(String.format(query, userId));
-			ps.setDate(1, startOfWeek);
+			ps.setTimestamp(1, new Timestamp(startOfWeek.getTime()));
 			ps.setDate(2, endOfWeek);
+			System.out.println("All events: " + ps);
 			ResultSet rs = ps.executeQuery();
-			appointments = getListFromResultSet(rs);
+			return getListFromResultSet(rs);
 		} catch (SQLException e) {
 			e.printStackTrace();
 			throw new RuntimeException("Feil i SQL, stoopid!");
 		}
-		return appointments;
 	}
 
 	private static Date getStartOfWeek(int weekNum) {
 		Calendar cal = Calendar.getInstance();
 		int year = cal.get(Calendar.YEAR);
+		cal.clear();
 		cal.set(Calendar.WEEK_OF_YEAR, weekNum);
 		cal.set(Calendar.YEAR, year);
 		Date start = new Date(cal.getTimeInMillis());
@@ -367,16 +367,12 @@ public class AppointmentHandler {
 	}
 
 	private static Date getEndOfWeek(int weekNum) {
-		Calendar cal = Calendar.getInstance();
-		int year = cal.get(Calendar.YEAR);
-		cal.clear();
-		cal.set(Calendar.WEEK_OF_YEAR, weekNum);
-		cal.set(Calendar.YEAR, year);
-		int aWeekInMs = 6*24*60*60*1000;
-		Date start = new Date(cal.getTimeInMillis() + aWeekInMs);
-		return start;
+		Date startOfWeek = getStartOfWeek(weekNum);
+		int aWeekInMs = 7*24*60*60*1000-1;
+		Date end = new Date(startOfWeek.getTime() + aWeekInMs);
+		return end;
 	}
-
+	
 	private static List<Appointment> getListFromResultSet(ResultSet rs) throws IOException {
 		List<Appointment> finalList = new ArrayList<Appointment>();
 		try {

@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.sql.Date;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Collection;
 import java.util.Scanner;
 
 public class IO {
@@ -56,5 +57,29 @@ public class IO {
 			email = getString(display);
 		} while (!isValidEmail(email));
 		return email;
+	}
+	
+	public static int promptChoice(Collection<Object> alternatives){
+		int index = 1;
+		for(Object alt: alternatives){
+			System.out.printf("%d. %s\n", index, alt);
+			index++;
+		}
+		String userInput = null;
+		Scanner scanner = new Scanner(System.in);
+		while (true){
+			try {
+				userInput = scanner.nextLine();
+				if (userInput.isEmpty()){
+					throw new UserAbortException();
+				}
+				int userChoice = Integer.parseInt(userInput);
+				if (1 <= userChoice && userChoice <= alternatives.size()){
+					return userChoice - 1;
+				}
+			} catch (Exception e){
+				System.out.println("Ugyldig valg. For å avslutte, trykk på enter.");
+			}
+		}
 	}
 }

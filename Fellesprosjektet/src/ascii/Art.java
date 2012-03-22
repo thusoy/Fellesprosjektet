@@ -9,8 +9,14 @@ import java.util.Map;
 import java.util.Scanner;
 
 public class Art {
+	/**
+	 * For å bytte font, gå til http://patorjk.com/software/taag/, lim inn
+	 * strengen fontChars, legg inn linjeskift mellom alle bokstavene, og copy-paste
+	 * resultatet inn i fila font.txt.
+	 */
 	private final static int charHeight = 6;
 	private final static String fontChars = "abcdefghijklmnopqrstuvwxyz0123456789 !";
+	private static Map<Character, String> replacements;
 	
 	private static Map<Character, String[]> chars;
 
@@ -29,16 +35,25 @@ public class Art {
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
+		
+		replacements = new HashMap<Character, String>();
+		replacements.put('æ', "ae");
+		replacements.put('ø', "oe");
+		replacements.put('å', "aa");
 	}
 	
+	/**
+	 * Printer ut gitt tekststreng til skjermen i ASCII-art. Ignorerer kapitalisering.
+	 * @param raw
+	 */
 	public static void printAsciiArt(String raw){
-		raw = raw.toLowerCase();
+		String clean = cleanUp(raw);
 		List<StringBuilder> outer = new ArrayList<StringBuilder>();
 		for(int i = 0; i < charHeight; i++){
 			outer.add(new StringBuilder());
 		}
 		
-		for(char c: raw.toCharArray()){
+		for(char c: clean.toCharArray()){
 			String[] array = chars.get(c);
 			for(int i = 0; i < array.length; i++){
 				outer.get(i).append(array[i]);
@@ -48,6 +63,14 @@ public class Art {
 			System.out.println(sb);
 		}
 		System.out.println();
+	}
+	
+	private static String cleanUp(String raw){
+		String lower = raw.toLowerCase();
+		for(Character c: replacements.keySet()){
+			lower = lower.replaceAll(Character.toString(c), replacements.get(c));
+		}
+		return lower;
 	}
 	
 }
