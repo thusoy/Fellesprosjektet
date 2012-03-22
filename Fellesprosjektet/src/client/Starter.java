@@ -69,7 +69,7 @@ public class Starter {
 	private void run() throws IOException{
 		CalendarFunction[] allFunc = CalendarFunction.values();
 		while(true){
-			System.out.println(String.format(String.format("%%0%dd", 10), 0).replace("0","\n"));
+			System.out.println(String.format(String.format("%%0%dd", 30), 0).replace("0","\n"));
 			int numUnansweredMeetings = AppointmentHandler.getAllUnansweredInvites(user.getId()).size();
 			int numNewMessages = MessageHandler.getUnreadMessagesForUser(user).size();
 			showWeek();
@@ -235,13 +235,15 @@ public class Starter {
 	private void showWeek() throws IOException {
 		List<Appointment> appointments = getWeekAppointments();
 		Day previous = null;
+		String timeFormat = "HH:mm";
+		DateFormat df = new SimpleDateFormat(timeFormat);
 		printAsciiArt(String.format("Uke %d", weekNum));
 		for(Appointment app: appointments){
 			Day thisDay = Day.fromDate(app.getStartTime());
 			if (thisDay != previous){
-				System.out.println("-----" + thisDay + "-----");
+				System.out.println(thisDay);
 			}
-			System.out.println(app);
+			System.out.printf("\t%s %s\n", df.format(app.getStartTime()), app.getTitle());
 			previous = thisDay;
 		}
 		System.out.println("****************************************");
