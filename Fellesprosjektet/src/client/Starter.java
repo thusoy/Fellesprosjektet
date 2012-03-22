@@ -1,5 +1,6 @@
 package client;
 
+import static client.helpers.IO.promptChoice;
 import static ascii.Art.printAsciiArt;
 import static client.helpers.AppointmentHelper.addNewAppointment;
 import static client.helpers.AppointmentHelper.changeAppointment;
@@ -27,10 +28,11 @@ import calendar.Day;
 import calendar.Message;
 import calendar.RejectedMessage;
 import client.helpers.InvalidLoginException;
+import client.helpers.UserAbortException;
 
 public class Starter {
 	
-	private static final String emptyLines = String.format(String.format("%%0%dd", 30), 0).replace("0","\n");
+	private static final String emptyLines = repeat("\n", 30);
 	private Person user;
 	private int weekNum;
 	
@@ -63,27 +65,31 @@ public class Starter {
 	}
 
 	private void run() throws IOException{
+		showWeek();
 		CalendarFunction[] allFunc = CalendarFunction.values();
 		while(true){
 			int numUnansweredMeetings = AppointmentHandler.getAllUnansweredInvites(user.getId()).size();
 			int numNewMessages = MessageHandler.getUnreadMessagesForUser(user).size();
-			showWeek();
 			System.out.println("Hva vil du gjøre?");
-			for(int i = 0; i < allFunc.length; i++){
-				CalendarFunction cf = allFunc[i];
+			List<String> choices = new ArrayList<String>();
+			for(CalendarFunction cf: allFunc){
+				String description = cf.description;
 				if (cf == CalendarFunction.SHOW_INVITES && numUnansweredMeetings > 0){
-					System.out.printf("%d. %s (%d)\n", i + 1, cf.description, numUnansweredMeetings);
+					description += String.format("(%d)", numUnansweredMeetings);
 				} else if (cf == CalendarFunction.SHOW_MESSAGES && numNewMessages > 0){
-					System.out.printf("%d. %s (%d)\n", i + 1, cf.description, numNewMessages);
-				} else {
-					System.out.printf("%d. %s\n", i + 1, cf.description);
+					description += String.format("(%d)", numNewMessages);
 				}
+				choices.add(description);
 			}
-			CalendarFunction cf = CalendarFunction.getUserFunction();
-			if (cf == CalendarFunction.QUIT){
+			try {
+				CalendarFunction cf = allFunc[promptChoice(choices)];
+				if (cf == CalendarFunction.QUIT){
+					throw new UserAbortException();
+				}
+				runFunc(cf);
+			} catch (UserAbortException e) {
 				break;
 			}
-			runFunc(cf);
 		}
 		System.out.println("Ha en fortsatt fin dag!");
 	}
@@ -93,7 +99,7 @@ public class Starter {
 		return cal.get(Calendar.WEEK_OF_YEAR);
 	}
 
-	public void runFunc(CalendarFunction func) throws IOException{
+	public void runFunc(CalendarFunction func) throws IOException, UserAbortException{
 		switch(func){
 		case ADD_APPOINTMENT:
 			addNewAppointment(user);
@@ -128,36 +134,29 @@ public class Starter {
 		}
 	}
 	
-	private void showMessages() throws IOException {
+	private void showMessages() throws IOException, UserAbortException {
 		List<Message> unreadMessages = MessageHandler.getUnreadMessagesForUser(user);
-		for(int i = 0; i < unreadMessages.size(); i++){
-			Message m = unreadMessages.get(i);
-			System.out.printf("%d. %s\n", i+1, m);
-		}
 		System.out.print("Hvilken melding vil du lese? ");
-		int userInput = getValidNum(unreadMessages.size());
-		Message selected = unreadMessages.get(userInput-1);
+		int userInput = promptChoice(unreadMessages);
+		Message selected = unreadMessages.get(userInput);
 		System.out.println(selected.showMessage(user).getContent());
 		if (selected instanceof RejectedMessage){
 			RejectedMessage m = (RejectedMessage) selected;
 			System.out.println("Hva vil du gjøre?");
-			m.getAndExecuteUserResponse(this);
+			m.getAndExecuteUserResponse(user);
 		}
 	}
 
-	private void showInvites() throws IOException {
+	private void showInvites() throws IOException, UserAbortException {
 		List<Appointment> allInvited = AppointmentHandler.getAllUnansweredInvites(user.getId());
-		for(int i = 0; i < allInvited.size(); i++){
-			System.out.printf("%d. %s\n", i + 1, allInvited.get(i));
-		}
 		System.out.print("Hvilken innkalling vil du svare på? ");
-		int userNum = getValidNum(allInvited.size());
+		int userNum = promptChoice(allInvited);
 		answerInvite(allInvited.get(userNum-1));
 	}
 	
 
 	
-	private void answerInvite(Appointment appointment) throws IOException {
+	private void answerInvite(Appointment appointment) throws IOException, UserAbortException {
 		while(true){
 			String input = getString("Hva vil du svare? ('ja', 'nei', eller enter for å utsette) ");
 			if (input.equalsIgnoreCase("ja")){
@@ -180,9 +179,10 @@ public class Starter {
 		System.out.print("Skriv inn en uke du vil vise: ");
 		int weekNum =  getValidNum(52);
 		this.weekNum = weekNum;
+		showWeek();
 	}
 
-	private void followCalendar() throws IOException {
+	private void followCalendar() throws IOException, UserAbortException {
 		String email = getValidEmail("Skriv inn e-postadressen til personen du vil følge: ");
 		long otherUserId = getUserIdFromEmail(email);
 		user.followPerson(otherUserId);
@@ -195,7 +195,7 @@ public class Starter {
 	}
 	
 	/**
-	 * Splits the appointments given into seven lists.
+	 * Splits the appointments given into seven lists, one for each day.
 	 * @param appointments
 	 */
 	private List<String>[] splitAppointmentsByDay(List<Appointment> appointments){
@@ -219,7 +219,7 @@ public class Starter {
 		return days;
 	}
 	
-	private void printCalendar(List<String>[] dayEvents){
+	private static void printCalendar(List<String>[] dayEvents){
 		int columnWidth = 25;
 		boolean foundMore = true;
 		StringBuilder first = new StringBuilder();
@@ -243,7 +243,7 @@ public class Starter {
 		}
 	}
 	
-	private String center(String input, int width, char fillChar){
+	private static String center(String input, int width, char fillChar){
 		int length = input.length();
 		if (length < width){
 			int padding = (width - length)/2;
@@ -256,7 +256,7 @@ public class Starter {
 		}
 	}
 	
-	private String padRight(String input, int width){
+	private static String padRight(String input, int width){
 		int length = input.length();
 		if (length <= width){
 			int padding = width - length;
@@ -268,7 +268,7 @@ public class Starter {
 		}
 	}
 	
-	private String padLeft(String input, int width){
+	private static String padLeft(String input, int width){
 		int length = input.length();
 		if (length <= width){
 			int padding = width - length;
@@ -280,7 +280,7 @@ public class Starter {
 		}
 	}
 	
-	private String repeat(String input, int times){
+	private static String repeat(String input, int times){
 		if (times <= 0){
 			return "";
 		}

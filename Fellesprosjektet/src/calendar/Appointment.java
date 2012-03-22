@@ -155,7 +155,7 @@ public class Appointment implements Serializable, Comparable<Appointment> {
 	 * Deretter blir appointment-objektet slettet.
 	 * @throws IOException 
 	 */
-	public void deleteAppointment() throws IOException {
+	public void delete() throws IOException {
 		AppointmentHandler.deleteAppointment(this.appId);
 	}
 	public void deleteAppointmentInvited() throws IOException {
@@ -174,8 +174,8 @@ public class Appointment implements Serializable, Comparable<Appointment> {
 		return roomName;
 	}
 	
-	public void setRoomName(String room_name) throws IOException {
-		this.roomName = room_name;
+	public void setRoomName(String roomName) throws IOException {
+		this.roomName = roomName;
 	}
 	
 	public Person getCreator() {

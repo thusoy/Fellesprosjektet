@@ -2,7 +2,6 @@ package client.helpers;
 
 import static client.helpers.DBHelper.getUserIdFromEmail;
 import static client.helpers.DBHelper.isValidEmail;
-import static client.helpers.IO.getString;
 import static hashtools.Hash.createHash;
 
 import java.io.IOException;
@@ -30,7 +29,7 @@ public class AuthHelper {
 		try{
 			Thread.sleep(100);
 		} catch (InterruptedException e){ }
-		throw new InvalidLoginException("Ugyldig kombinasjon av brukernavn/passord, prøv igjen!");
+		throw new InvalidLoginException();
 	}
 	
 	private static String getSalt(String email) throws IOException{

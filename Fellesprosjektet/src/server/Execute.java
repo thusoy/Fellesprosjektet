@@ -51,7 +51,6 @@ public class Execute {
 		int tries = 3;
 		while(tries > 0){
 			try {
-				System.out.println("kobler opp mot db...");
 				conn = DriverManager.getConnection(database, "tarjeikl_fpuser", "bruker");
 				break;
 			} catch (SQLException e) {

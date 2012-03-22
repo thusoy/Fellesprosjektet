@@ -4,7 +4,7 @@ public class InvalidLoginException extends Exception{
 
 	private static final long serialVersionUID = -6308285173760562483L;
 
-	public InvalidLoginException(String msg){
-		super(msg);
+	public InvalidLoginException(){
+		super("Ugyldig kombinasjon av brukernavn/passord, prøv igjen!");
 	}
 }

@@ -16,7 +16,7 @@ import java.util.List;
 public class ReceiveWorker extends Thread {
 
 	private Connection aConnection;
-	private List messageListenerList;
+	private List<MessageListener> messageListenerList;
 	
 	/**
 	 * 
@@ -24,7 +24,7 @@ public class ReceiveWorker extends Thread {
 	 */
 	public ReceiveWorker(Connection aConnection) {
 		this.aConnection = aConnection;
-		messageListenerList = new ArrayList();
+		messageListenerList = new ArrayList<MessageListener>();
 	}
 
 	/**
@@ -52,9 +52,9 @@ public class ReceiveWorker extends Thread {
 		try {
 			while (true) {
 				String message = aConnection.receive();
-				Iterator iterator = messageListenerList.iterator();
+				Iterator<MessageListener> iterator = messageListenerList.iterator();
 				while (iterator.hasNext()) {
-					MessageListener listener = (MessageListener)iterator.next();
+					MessageListener listener = iterator.next();
 					listener.messageReceived(message);
 				}
 			}

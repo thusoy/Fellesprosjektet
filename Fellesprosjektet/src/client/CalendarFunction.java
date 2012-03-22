@@ -1,6 +1,5 @@
 package client;
 
-import java.util.Scanner;
 
 public enum CalendarFunction {
 	ADD_APPOINTMENT ("Legg til avtale"),
@@ -22,13 +21,4 @@ public enum CalendarFunction {
 		this.description = description;
 	}
 	
-	public static CalendarFunction getUserFunction(){
-		CalendarFunction[] allFunc = CalendarFunction.values();
-		int input;
-		Scanner scanner = new Scanner(System.in);
-		do {
-			input = scanner.nextInt();
-		} while (input <= 0 && input > allFunc.length);
-		return allFunc[input-1];
-	}
 }

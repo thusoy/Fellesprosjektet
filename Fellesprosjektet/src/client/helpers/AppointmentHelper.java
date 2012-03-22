@@ -1,10 +1,10 @@
 package client.helpers;
 
 import static client.helpers.DBHelper.getPersonFromEmail;
-import static client.helpers.IO.getString;
-import static client.helpers.IO.getValidNum;
-import static client.helpers.IO.parseDate;
 import static client.helpers.DBHelper.isValidEmail;
+import static client.helpers.IO.getString;
+import static client.helpers.IO.parseDate;
+import static client.helpers.IO.promptChoice;
 
 import java.io.IOException;
 import java.sql.Date;
@@ -27,6 +27,8 @@ import calendar.Appointment;
 import calendar.Room;
 
 public class AppointmentHelper {
+	private static final String DATE_FORMAT_STRING = "dd-MM-yyyy HH:mm";
+	private static final DateFormat DATE_FORMAT =  new SimpleDateFormat(DATE_FORMAT_STRING);
 
 	public static List<Appointment> getWeekAppointments(Person user, int weekNum) throws IOException{
 		List<Appointment> appointments = AppointmentHandler.getAllCreated(user.getId(), weekNum);
@@ -48,21 +50,22 @@ public class AppointmentHelper {
 		sortedUnique.addAll(created);
 		List<Appointment> unique = new ArrayList<Appointment>(sortedUnique);
 		Collections.sort(unique);
+		System.out.println("Størrelse før: " + created.size());
+		System.out.println("Størrelse etter: " + unique.size());
 		return unique;
 	}
 	
 	public static void showAppointment(Person user) throws IOException {
-		DateFormat df = new SimpleDateFormat("dd-MM-yyyy HH:mm");		
 		List<Appointment> appointments =  getAllAppointments(user);
 		Scanner scanner = new Scanner(System.in);
 		System.out.println("Hvilken avtale vil du se? ");
 		int appointmentNo = scanner.nextInt();
 		Appointment app = appointments.get(appointmentNo);
-		System.out.printf("Eier av avtalen: %s %s \n", app.getCreator().getFirstname(), app.getCreator().getLastname());
+		System.out.printf("Eier av avtalen: %s %s\n", app.getCreator().getFirstname(), app.getCreator().getLastname());
 		System.out.println("Tittel: "+app.getTitle());
 		System.out.println("Sted: "+app.getPlace());
-		System.out.println("Start: "+df.format(app.getStartTime()));
-		System.out.println("Slutt: "+df.format(app.getEndTime()));
+		System.out.println("Start: "+DATE_FORMAT.format(app.getStartTime()));
+		System.out.println("Slutt: "+DATE_FORMAT.format(app.getEndTime()));
 		System.out.println("Beskrivelse: "+app.getDescription());
 		System.out.println("Rom: "+app.getRoomName());
 		System.out.println("Privat: "+app.isPrivate());
@@ -80,23 +83,19 @@ public class AppointmentHelper {
 		}
 	}
 	
-	public static void changeAppointment(Person user) throws IOException {
+	public static void changeAppointment(Person user) throws IOException, UserAbortException {
 		List<Appointment> appointments = AppointmentHandler.getAllCreated(user.getId());
-		for (int i=0; i<appointments.size(); i++) {
-			System.out.printf("%d. %s\n", i+1, appointments.get(i));
-		}
-		int change = getValidNum(appointments.size());
-		Appointment app = appointments.get(change-1);
+		int userChoice = promptChoice(appointments);
+		Appointment app = appointments.get(userChoice);
 		changeAppointment(user, app);
 	}
 	
-	public static void changeAppointment(Person user, Appointment app) throws IOException{
-		String dateTimeFormat = "dd-MM-yyyy HH:mm";
-		Date startdate = parseDate(dateTimeFormat, String.format("Startdato (%s): ", dateTimeFormat));
-		Date enddate = parseDate(dateTimeFormat, String.format("Sluttdato (%s): ", dateTimeFormat));
-		boolean isPrivate = !getString("Hvis avtalen er privat, skriv 'ja'. Hvis ikke, trykk på enter. ").isEmpty();
-		
+	public static void changeAppointment(Person user, Appointment app) throws IOException, UserAbortException{
+		System.out.printf("Tast inn endringene for %s.\n", app);
 		app.setTitle(getString("Skriv inn tittel: "));
+		Date startdate = parseDate(DATE_FORMAT, String.format("Startdato (%s): ", DATE_FORMAT_STRING));
+		Date enddate = parseDate(DATE_FORMAT, String.format("Sluttdato (%s): ", DATE_FORMAT_STRING));
+		boolean isPrivate = !getString("Hvis avtalen er privat, skriv 'ja'. Hvis ikke, trykk på enter. ").isEmpty();
 		app.setStartTime(startdate);
 		app.setEndTime(enddate);
 		app.setPrivate(isPrivate);
@@ -108,39 +107,44 @@ public class AppointmentHelper {
 		System.out.println("Avtalen er endret.");
 	}
 	
-	public static void deleteAppointment(Person user) throws IOException {
+	public static void deleteAppointment(Person user) throws IOException, UserAbortException {
 		long userId = user.getId();
 		List<Appointment> appointments = getAllAppointmentsInvolved(userId);
-		for(int i = 0; i < appointments.size(); i++){
-			System.out.printf("%d. %s\n", i+1, appointments.get(i));
-		}
-		int delete = getValidNum(appointments.size());
-		long appId = appointments.get(delete-1).getAppId();
+		int choice = promptChoice(appointments);
+		long appId = appointments.get(choice).getAppId();
 		Appointment app = AppointmentHandler.getAppointment(appId);
-		deleteAppointment(user, app);
+		deleteAppointmentHelper(user, app);
 	}
 	
-	private static void deleteAppointment(Person user, Appointment app) throws IOException{
+	public static void deleteAppointment(Person user, Appointment app) throws IOException{
+		deleteAppointmentHelper(user, app);
+	}
+	
+	private static void deleteAppointmentHelper(Person user, Appointment app) throws IOException{
 		if (user.equals(app.getCreator())){
-			app.deleteAppointment();
+			app.delete();
 		}else {
 			app.deleteAppointmentInvited();
 		}
 		System.out.println("Avtalen er slettet");
 	}
 	
+	/**
+	 * Gets all the appointments a user either has created, or participates in.
+	 * @param userId
+	 * @throws IOException
+	 */
 	private static List<Appointment> getAllAppointmentsInvolved(long userId) throws IOException {
-		List<Appointment> appointments = AppointmentHandler.getAllCreated(userId);
-		List<Appointment> app = AppointmentHandler.getAllInvited(userId);
-		appointments.addAll(app);
-		return appointments;
+		List<Appointment> ownApps = AppointmentHandler.getAllCreated(userId);
+		List<Appointment> participatesInApps = AppointmentHandler.getAllInvited(userId);
+		ownApps.addAll(participatesInApps);
+		return ownApps;
 	}
 	
-	public static void addNewAppointment(Person user) throws IOException {
-		String dateTimeFormat = "dd-MM-yyyy HH:mm";
+	public static void addNewAppointment(Person user) throws IOException, UserAbortException {
 		String title = getString("Skriv inn tittel: ");
-		Date startdate = parseDate(dateTimeFormat, String.format("Startdato (%s): ", dateTimeFormat));
-		Date enddate = parseDate(dateTimeFormat, String.format("Sluttdato (%s): ", dateTimeFormat));
+		Date startdate = parseDate(DATE_FORMAT, String.format("Startdato (%s): ", DATE_FORMAT_STRING));
+		Date enddate = parseDate(DATE_FORMAT, String.format("Sluttdato (%s): ", DATE_FORMAT_STRING));
 		boolean isPrivate = !getString("Hvis avtalen er privat, skriv 'ja'. Hvis ikke, trykk på enter. ").isEmpty();
 		Map<Person, Boolean> participants = getParticipants(user);
 		
@@ -150,12 +154,11 @@ public class AppointmentHelper {
 		System.out.println("Ny avtale lagret!");
 	}
 	
-	private static void setRoomOrPlace(Appointment app) throws IOException{
+	private static void setRoomOrPlace(Appointment app) throws IOException, UserAbortException{
 		if (app.getParticipants() != null){
-			String reserve = getString("Vil du reservere m¿terom? (ja/nei): ");
+			String reserve = getString("Vil du reservere møterom? (ja/nei): ");
 			if (reserve.equalsIgnoreCase("ja")){
-				String roomName = reserveRoom(app.getStartTime(), app.getEndTime(), app.getParticipants());
-				app.setRoomName(roomName);
+				reserveRoom(app);
 			} else {
 				String place = getString("Skriv inn sted: ");
 				app.setPlace(place);
@@ -166,28 +169,25 @@ public class AppointmentHelper {
 		}
 	}
 	
-	private static String reserveRoom(Date startdate, Date enddate, Map<Person, Boolean> participants) throws IOException {
-		List<Room> rooms = RoomHandler.availableRooms(startdate, enddate, participants.size());
-		System.out.println("Reserver m¿terom: ");
-		for (int i = 0; i < rooms.size(); i++) {
-			System.out.printf("%d. %s\n", i+1, rooms.get(i).getName());
-		}
-		int choosenRoom = getValidNum(rooms.size());
-		return rooms.get(choosenRoom).getName();
+	private static void reserveRoom(Appointment app) throws IOException, UserAbortException {
+		List<Room> rooms = RoomHandler.availableRooms(app.getStartTime(), app.getEndTime(), app.getParticipants().size());
+		System.out.println("Reserver møterom: ");
+		int chosenRoom = promptChoice(rooms);
+		app.setRoomName(rooms.get(chosenRoom).getName());
 	}
 	
-	private static Map<Person, Boolean> getParticipants(Person user) throws IOException{
+	private static Map<Person, Boolean> getParticipants(Person user) throws IOException, UserAbortException{
 		Map<Person, Boolean> map = new HashMap<Person, Boolean>();
 		while (true) {
-			String email = getString("Enter email to invite to the event: ");
+			String email = getString("Skriv inn e-posten til personen du vil følge (eller trykk enter hvis du er ferdig): ");
 			if (email.isEmpty()){
 				break;
 			} else if (isValidEmail(email) && !email.equalsIgnoreCase(user.getEmail())){
 				Person p = getPersonFromEmail(email);
 				map.put(p, null);
-				System.out.printf("%s added to participants!\n", email);
+				System.out.printf("%s ble invitert!\n", email);
 			} else {
-				System.out.println("Invalid email!");
+				System.out.println("Ugyldig e-postadresse, prøv igjen.");
 			}
 		}
 		return map;

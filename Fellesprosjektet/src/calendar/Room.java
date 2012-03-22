@@ -7,7 +7,7 @@ import java.util.Map;
 
 import server.RoomHandler;
 
-public class Room {
+public class Room implements Comparable<Room>{
 	private String name;
 	private int capacity;
 	private LinkedHashMap<Date, Date> isOccupied;
@@ -75,6 +75,11 @@ public class Room {
 		} else if (!name.equals(other.name))
 			return false;
 		return true;
+	}
+
+	@Override
+	public int compareTo(Room other) {
+		return Integer.compare(capacity, other.capacity);
 	}
 	
 	

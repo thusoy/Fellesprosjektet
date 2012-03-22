@@ -13,6 +13,8 @@ public class Art {
 	 * For å bytte font, gå til http://patorjk.com/software/taag/, lim inn
 	 * strengen fontChars, legg inn linjeskift mellom alle bokstavene, og copy-paste
 	 * resultatet inn i fila font.txt.
+	 * 
+	 * Nåværende font er 'Star Wars'
 	 */
 	private final static int charHeight = 6;
 	private final static String fontChars = "abcdefghijklmnopqrstuvwxyz0123456789 !";

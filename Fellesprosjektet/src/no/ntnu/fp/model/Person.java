@@ -1,13 +1,9 @@
 package no.ntnu.fp.model;
 
-import static hashtools.Hash.createHash;
 import static hashtools.Hash.SHA512;
+import static hashtools.Hash.createHash;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
 import java.io.IOException;
-import java.sql.SQLException;
 
 import server.Execute;
 import server.PersonHandler;

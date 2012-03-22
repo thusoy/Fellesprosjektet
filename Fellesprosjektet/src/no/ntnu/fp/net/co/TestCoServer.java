@@ -32,8 +32,7 @@ public class TestCoServer {
   public static void main (String args[]){
 
     // Create log
-    Log log = new Log();
-    log.setLogName("Server");
+    Log.setLogName("Server");
 
     // server connection instance, listen on port 5555
     Connection server = new ConnectionImpl(5555);

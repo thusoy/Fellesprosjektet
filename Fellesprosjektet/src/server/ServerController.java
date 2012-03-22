@@ -7,8 +7,6 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-import calendarprotocol.ServerState;
-
 public class ServerController extends Thread {
 	
 	public static final int port = 1337;
@@ -28,7 +26,7 @@ public class ServerController extends Thread {
 		BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 		CalendarProtocol protocol = new CalendarProtocol();
 		
-		String input = null;
+//		String input = null;
 		String response = protocol.getResponse(null);
 		System.out.println("Server first line: " + response);
 		out.println(response);

@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.sql.Date;
 import java.sql.SQLException;
 import java.util.HashMap;
-import java.util.List;
 
 import no.ntnu.fp.model.Person;
 
@@ -51,16 +50,15 @@ public class TestAppointment {
 //		assertTrue("Begge objektene skal være lagt i databasen", all.contains(a2));
 //	}
 	
-	@Test
-	public void testGetInterval(){
-		int dayInMs = 24*3600*1000;
-		long now = System.currentTimeMillis();
-		Date first = new Date(now);
-		Date second = new Date(now + dayInMs);
-		Date third = new Date(now + 3*dayInMs);
-		
-		
-	}
+//	@Test
+//	public void testGetInterval(){
+//		int dayInMs = 24*3600*1000;
+//		long now = System.currentTimeMillis();
+//		Date first = new Date(now);
+//		Date second = new Date(now + dayInMs);
+//		Date third = new Date(now + 3*dayInMs);
+//	}
+	
 	@Test
 	public void testUpdateAppointment() throws IOException {
 		Person john = new Person("john", "high", "lol@1.no", "komtek", "banan");
@@ -89,7 +87,7 @@ public class TestAppointment {
 		AppointmentHandler.addUserToAppointment(a1.getAppId(), john.getId());
 		AppointmentHandler.updateUserAppointment(a1.getAppId(), john.getId(), true);
 		assertTrue("John kommmer pŒ m¿tet", AppointmentHandler.getInviteStatusOnUser(a1.getAppId(), john.getId()));
-		a1.deleteAppointment();
+		a1.delete();
 	}
 	
 	@Test

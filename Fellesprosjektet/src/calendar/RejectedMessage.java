@@ -1,15 +1,17 @@
 package calendar;
 
+import static client.helpers.AppointmentHelper.changeAppointment;
+import static client.helpers.AppointmentHelper.deleteAppointment;
+
 import java.io.IOException;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Scanner;
 
 import no.ntnu.fp.model.Person;
-import client.Starter;
-import server.RoundTime;
 import server.MessageHandler;
-
+import server.RoundTime;
+import client.helpers.UserAbortException;
 
 public class RejectedMessage extends Message {
 	
@@ -43,7 +45,7 @@ public class RejectedMessage extends Message {
 		return app;
 	}
 	
-	public void getAndExecuteUserResponse(Starter starter) throws IOException{
+	public void getAndExecuteUserResponse(Person user) throws IOException, UserAbortException{
 		System.out.println("Hva vil du gjøre?");
 		String[] options = {"Endre avtale", "Slett avtale", "Ignorer deltager"};
 		for(int i = 0; i < options.length; i++){
@@ -53,10 +55,10 @@ public class RejectedMessage extends Message {
 		int userInput = scanner.nextInt();
 		switch(userInput){
 		case 1:
-			starter.changeAppointment(app);
+			changeAppointment(user, app);
 			break;
 		case 2:
-			starter.deleteAppointment(app);
+			deleteAppointment(user, app);
 		}
 		
 	}

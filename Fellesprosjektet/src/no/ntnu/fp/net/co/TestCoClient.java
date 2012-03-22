@@ -31,8 +31,7 @@ public class TestCoClient {
   public static void main (String args[]){
 
     // Set up log
-    Log log = new Log();
-    log.setLogName("Client");
+    Log.setLogName("Client");
 
     // Connection object listening on 4001
     Connection conn = new ConnectionImpl(4001);
