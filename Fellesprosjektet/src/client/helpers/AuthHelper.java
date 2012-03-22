@@ -1,6 +1,7 @@
 package client.helpers;
 
 import static client.helpers.DBHelper.getUserIdFromEmail;
+import static client.helpers.IO.getString;
 import static hashtools.Hash.createHash;
 
 import java.io.IOException;
@@ -11,7 +12,14 @@ import server.PersonHandler;
 
 public class AuthHelper {
 
-	public static Person authenticationHelper(String email, String password) throws IOException{
+	public static Person authenticateUser() throws IOException {
+		String email = getString("E-post: ");
+		String password = getString("Passord: ");
+		Person user = authenticationHelper(email, password);
+		return user;
+	}
+	
+	private static Person authenticationHelper(String email, String password) throws IOException{
 		String salt = getSalt(email);
 		String passwordHash = createHash(password, salt);
 		Person user = getUserFromEmailAndPassword(email, passwordHash);

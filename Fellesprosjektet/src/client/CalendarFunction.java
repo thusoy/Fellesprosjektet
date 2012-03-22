@@ -4,15 +4,15 @@ import java.util.Scanner;
 
 public enum CalendarFunction {
 	ADD_APPOINTMENT ("Legg til avtale"),
-	DELETE_APPOINTMENT ("Slett avtale"),
+	SHOW_APPOINTMENT ("Vis avtale"),
 	CHANGE_APPOINTMENT ("Endre avtale"),
+	DELETE_APPOINTMENT ("Slett avtale"),
 	SHOW_WEEK ("Vis uke"),
 	FOLLOW_CALENDAR ("Følg annen kalender"),
-	SHOW_APPOINTMENT ("Vis avtale"),
-	SHOW_NEXT_WEEK ("Vis neste uke"),
-	SHOW_PREVIOUS_WEEK ("Vis forrige uke"),
 	SHOW_INVITES ("Vis møteinnkallinger"),
 	SHOW_MESSAGES ("Vis meldinger"),
+	SHOW_NEXT_WEEK ("Vis neste uke"),
+	SHOW_PREVIOUS_WEEK ("Vis forrige uke"),
 	QUIT ("Avslutt");
 	;
 	

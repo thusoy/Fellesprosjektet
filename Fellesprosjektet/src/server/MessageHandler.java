@@ -30,13 +30,12 @@ public class MessageHandler {
 			RejectedMessage rm = (RejectedMessage) msg;
 			appId = rm.getApp().getAppId();
 		}
-//		Long appId = msg instanceof RejectedMessage ? ((RejectedMessage) msg).getApp().getAppId() : null;
 		String query = "INSERT INTO Message(msgId, dateSent, content, title, appointment) " + 
 						"VALUES(%d, '%s', ?, '%s', ?)";
 		try {
 			PreparedStatement ps = Execute.getPreparedStatement(String.format(query, msgId, dateSent, title));
 			ps.setString(1, content);
-			ps.setLong(2, appId);
+			ps.setObject(2, appId, java.sql.Types.BIGINT);
 			ps.execute();
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -70,8 +69,11 @@ public class MessageHandler {
 	}
 	
 	public static void sendMessageToAllParticipants(Appointment app, String title,
-			String content) throws IOException {
+		String content) throws IOException {
 			Set<Person> participants = app.getParticipants().keySet();
+//			if(participants.isEmpty()){
+//				return;
+//			}
 			Message msg = new Message(title, content);
 			msg.setReceivers(Arrays.asList(participants.toArray(new Person[0])));	
 		}

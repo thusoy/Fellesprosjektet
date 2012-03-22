@@ -208,5 +208,9 @@ public class Person {
 		String string = "%s %s (%s)";
 		return String.format(string, firstname, lastname, email);
 	}
+	
+	public String fullName(){
+		return String.format("%s %s", firstname, lastname);
+	}
 
 }

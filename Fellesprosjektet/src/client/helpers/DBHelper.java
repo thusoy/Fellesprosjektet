@@ -1,6 +1,8 @@
 package client.helpers;
 
 import java.io.IOException;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import no.ntnu.fp.model.Person;
 import server.Execute;
@@ -18,5 +20,16 @@ public class DBHelper {
 		String query = "SELECT userId FROM User WHERE email='%s'";
 		long id = Execute.executeGetLong(String.format(query, email));
 		return id;
+	}
+	
+	public static boolean isValidEmail(String email) throws IOException{
+		String query = "SELECT * FROM User WHERE email='%s'";
+		ResultSet rs = Execute.getResultSet(String.format(query, email));
+		try {
+			return rs.next();
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new RuntimeException("Feil i sQL!");
+		}
 	}
 }
