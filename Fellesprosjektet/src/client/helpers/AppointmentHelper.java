@@ -20,6 +20,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import server.AppointmentHandler;
+import server.MessageHandler;
 import server.PersonHandler;
 import server.RoomHandler;
 import calendar.Appointment;
@@ -100,6 +101,9 @@ public class AppointmentHelper {
 		
 		app.save();
 		System.out.println("Avtalen er endret.");
+		if (!app.getParticipants().isEmpty()) {
+			MessageHandler.sendMessageToAllParticipants(app, "Avtalen "+app.getTitle()+" er endret", "Denne avtalen har blitt endret. ");
+		}
 	}
 	
 	public static void deleteAppointment(Person user) throws IOException, UserAbortException {

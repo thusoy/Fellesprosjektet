@@ -127,19 +127,21 @@ public class Starter {
 			break;
 		case SHOW_NEXT_WEEK:
 			weekNum++;
+			showWeek();
 			break;
 		case SHOW_MESSAGES:
 			showMessages();
 			break;
 		case SHOW_PREVIOUS_WEEK:
 			weekNum--;
+			showWeek();
 			break;
 		}
 	}
 	
 	private void showMessages() throws IOException, UserAbortException {
 		List<Message> unreadMessages = MessageHandler.getUnreadMessagesForUser(user);
-		System.out.print("Hvilken melding vil du lese? ");
+		System.out.print("Hvilken melding vil du lese? \n");
 		int userInput = promptChoice(unreadMessages);
 		Message selected = unreadMessages.get(userInput);
 		System.out.println(selected.showMessage(user).getContent());
