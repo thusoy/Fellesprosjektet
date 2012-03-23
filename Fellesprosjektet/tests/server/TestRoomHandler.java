@@ -1,6 +1,5 @@
 package server;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
@@ -8,12 +7,11 @@ import java.sql.Date;
 import java.sql.SQLException;
 import java.util.List;
 
-import no.ntnu.fp.model.Person;
-
 import org.junit.Before;
 import org.junit.Test;
 
 import calendar.Appointment;
+import calendar.Person;
 import calendar.Room;
 
 public class TestRoomHandler {
@@ -25,20 +23,6 @@ public class TestRoomHandler {
 		Execute.executeUpdate(query);
 		String query2 = "TRUNCATE TABLE User";
 		Execute.executeUpdate(query2);
-	}
-	
-	@Test
-	public void testGetAllRooms() throws ClassNotFoundException, IOException, SQLException{
-		Room a = new Room("EL-204", 6, false);
-		Room b = new Room("EL-304", 6, false);
-		Room c = new Room("random", 150, false);
-		List<Room> allRooms = RoomHandler.getAllRooms();
-		int numRooms = allRooms.size();
-		assertEquals("Skal være tre rom i databasen!", 3, numRooms);
-		assertEquals("Samme objektet skal kunne hentes ut!", a, RoomHandler.getRoom(a.getName()));
-		assertTrue("Rom a skal ligge i databasen!", allRooms.contains(a));
-		assertTrue("Rom b skal ligge i databasen!", allRooms.contains(b));
-		assertTrue("Rom c skal ligge i databasen!", allRooms.contains(c));
 	}
 	
 	@Test

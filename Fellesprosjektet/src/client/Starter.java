@@ -20,15 +20,15 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-import no.ntnu.fp.model.Person;
 import server.AppointmentHandler;
 import server.MessageHandler;
 import calendar.Appointment;
-import calendar.Day;
 import calendar.Message;
+import calendar.Person;
 import calendar.RejectedMessage;
 import client.helpers.InvalidLoginException;
 import client.helpers.UserAbortException;
+import dateutils.Day;
 
 public class Starter {
 	
@@ -70,7 +70,7 @@ public class Starter {
 		while(true){
 			int numUnansweredMeetings = AppointmentHandler.getAllUnansweredInvites(user.getId()).size();
 			int numNewMessages = MessageHandler.getUnreadMessagesForUser(user).size();
-			System.out.println("Hva vil du gjøre?");
+			System.out.println("\nHva vil du gjøre?");
 			List<String> choices = new ArrayList<String>();
 			for(CalendarFunction cf: allFunc){
 				String description = cf.description;
@@ -175,7 +175,7 @@ public class Starter {
 		getString("Trykk enter for å gå videre.");
 	}
 	
-	private void getAndShowWeek() throws IOException {
+	private void getAndShowWeek() throws IOException, UserAbortException {
 		System.out.print("Skriv inn en uke du vil vise: ");
 		int weekNum =  getValidNum(52);
 		this.weekNum = weekNum;

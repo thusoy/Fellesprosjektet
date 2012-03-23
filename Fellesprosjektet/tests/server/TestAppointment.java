@@ -8,12 +8,12 @@ import java.sql.Date;
 import java.sql.SQLException;
 import java.util.HashMap;
 
-import no.ntnu.fp.model.Person;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import calendar.Appointment;
+import calendar.Person;
 
 public class TestAppointment {
 	
@@ -100,6 +100,6 @@ public class TestAppointment {
 		participants.put(jo, null);
 		a1.updateParticipants(participants);
 		a1.save();
-		AppointmentHandler.sendMessageUserHasDenied(a1.getAppId(), jo.getId());
+		MessageHandler.sendMessageUserHasDenied(a1.getAppId(), jo.getId());
 	}
 }

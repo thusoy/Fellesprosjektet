@@ -5,12 +5,12 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 
-import no.ntnu.fp.model.Person;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import calendar.Message;
+import calendar.Person;
 
 public class TestMessageHandler {
 	

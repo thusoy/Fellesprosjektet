@@ -1,11 +1,15 @@
 package server;
 
 import java.io.IOException;
+import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.sql.Date;
 import java.util.List;
+
 import calendar.Room;
+import client.helpers.StoopidSQLException;
 
 public class RoomHandler {
 	
@@ -17,44 +21,26 @@ public class RoomHandler {
 				"INSERT INTO Room(name, capacity) VALUES('%s', %d)";
 		Execute.executeUpdate(String.format(query, name, capacity));
 	}
-		
-	public static List<Room> getAllRooms() throws IOException{
-		
-		String queryGetAllRooms =
-				"SELECT name FROM Room";
-		
+	
+	private static List<Room> getAllRooms() throws IOException{
+		String query = "SELECT name, capacity FROM Room";
 		List<Room> roomList = new ArrayList<Room>();
-		List<String> RoomNameList;
+		PreparedStatement ps = Execute.getPreparedStatement(query);
 		try {
-			RoomNameList = Execute.executeGetStringList(queryGetAllRooms);
+			ResultSet rs = ps.executeQuery();
+			String name = rs.getString("name");
+			int capacity = rs.getInt("capacity");
+			roomList.add(Room.recreateRoom(name, capacity));
 		} catch (SQLException e) {
-			throw new RuntimeException("SQLFeil");
+			throw new StoopidSQLException(e);
 		}
-		for (String roomName : RoomNameList) {
-			String queryGetCapacity =
-					"Select capacity FROM Room WHERE name='%s'";
-			int capacity;
-			try {
-				capacity = Execute.executeGetInt(String.format(queryGetCapacity, roomName));
-			} catch (SQLException e) {
-				throw new RuntimeException("SQLFeil");
-			}
-			Room room = new Room(roomName, capacity, true);
-			
-			roomList.add(room);
-		}
-	return roomList;	 
+		return roomList;
 	}
+	
 	public static Room getRoom(String name) throws IOException {
-		String query =
-				"Select capacity FROM Room WHERE name='%s'";
-		int capacity;
-		try {
-			capacity = Execute.executeGetInt(String.format(query, name));
-		} catch (SQLException e) {
-			throw new RuntimeException("SQLFeil");
-		}
-		Room room = new Room(name, capacity, true);
+		String query = "Select capacity FROM Room WHERE name=?";
+		int capacity = Execute.getInt(query, name);
+		Room room = Room.recreateRoom(name, capacity);
 		return room;
 	}
 	

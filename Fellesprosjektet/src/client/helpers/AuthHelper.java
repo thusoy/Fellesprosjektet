@@ -6,7 +6,8 @@ import static hashtools.Hash.createHash;
 
 import java.io.IOException;
 
-import no.ntnu.fp.model.Person;
+import calendar.Person;
+
 import server.Execute;
 import server.PersonHandler;
 
@@ -34,7 +35,7 @@ public class AuthHelper {
 	
 	private static String getSalt(String email) throws IOException{
 		String query = "SELECT salt FROM User WHERE email='%s'";
-		String salt = Execute.executeGetString(String.format(query, email));
+		String salt = Execute.getString(String.format(query, email));
 		return salt;
 	}
 	

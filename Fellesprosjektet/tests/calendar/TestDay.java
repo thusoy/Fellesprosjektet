@@ -9,6 +9,8 @@ import java.util.TreeSet;
 
 import org.junit.Test;
 
+import dateutils.Day;
+
 public class TestDay {
 
 	@Test

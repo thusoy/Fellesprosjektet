@@ -1,4 +1,4 @@
-package calendar;
+package dateutils;
 
 import java.sql.Date;
 import java.util.Set;

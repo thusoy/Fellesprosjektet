@@ -5,7 +5,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import no.ntnu.fp.model.Person;
+import calendar.Person;
+
 import server.Execute;
 import server.PersonHandler;
 

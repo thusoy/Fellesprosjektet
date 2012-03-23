@@ -1,4 +1,4 @@
-package no.ntnu.fp.model;
+package calendar;
 
 import static hashtools.Hash.SHA512;
 import static hashtools.Hash.createHash;
@@ -42,7 +42,6 @@ public class Person {
 	}
 	
 	private Person(){
-		
 	}
 	
 	public static Person recreatePerson(long id, String firstname, String lastname, String email, String department, String passwordHash) throws IOException{
@@ -53,8 +52,7 @@ public class Person {
 		p.setDepartment(department);
 		p.setPasswordHash(passwordHash);
 		p.setId(id);
-		String query = String.format("SELECT salt FROM User WHERE userId=%d", id);
-		String salt = Execute.executeGetString(query);
+		String salt = Execute.getString("SELECT salt FROM User WHERE userId=?", id);
 		p.salt = salt;
 		return p;
 	}

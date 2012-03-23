@@ -8,7 +8,6 @@ import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-import no.ntnu.fp.model.Person;
 import server.MessageHandler;
 import server.RoundTime;
 import client.helpers.UserAbortException;

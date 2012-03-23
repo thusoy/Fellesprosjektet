@@ -5,7 +5,6 @@ import static org.junit.Assert.assertEquals;
 import java.io.IOException;
 import java.util.List;
 
-import no.ntnu.fp.model.Person;
 
 import org.junit.Before;
 import org.junit.Test;

@@ -25,23 +25,25 @@ public class IO {
 	/**
 	 * Gets a valid integer from the user, 1 <= num <= upperInclusiveBound.
 	 * @param upperInclusiveBound
+	 * @throws UserAbortException 
 	 */
-	@Deprecated
-	public static int getValidNum(int upperInclusiveBound){
+	public static int getValidNum(int upperInclusiveBound) throws UserAbortException{
 		Scanner scanner = new Scanner(System.in);
-		int input;
+		String userInput;
 		while(true){
 			try {
-				System.out.print("Gjør et valg: ");
-				input = scanner.nextInt();
-				if (1 <= input && input <= upperInclusiveBound){
-					break;
+				userInput = scanner.nextLine();
+				if (userInput.isEmpty()){
+					throw new UserAbortException();
 				}
-			} catch (Exception e){ 
-				System.out.println("Beklager, det du skrev inn er ikke et gyldig valg. Prøv igjen.");
+				int userChoice = Integer.parseInt(userInput);
+				if (1 <= userChoice && userChoice <= upperInclusiveBound){
+					return userChoice;
+				}
+			} catch (NumberFormatException e){
+				System.out.println("Ugyldig valg. For å avslutte, trykk på enter.");
 			}
 		}
-		return input;
 	}
 	
 	public static Date parseDate(String format, String inputText) throws UserAbortException{

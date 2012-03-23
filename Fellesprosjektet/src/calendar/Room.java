@@ -12,13 +12,22 @@ public class Room implements Comparable<Room>{
 	private int capacity;
 	private LinkedHashMap<Date, Date> isOccupied;
 	
-	public Room(String name, int capacity, boolean recreation) throws IOException{
+	public Room(String name, int capacity) throws IOException{
 		this.name = name;
 		this.capacity = capacity;
 		isOccupied = new LinkedHashMap<Date, Date>();
-		if(!recreation) {
-			RoomHandler.createRoom(this);
-		}
+		RoomHandler.createRoom(this);
+	}
+	
+	private Room(){
+	}
+	
+	public static Room recreateRoom(String name, int capacity){
+		Room room = new Room();
+		room.name = name;
+		room.capacity = capacity;
+		room.isOccupied = new LinkedHashMap<Date, Date>();
+		return room;
 	}
 	
 	public String getName() {

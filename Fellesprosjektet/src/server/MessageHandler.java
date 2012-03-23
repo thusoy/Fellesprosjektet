@@ -1,5 +1,6 @@
 package server;
 
+import static server.AppointmentHandler.getAppointment;
 import calendar.RejectedMessage;
 import static calendar.Message.recreateMessage;
 
@@ -13,9 +14,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-import no.ntnu.fp.model.Person;
+import client.helpers.StoopidSQLException;
+
 import calendar.Appointment;
 import calendar.Message;
+import calendar.Person;
 
 public class MessageHandler {
 	
@@ -146,12 +149,45 @@ public class MessageHandler {
 	}
 	
 	public static boolean getHasBeenRead(long msgId, long userId) throws IOException{
-		String query =
-				"SELECT hasBeenRead FROM UserMessages WHERE msgId=%d AND userId=%d";
+		String query = "SELECT hasBeenRead FROM UserMessages WHERE msgId=? AND userId=?";
+		PreparedStatement ps = Execute.getPreparedStatement(query);
 		try {
-			return Execute.executeGetBoolean(String.format(query, msgId, userId));
+			ps.setLong(1, msgId);
+			ps.setLong(2, userId);
+			return Execute.getBoolean(ps);
 		} catch (SQLException e) {
-			throw new RuntimeException("SQLFeil");
+			throw new StoopidSQLException(e);
 		}
+	}
+	
+	public static void sendMessageAppointmentInvite(long appId) throws IOException{
+		Appointment ap = getAppointment(appId);
+		Message msg = new Message("Ny avtale: "+ap.getTitle(),"Du er blitt lagt til i avtalen: "+ ap.getTitle() + ". Beskrivelse: " + ap.getDescription());
+		for (Person user: ap.getParticipants().keySet()) {
+			MessageHandler.sendMessageToUser(msg.getId(), user.getId());
+		}
+	}
+	public static void sendMessageUpdateInfo(long appId) throws IOException {
+		Appointment ap = getAppointment(appId);
+		Message msg = new Message("Endring i avtalen: "+ap.getTitle(),
+				"Denne avtalen har blitt endret. Starttidspunkt: "+ap.getStartTime()+" Sluttidspunkt: "+ap.getEndTime());
+		for (Person user: ap.getParticipants().keySet()) {
+			MessageHandler.sendMessageToUser(msg.getId(), user.getId());
+		}
+	}
+	
+	public static void sendMessageUserHasDenied(long appId, long userId) throws IOException {
+		Appointment ap = getAppointment(appId);
+		Person p = PersonHandler.getPerson(userId);
+		String content = "%s %s har avslått avtalen '%s'.";
+		String formatted = String.format(content, p.getFirstname(), p.getLastname(), ap.getTitle());
+		Message msg = new RejectedMessage("Avslag pŒ avtale", formatted, ap);
+		for (Person user: ap.getParticipants().keySet()) {
+			if (user.getId() == userId){
+				continue;
+			}
+			MessageHandler.sendMessageToUser(msg.getId(), user.getId());
+		}
+		MessageHandler.sendMessageToUser(msg.getId(), ap.getCreator().getId());
 	}
 }

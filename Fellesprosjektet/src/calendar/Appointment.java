@@ -6,15 +6,15 @@ import java.sql.Date;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import no.ntnu.fp.model.Person;
 import server.AppointmentHandler;
 import server.Execute;
+import server.MessageHandler;
 import server.RoundTime;
+import dateutils.Day;
 
 public class Appointment implements Serializable, Comparable<Appointment> {
 	private static final long serialVersionUID = -5442910434292395380L;
@@ -75,7 +75,7 @@ public class Appointment implements Serializable, Comparable<Appointment> {
 		String query = "UPDATE UserAppointments SET hasAccepted=%b WHERE userId=%d AND appId=%d";
 		Execute.executeUpdate(String.format(query, answer, user.getId(), appId));
 		if (answer == false){
-			AppointmentHandler.sendMessageUserHasDenied(appId, user.getId());
+			MessageHandler.sendMessageUserHasDenied(appId, user.getId());
 		}
 	}
 	
@@ -195,10 +195,6 @@ public class Appointment implements Serializable, Comparable<Appointment> {
 
 	public static Appointment getAppointment(long appId) throws IOException {
 		return AppointmentHandler.getAppointment(appId);
-	}
-
-	public static List<Appointment> getAll() throws IOException {
-		return AppointmentHandler.getAll();
 	}
 
 	@Override

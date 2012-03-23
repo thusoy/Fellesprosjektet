@@ -10,11 +10,12 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
+import client.helpers.StoopidSQLException;
 
 public class Execute {
+	private static long nextId = System.currentTimeMillis();
 	private static final String driver = "com.mysql.jdbc.Driver";
 	private static final String database = "jdbc:mysql://mysql.stud.ntnu.no/tarjeikl_fp33";
 	private static Connection conn = null;
@@ -34,9 +35,17 @@ public class Execute {
 		}
 	}
 	
-	public static PreparedStatement getPreparedStatement(String query) throws SQLException, IOException{
+	public static long getUniqueId(){
+		return nextId++;
+	}
+	
+	public static PreparedStatement getPreparedStatement(String query) throws IOException{
 		setUpConnection();
-		return conn.prepareStatement(query);
+		try {
+			return conn.prepareStatement(query);
+		} catch (SQLException e) {
+			throw new StoopidSQLException(e);
+		}
 	}
 	
 	private static void setUpConnection() throws IOException{
@@ -62,6 +71,19 @@ public class Execute {
 					e1.printStackTrace();
 				}
 			}
+		}
+	}
+	
+	public static boolean getBoolean(PreparedStatement ps) throws IOException{
+		try {
+			ResultSet rs = ps.executeQuery();
+			if (rs.next()){
+				return rs.getBoolean(1);
+			} else {
+				throw new IllegalArgumentException("Empty ResultSet!");
+			}
+		} catch (SQLException e) {
+			throw new StoopidSQLException(e);
 		}
 	}
 	
@@ -103,6 +125,7 @@ public class Execute {
 	 * @throws IOException
 	 * @throws SQLException
 	 */
+	@Deprecated
 	public static Date executeGetDatetime(String query) throws IOException, SQLException{
 		Statement stmt = getStatement();
 		ResultSet rs = stmt.executeQuery(query);
@@ -120,6 +143,7 @@ public class Execute {
 	 * @throws IOException
 	 * @throws SQLException
 	 */
+	@Deprecated
 	public static Date executeGetDate(String query) throws IOException, SQLException{
 		Statement stmt = getStatement();
 		ResultSet rs = stmt.executeQuery(query);
@@ -136,6 +160,7 @@ public class Execute {
 	 * @throws IOException
 	 * @throws SQLException
 	 */
+	@Deprecated
 	public static boolean executeGetBoolean(String query) throws IOException, SQLException{
 		Statement stmt = getStatement();
 		ResultSet rs = stmt.executeQuery(query);
@@ -152,30 +177,12 @@ public class Execute {
 	 * @throws IOException
 	 * @throws SQLException
 	 */
+	@Deprecated
 	public static int executeGetInt(String query) throws IOException, SQLException{
 		Statement stmt = getStatement();
 		ResultSet rs = stmt.executeQuery(query);
 		rs.next();
 		return rs.getInt(1);	
-	}
-	
-	/**
-	 * A wrapper for the database calls. Returns all the ints returned by the query as 
-	 * a List<String>.
-	 * @param query
-	 * @return
-	 * @throws ClassNotFoundException
-	 * @throws IOException
-	 * @throws SQLException
-	 */
-	public static List<String> executeGetStringList(String query) throws IOException, SQLException{
-		Statement stmt = getStatement();
-		ResultSet rs = stmt.executeQuery(query);
-		List<String> output = new ArrayList<String>();
-		while(rs.next()){
-			output.add(rs.getString(1));
-		}
-		return output;
 	}
 	
 	/**
@@ -187,6 +194,7 @@ public class Execute {
 	 * @throws IOException
 	 * @throws SQLException
 	 */
+	@Deprecated
 	public static List<Long> executeGetLongList(String query) throws IOException, SQLException{
 		Statement stmt = getStatement();
 		ResultSet rs = stmt.executeQuery(query);
@@ -195,6 +203,35 @@ public class Execute {
 			output.add(rs.getLong(1));
 		}
 		return output;
+	}
+	
+	public static void update(String query, long... ids) throws IOException{
+		PreparedStatement  ps = Execute.getPreparedStatement(query);
+		update(ps, ids);
+	}
+	
+	public static void update(PreparedStatement ps, long... ids) throws IOException{
+		try {
+			for(int i = 0; i < ids.length; i++){
+				ps.setLong(i + 1, ids[i]);
+			}
+			ps.executeUpdate();
+		} catch (SQLException e) {
+			throw new StoopidSQLException(e);
+		}
+	}
+	
+	public static List<Long> getListOfLongs(PreparedStatement ps) throws IOException {
+		try {
+			ResultSet rs = ps.executeQuery();
+			List<Long> output = new ArrayList<Long>();
+			while(rs.next()){
+				output.add(rs.getLong(1));
+			}
+			return output;
+		} catch (SQLException e) {
+			throw new StoopidSQLException(e);
+		}
 	}
 	
 	/**
@@ -206,6 +243,7 @@ public class Execute {
 	 * @throws IOException
 	 * @throws SQLException
 	 */
+	@Deprecated
 	public static long executeGetLong(String query) throws IOException{
 		Statement stmt = getStatement();
 		ResultSet rs;
@@ -223,43 +261,58 @@ public class Execute {
 	 * A wrapper for the database calls. Returns the first value in the first column of 'query' as
 	 * a String.
 	 * @param query
-	 * @return
-	 * @throws ClassNotFoundException
 	 * @throws IOException
-	 * @throws SQLException
 	 */
-	public static String executeGetString(String query) throws IOException{
-		Statement stmt = getStatement();
-		ResultSet rs;
+	public static String getString(String query) throws IOException{
+		PreparedStatement ps = getPreparedStatement(query);
+		return getString(ps);
+	}
+	
+	public static String getString(String query, long id) throws IOException{
+		PreparedStatement ps = getPreparedStatement(query);
 		try {
-			rs = stmt.executeQuery(query);
+			ps.setLong(1, id);
+			return getString(ps);
+		} catch (SQLException e) {
+			throw new StoopidSQLException(e);
+		}
+	} 
+	
+	public static String getString(String query, String field) throws IOException{
+		PreparedStatement ps = getPreparedStatement(query);
+		try {
+			ps.setString(1, field);
+			return getString(ps);
+		} catch (SQLException e) {
+			throw new StoopidSQLException(e);
+		}
+	} 
+	
+	private static String getString(PreparedStatement ps){
+		try{
+			ResultSet rs = ps.executeQuery();
 			if (rs.next())
 				return rs.getString(1);
 			else
-				throw new RuntimeException("Empty resultset!");
+				throw new IllegalArgumentException("Empty resultset!");
 		} catch (SQLException e) {
-			e.printStackTrace();
-			throw new RuntimeException("Feil i SQL");
+			throw new StoopidSQLException(e);
 		}
 	}
 	
-	/**
-	 * A wrapper for the database calls. Returns a Map<Integer, Boolean> from the query. The query
-	 * must return an int in the first column, and a boolean in the second.
-	 * @param query
-	 * @return
-	 * @throws ClassNotFoundException
-	 * @throws IOException
-	 * @throws SQLException
-	 */
-	public static Map<Long, Boolean> executeGetHashMap(String query) throws IOException, SQLException{
-		Statement stmt = getStatement();
-		ResultSet rs = stmt.executeQuery(query);
-		Map<Long, Boolean> output = new HashMap<Long, Boolean>();
-		while(rs.next()){
-			Boolean answer = rs.getObject(2) != null ? rs.getBoolean(2) : null;
-			output.put(rs.getLong(1), answer);	
+	public static int getInt(String query, String field) throws IOException{
+		PreparedStatement ps = getPreparedStatement(query);
+		try {
+			ps.setString(1, field);
+			ResultSet rs = ps.executeQuery();
+			if (rs.next()){
+				return rs.getInt(1);
+			} else {
+				throw new IllegalArgumentException("Empty resultset!");
+			}
+		} catch (SQLException e) {
+			throw new StoopidSQLException(e);
 		}
-		return output;
-	}
+	} 
+	
 }

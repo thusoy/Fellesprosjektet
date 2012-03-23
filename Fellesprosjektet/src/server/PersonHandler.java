@@ -1,6 +1,7 @@
 package server;
 
-import static no.ntnu.fp.model.Person.recreatePerson;
+import static calendar.Person.recreatePerson;
+import static server.Execute.update;
 
 import java.io.IOException;
 import java.sql.PreparedStatement;
@@ -10,64 +11,46 @@ import java.util.ArrayList;
 import java.util.List;
 
 import calendar.Appointment;
+import calendar.Person;
+import client.helpers.StoopidSQLException;
 
-import no.ntnu.fp.model.Person;
 
 public class PersonHandler {
 
 	public static void createUser(Person person) throws IOException{
-		String firstname = person.getFirstname();
-		String lastname = person.getLastname();
-		String email = person.getEmail();
-		String department = person.getDepartment();
-		String passwordHash = person.getPasswordHash();
-		String salt = person.getSalt();
-		long userId = person.getId();
-
-		String query =
-				"INSERT INTO User(userId, email, firstname, lastname, department, passwordHash, salt) " +
-				"VALUES(%d, '%s', '%s', '%s', ?, '%s', '%s')";
-
+		String query = "INSERT INTO User(userId, email, firstname, lastname, department, " +
+					"passwordHash, salt) VALUES(?, ?, ?, ?, ?, ?, ?)";
 		try {
-			PreparedStatement ps = Execute.getPreparedStatement(String.format(query, userId, email, firstname, 
-					lastname, passwordHash, salt));
-			ps.setString(1, department);
+			PreparedStatement ps = Execute.getPreparedStatement(query);
+			ps.setLong(1, person.getId());
+			ps.setString(2, person.getEmail());
+			ps.setString(3, person.getFirstname());
+			ps.setString(4, person.getLastname());
+			ps.setString(5, person.getDepartment());
+			ps.setString(6, person.getPasswordHash());
+			ps.setString(7, person.getSalt());
 			ps.execute();
 		} catch (SQLException e) {
-			e.printStackTrace();
+			throw new StoopidSQLException(e);
 		}
 
 	}
-	public static void updateUser(Person person) throws IOException {
-		String firstname = person.getFirstname();
-		String lastname = person.getLastname();
-		String email = person.getLastname();
-		String department = person.getDepartment();
-		String passwordHash = person.getPasswordHash();
-		
-
-		String query =
-				"UPDATE User SET" +
-						" email='%s'" +
-						" firstname='%s'" +
-						" lastname='%s'" +
-						" department='%s'" +
-						" passwordHash='%s'";
-
-		Execute.executeUpdate(String.format(query, email, firstname, lastname, department, passwordHash));
-	}
 	
 	public static void deleteUser(long personId) throws IOException{
-		String query =
-				"DELETE FROM User WHERE userId=%d";
-		Execute.executeUpdate(String.format(query, personId));
+		String query = "DELETE FROM User WHERE userId=?";
+		update(query, personId);
 	}
 
 	public static Person getPerson(long personId) throws IOException {
-		String query = "SELECT userId, email, firstname, lastname, department, passwordHash, salt FROM User " +
-						"WHERE userId=%d";
-		ResultSet rs = Execute.getResultSet(String.format(query, personId));
-		List<Person> persons = getListFromResultSet(rs);
+		String query = "SELECT userId, email, firstname, lastname, department, " + 
+					"passwordHash, salt FROM User WHERE userId=?";
+		PreparedStatement ps = Execute.getPreparedStatement(query);
+		try {
+			ps.setLong(1, personId);
+		} catch (SQLException e) {
+			throw new StoopidSQLException(e);
+		}
+		List<Person> persons = getListFromPreparedStatement(ps);
 		if (persons.size() == 1){
 			return persons.get(0);
 		} else {
@@ -76,45 +59,42 @@ public class PersonHandler {
 	}
 	
 	public static List<Appointment> getFollowAppointments(long userId, int weekNum) throws IOException {
-		String query =
-				"SELECT followsUserId FROM UserCalendars WHERE userId=%d";
-		List<Long> ids = new ArrayList<Long>();
-		try {
-			ids = Execute.executeGetLongList(String.format(query, userId));
-		} catch (SQLException e) {
-			e.printStackTrace();
-			throw new RuntimeException("SQL feil");
-		}
+		List<Long> ids = getFollowingIds(userId);
 		List<Appointment> apps = new ArrayList<Appointment>();
 		for (long id: ids) {
 			apps.addAll(AppointmentHandler.getAllCreated(id, weekNum));
-			apps.addAll(AppointmentHandler.getAllInvited(id, weekNum));
-			
-		}
-		return apps;
-	}
-	public static List<Appointment> getFollowAppointments(long userId) throws IOException {
-		String query =
-				"SELECT followsUserId FROM UserCalendars WHERE userId=%d";
-		List<Long> ids = new ArrayList<Long>();
-		try {
-			ids = Execute.executeGetLongList(String.format(query, userId));
-		} catch (SQLException e) {
-			e.printStackTrace();
-			throw new RuntimeException("SQL feil");
-		}
-		List<Appointment> apps = new ArrayList<Appointment>();
-		for (long id: ids) {
-			apps.addAll(AppointmentHandler.getAllCreated(id));
-			apps.addAll(AppointmentHandler.getAllInvited(id));
-			System.out.println(id);
+			apps.addAll(AppointmentHandler.getAllInvitedInWeek(id, weekNum));
 		}
 		return apps;
 	}
 	
-	private static List<Person> getListFromResultSet(ResultSet rs) throws IOException {
+	public static List<Appointment> getFollowAppointments(long userId) throws IOException {
+		List<Long> ids = getFollowingIds(userId);
+		List<Appointment> apps = new ArrayList<Appointment>();
+		for (long id: ids) {
+			apps.addAll(AppointmentHandler.getAllByUser(id));
+			apps.addAll(AppointmentHandler.getAllInvited(id));
+		}
+		return apps;
+	}
+	
+	private static List<Long> getFollowingIds(long userId) throws IOException{
+		String query = "SELECT followsUserId FROM UserCalendars WHERE userId=?";
+		List<Long> ids;
+		PreparedStatement ps = Execute.getPreparedStatement(query);
+		try {
+			ps.setLong(1, userId);
+			ids = Execute.getListOfLongs(ps);
+		} catch (SQLException e) {
+			throw new StoopidSQLException(e);
+		}
+		return ids;
+	}
+	
+	private static List<Person> getListFromPreparedStatement(PreparedStatement ps) throws IOException {
 		List<Person> list = new ArrayList<Person>();
 		try {
+			ResultSet rs = ps.executeQuery();
 			while(rs.next()){
 				long id = rs.getLong("userId");
 				String firstname = rs.getString("firstname");

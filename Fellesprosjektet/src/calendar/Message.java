@@ -5,7 +5,6 @@ import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 
-import no.ntnu.fp.model.Person;
 import server.Execute;
 import server.MessageHandler;
 import server.RoundTime;
