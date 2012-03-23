@@ -56,6 +56,9 @@ public class Starter {
 				user = authenticateUser();
 			} catch (InvalidLoginException e) {
 				System.out.println(e.getMessage());
+			} catch (UserAbortException e) {
+				System.out.println("Ha en fortsatt fin dag!");
+				System.exit(0);
 			}
 		}
 		this.user = user;
@@ -151,10 +154,8 @@ public class Starter {
 		List<Appointment> allInvited = AppointmentHandler.getAllUnansweredInvites(user.getId());
 		System.out.print("Hvilken innkalling vil du svare på? ");
 		int userNum = promptChoice(allInvited);
-		answerInvite(allInvited.get(userNum-1));
+		answerInvite(allInvited.get(userNum));
 	}
-	
-
 	
 	private void answerInvite(Appointment appointment) throws IOException, UserAbortException {
 		while(true){

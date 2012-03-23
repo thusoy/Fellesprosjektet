@@ -2,20 +2,20 @@ package client.helpers;
 
 import static client.helpers.DBHelper.getUserIdFromEmail;
 import static client.helpers.DBHelper.isValidEmail;
+import static client.helpers.IO.getString;
 import static hashtools.Hash.createHash;
 
 import java.io.IOException;
 
-import calendar.Person;
-
 import server.Execute;
 import server.PersonHandler;
+import calendar.Person;
 
 public class AuthHelper {
 
-	public static Person authenticateUser() throws IOException, InvalidLoginException {
-		String email = "tarjei@roms.no";//getString("E-post: ");
-		String password = "lol";// getString("Passord: ");
+	public static Person authenticateUser() throws IOException, InvalidLoginException, UserAbortException {
+		String email = getString("E-post: ");
+		String password = getString("Passord: ");
 		Person user = authenticationHelper(email, password);
 		return user;
 	}
