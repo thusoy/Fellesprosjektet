@@ -1,11 +1,11 @@
 package client.helpers;
 
+import static ascii.Art.printAsciiArt;
 import static client.helpers.DBHelper.getPersonFromEmail;
 import static client.helpers.DBHelper.isValidEmail;
 import static client.helpers.IO.getString;
 import static client.helpers.IO.parseDate;
 import static client.helpers.IO.promptChoice;
-import static ascii.Art.printAsciiArt;
 
 import java.io.IOException;
 import java.sql.Date;
@@ -16,14 +16,15 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.Set;
 import java.util.TreeSet;
 
 import server.AppointmentHandler;
-import server.MessageHandler;
 import server.PersonHandler;
 import server.RoomHandler;
 import calendar.Appointment;
+import calendar.Message;
 import calendar.Person;
 import calendar.Room;
 
@@ -76,6 +77,9 @@ public class AppointmentHelper {
 			String answerString = answer == null ? "har ikke svart" : answer ? "kommer" : "kommer ikke";
 			System.out.printf("\t%s: %s.\n", p.fullName(), answerString);
 		}
+		Scanner scanner = new Scanner(System.in);
+		System.out.println("Trykk enter for å fortsette");
+		scanner.nextLine();
 	}
 	
 	public static void changeAppointment(Person user) throws IOException, UserAbortException {
@@ -102,15 +106,24 @@ public class AppointmentHelper {
 		app.save();
 		System.out.println("Avtalen er endret.");
 		if (!app.getParticipants().isEmpty()) {
-			MessageHandler.sendMessageToAllParticipants(app, "Avtalen "+app.getTitle()+" er endret", "Denne avtalen har blitt endret. ");
+			Message msg = new Message("Avtalen "+app.getTitle()+" er endret", "Denne avtalen har blitt endret. ");
+			msg.setReceivers(mapKeysToList(app.getParticipants()));
 		}
+	}
+	
+	private static <T, S> List<T> mapKeysToList(Map<T, S> map){
+		List<T> list = new ArrayList<T>();
+		for(T t: map.keySet()){
+			list.add(t);
+		}
+		return list;
 	}
 	
 	public static void deleteAppointment(Person user) throws IOException, UserAbortException {
 		long userId = user.getId();
 		List<Appointment> appointments = getAllAppointmentsInvolved(userId);
 		int choice = promptChoice(appointments);
-		long appId = appointments.get(choice).getAppId();
+		long appId = appointments.get(choice).getId();
 		Appointment app = AppointmentHandler.getAppointment(appId);
 		deleteAppointmentHelper(user, app);
 	}
@@ -154,7 +167,7 @@ public class AppointmentHelper {
 	}
 	
 	private static void setRoomOrPlace(Appointment app) throws IOException, UserAbortException{
-		if (app.getParticipants() != null){
+		if (app.getParticipants().size() > 0){
 			String reserve = getString("Vil du reservere møterom? (ja/nei): ");
 			if (reserve.equalsIgnoreCase("ja")){
 				reserveRoom(app);
@@ -178,10 +191,11 @@ public class AppointmentHelper {
 	private static Map<Person, Boolean> getParticipants(Person user) throws IOException, UserAbortException{
 		Map<Person, Boolean> map = new HashMap<Person, Boolean>();
 		while (true) {
-			String email = getString("Skriv inn e-posten til personen du vil følge (eller trykk enter hvis du er ferdig): ");
+			String email = getString("Skriv inn e-posten til personen du vil invitere (eller trykk enter hvis du er ferdig): ");
 			if (email.isEmpty()){
 				break;
-			} else if (isValidEmail(email) && !email.equalsIgnoreCase(user.getEmail())){
+				//TODO Fjern utkommentering av adding av egen epost
+			} else if (isValidEmail(email) ){//&& !email.equalsIgnoreCase(user.getEmail())){
 				Person p = getPersonFromEmail(email);
 				map.put(p, null);
 				System.out.printf("%s ble invitert!\n", email);

@@ -1,5 +1,7 @@
 package calendar;
 
+import static dateutils.DateUtils.stripMsFromTime;
+
 import java.io.IOException;
 import java.io.Serializable;
 import java.sql.Date;
@@ -13,7 +15,6 @@ import java.util.TreeSet;
 import server.AppointmentHandler;
 import server.Execute;
 import server.MessageHandler;
-import server.RoundTime;
 import dateutils.Day;
 
 public class Appointment implements Serializable, Comparable<Appointment> {
@@ -66,14 +67,14 @@ public class Appointment implements Serializable, Comparable<Appointment> {
 		app.setEndTime(endTime);
 		app.setPrivate(isPrivate);
 		app.setParticipants(participants);
-		app.setCreator(creator);
 		return app;
 	}
 
-	public void acceptInvite(Person user, Boolean answer) throws IOException{
+	//TODO SQl har ingenting i modellen å gjøre! Bør separeres til handlern.
+	public void answerInvite(Person user, Boolean answer) throws IOException{
 		participants.put(user, answer);
-		String query = "UPDATE UserAppointments SET hasAccepted=%b WHERE userId=%d AND appId=%d";
-		Execute.executeUpdate(String.format(query, answer, user.getId(), appId));
+		String query = "UPDATE UserAppointments SET hasAccepted=%b WHERE userId=? AND appId=?";
+		Execute.update(String.format(query, answer), user.getId(), appId);
 		if (answer == false){
 			MessageHandler.sendMessageUserHasDenied(appId, user.getId());
 		}
@@ -81,10 +82,6 @@ public class Appointment implements Serializable, Comparable<Appointment> {
 	
 	public void save() throws IOException{
 		AppointmentHandler.updateAppointment(this);
-	}
-	
-	public void updateParticipants(HashMap<Person, Boolean> participants) throws IOException{
-		this.participants = participants;
 	}
 	
 	public void setAppId(long appId) {
@@ -95,11 +92,7 @@ public class Appointment implements Serializable, Comparable<Appointment> {
 		this.title = title;
 	}
 
-	public void setCreator(Person creator) throws IOException {
-		this.creator = creator;
-	}
-
-	public long getAppId() {
+	public long getId() {
 		if (appId == null){
 			throw new IllegalStateException("AppId ikke satt enda!");
 		}
@@ -124,23 +117,27 @@ public class Appointment implements Serializable, Comparable<Appointment> {
 		return startTime;
 	}
 	public void setStartTime(Date startTime) throws IOException {
-		this.startTime = RoundTime.roundTime(startTime);
+		this.startTime = stripMsFromTime(startTime);
 	}
 	public Date getEndTime() {
 		return endTime;
 	}
 	public void setEndTime(Date endTime) throws IOException {
-		this.endTime = RoundTime.roundTime(endTime);
+		this.endTime = stripMsFromTime(endTime);
 	}
+	@Deprecated
 	public Set<Day> getDaysAppearing() {
 		return daysAppearing;
 	}
+	@Deprecated
 	public void setDaysAppearing(Set<Day> daysAppearing) throws IOException {
 		this.daysAppearing = daysAppearing;
 	}
+	@Deprecated
 	public Date getEndOfRepeatDate() {
 		return endOfRepeatDate;
 	}
+	@Deprecated
 	public void setEndOfRepeatDate(Date endOfRepeatDate) throws IOException {
 		this.endOfRepeatDate = endOfRepeatDate;
 	}
@@ -167,7 +164,11 @@ public class Appointment implements Serializable, Comparable<Appointment> {
 	}
 	
 	public void setParticipants(Map<Person, Boolean> participants) throws IOException {
-		this.participants = participants;
+		if (participants == null){
+			this.participants = new HashMap<Person, Boolean>();
+		} else {
+			this.participants = participants;
+		}
 	}
 	
 	public String getRoomName() {
@@ -187,10 +188,6 @@ public class Appointment implements Serializable, Comparable<Appointment> {
 		DateFormat formatter = new SimpleDateFormat("dd.MM HH:mm");
 		String startdate = formatter.format(startTime);
 		return String.format(base, title, startdate);
-	}
-
-	public void setId(long appId) {
-		this.appId = appId;
 	}
 
 	public static Appointment getAppointment(long appId) throws IOException {

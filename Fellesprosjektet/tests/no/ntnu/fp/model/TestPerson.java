@@ -20,7 +20,7 @@ public class TestPerson {
 	@Before
 	public void truncateUser() throws IOException, SQLException{
 		String query = "TRUNCATE TABLE User";
-		Execute.executeUpdate(query);
+		Execute.update(query);
 	}
 	
 	@Test

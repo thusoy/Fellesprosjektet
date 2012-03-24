@@ -1,5 +1,7 @@
 package calendar;
 
+import static dateutils.DateUtils.stripMsFromTime;
+
 import java.io.IOException;
 import java.sql.Date;
 import java.util.ArrayList;
@@ -7,7 +9,6 @@ import java.util.List;
 
 import server.Execute;
 import server.MessageHandler;
-import server.RoundTime;
 
 public class Message implements Comparable<Message> {
 	
@@ -26,7 +27,7 @@ public class Message implements Comparable<Message> {
 	public Message (String title, String content) throws IOException{
 		this.title=title;
 		this.content=content;
-		this.dateSent= RoundTime.roundTime(new Date(System.currentTimeMillis()));
+		setDateSent(new Date(System.currentTimeMillis()));
 		receivers = new ArrayList<Person>();
 		MessageHandler.createMessage(this);
 	}
@@ -59,20 +60,31 @@ public class Message implements Comparable<Message> {
 	}
 	
 	public void addReceiver(Person p) throws IOException{
-		String query = "INSERT INTO UserMessages(msgId, userId, hasBeenRead) VALUES(%d, %d, null)";
-		Execute.executeUpdate(String.format(query, msgId, p.getId()));
+		MessageHandler.sendMessageToUser(msgId, p.getId());
+		if (receivers == null){
+			receivers = new ArrayList<Person>();
+		}
 		receivers.add(p);
 	}
 	
-	// TODO Lagre til databasen i batch, fremfor en og en.
+	/**
+	 * Sets the given receivers as receivers of the message, and sends it out.
+	 * @param receivers
+	 * @throws IOException
+	 */
 	public void setReceivers(List<Person> receivers) throws IOException{
-		String deleteQuery = String.format("DELETE FROM UserMessages WHERE msgId=%d", msgId);
-		Execute.executeUpdate(deleteQuery);
-		String query = "INSERT INTO UserMessages(msgId, userId, hasBeenRead) VALUES(%d, %d, false)";
-		for(Person p: receivers){
-			Execute.executeUpdate(String.format(query, msgId, p.getId()));
+		String deleteQuery = "DELETE FROM UserMessages WHERE msgId=?";
+		Execute.update(deleteQuery, msgId);
+		if (receivers == null){
+			this.receivers = new ArrayList<Person>();
+		} else {
+			this.receivers = receivers;
+			MessageHandler.sendMessageToAllParticipants(this);
 		}
-		this.receivers = receivers;
+	}
+	
+	public List<Person> getReceivers(){
+		return receivers;
 	}
 
 	public String getContent() {
@@ -88,12 +100,9 @@ public class Message implements Comparable<Message> {
 	}
 	
 	public void setDateSent(Date dateSent){
-		this.dateSent = dateSent;
+		this.dateSent = stripMsFromTime(dateSent);
 	}
 	
-
-	
-
 	@Override
 	public int hashCode() {
 		final int prime = 31;

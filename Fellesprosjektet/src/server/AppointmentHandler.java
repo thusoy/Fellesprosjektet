@@ -3,21 +3,23 @@ package server;
 import static calendar.Appointment.recreateAppointment;
 import static dateutils.DateUtils.getEndOfWeek;
 import static dateutils.DateUtils.getStartOfWeek;
-import static server.Execute.update;
 import static server.Execute.getUniqueId;
+import static server.Execute.update;
+
 import java.io.IOException;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.sql.Types;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import calendar.Appointment;
+import calendar.Message;
 import calendar.Person;
 import client.helpers.StoopidSQLException;
 import dateutils.Day;
@@ -72,7 +74,7 @@ public class AppointmentHandler {
 		String roomName = app.getRoomName();
 		Map<Person, Boolean> participants = app.getParticipants();
 		boolean isPrivate = app.isPrivate();
-		long appId = app.getAppId();
+		long appId = app.getId();
 		long creatorId = app.getCreator() != null ? app.getCreator().getId() : 0;
 		
 		String query =
@@ -104,28 +106,36 @@ public class AppointmentHandler {
 	
 	public static void deleteAppointment(long appId) throws IOException {
 		Appointment app = getAppointment(appId);
-		MessageHandler.sendMessageToAllParticipants(app, "Avtale: "+app.getTitle(), "Denne avtalen er blitt slettet");
+		Message msg = new Message("Slettet avtale " + app.getTitle(), "Denne avtalen er blitt slettet");
+		List<Person> receivers = Arrays.asList(app.getParticipants().keySet().toArray(new Person[0]));
+		msg.setReceivers(receivers);
 		String appQuery = "DELETE FROM Appointment WHERE appId=?";
 		String userAppQuery = "DELETE FROM UserAppointments WHERE appId=?";
 		update(appQuery, appId);
 		update(userAppQuery, appId);
 	}
+	
 	public static void deleteAppointmentInvited(long appId) throws IOException {
 		Appointment app = getAppointment(appId);
-		MessageHandler.sendMessageToAllParticipants(app, "Avslag: "+app.getTitle(), "En person har avlått møtet");
+		Message msg = new Message("Avslag: " + app.getTitle(), "En person har avslått møtet");
+		List<Person> receivers = mapKeysToList(app.getParticipants());
+		msg.setReceivers(receivers);
 		String query = "DELETE FROM UserAppointments WHERE appId=?";
 		update(query, appId);
 	}
 	
-	public static void updateUserAppointment(long appId, long userId, Boolean bool) throws IOException {
-		String query = "UPDATE UserAppointments SET hasAccepted=%b WHERE userId=? AND appId=?";
-		PreparedStatement ps = Execute.getPreparedStatement(query);
-		try {
-			ps.setObject(1, bool, Types.BOOLEAN);
-		} catch (SQLException e) {
-			throw new StoopidSQLException(e);
+	private static <T, S> List<T> mapKeysToList(Map<T, S> map){
+		List<T> list = new ArrayList<T>();
+		for(T t: map.keySet()){
+			list.add(t);
 		}
-		Execute.executeUpdate(String.format(query, bool, userId, appId));
+		return list;
+	}
+	
+	public static void updateUserAppointment(long appId, long userId, Boolean bool) throws IOException {
+		String query = "UPDATE UserAppointments SET hasAccepted=%s WHERE userId=? AND appId=?";
+		String boolString = bool == null ? "null" : bool ? "true" : "false";
+		update(String.format(query, boolString), userId, appId);
 	}
 	
 	public static Map<Long, Boolean> getParticipants(long appId) throws IOException {
@@ -162,9 +172,8 @@ public class AppointmentHandler {
 		try {
 			getInviteStatusOnUser(appId, userId);
 		} catch (RuntimeException e){
-			// Empty resultset
-			String query = "INSERT INTO UserAppointments(appId, userId, hasAccepted) VALUES(%d, %d, null)";
-			Execute.executeUpdate(String.format(query, appId, userId));
+			String query = "INSERT INTO UserAppointments(appId, userId, hasAccepted) VALUES(?, ?, null)";
+			update(query, appId, userId);
 		}
 	}
 	

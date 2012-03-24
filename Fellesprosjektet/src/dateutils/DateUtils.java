@@ -21,4 +21,15 @@ public class DateUtils {
 		Date end = new Date(startOfWeek.getTime() + aWeekInMs);
 		return end;
 	}
+	
+	public static Date stripMsFromTime(Date date){
+		long original = date.getTime();
+		long newTime = (original/1000)*1000;
+		return new Date(newTime);
+	}
+	
+	public static int getCurrentWeekNum() {
+		Calendar cal = Calendar.getInstance();
+		return cal.get(Calendar.WEEK_OF_YEAR);
+	}
 }

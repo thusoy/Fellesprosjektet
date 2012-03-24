@@ -1,6 +1,7 @@
 package client.helpers;
 
 import static client.helpers.DBHelper.isValidEmail;
+import gui.SimpleTextGUI;
 
 import java.io.IOException;
 import java.sql.Date;
@@ -11,13 +12,23 @@ import java.util.Collection;
 import java.util.Scanner;
 
 public class IO {
+	private static final boolean useGUI = false;
 
 	public static String getString(String display) throws UserAbortException{
-		Scanner scanner = new Scanner(System.in);
-		System.out.print(display);
-		String userInput = scanner.nextLine();
+		String userInput;
+		if (useGUI){
+			SimpleTextGUI.setInputText(display);
+			userInput = SimpleTextGUI.getInput();
+		} else {
+			System.out.print(display);
+			Scanner scanner = new Scanner(System.in);
+			userInput = scanner.nextLine();
+		}
 		if (userInput.equalsIgnoreCase("quit")){
 			throw new UserAbortException();
+		}
+		if (useGUI){
+			SimpleTextGUI.setInputText("");
 		}
 		return userInput;
 	}
@@ -28,11 +39,15 @@ public class IO {
 	 * @throws UserAbortException 
 	 */
 	public static int getValidNum(int upperInclusiveBound) throws UserAbortException{
-		Scanner scanner = new Scanner(System.in);
 		String userInput;
 		while(true){
 			try {
-				userInput = scanner.nextLine();
+				if (useGUI){
+					userInput = SimpleTextGUI.getInput();
+				} else {
+					Scanner scanner = new Scanner(System.in);
+					userInput = scanner.nextLine();
+				}
 				if (userInput.isEmpty()){
 					throw new UserAbortException();
 				}
@@ -86,10 +101,14 @@ public class IO {
 			index++;
 		}
 		String userInput = null;
-		Scanner scanner = new Scanner(System.in);
 		while (true){
 			try {
-				userInput = scanner.nextLine();
+				if (useGUI){
+					userInput = SimpleTextGUI.getInput();
+				} else {
+					Scanner scanner = new Scanner(System.in);
+					userInput = scanner.nextLine();
+				}				
 				if (userInput.isEmpty()){
 					throw new UserAbortException();
 				}

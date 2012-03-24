@@ -70,8 +70,8 @@ public class Person {
 	}
 	
 	public void followPerson(long otherUserId) throws IOException {
-		String query = "INSERT INTO UserCalendars(userId, followsUserId) VALUES(%d, %d)";
-		Execute.executeUpdate(String.format(query, id, otherUserId));
+		String query = "INSERT INTO UserCalendars(userId, followsUserId) VALUES(?, ?)";
+		Execute.update(query, id, otherUserId);
 	}
 	
 	/**
@@ -131,6 +131,10 @@ public class Person {
 
 	public String getPasswordHash() {
 		return passwordHash;
+	}
+	
+	public void delete() throws IOException{
+		PersonHandler.deleteUser(id);
 	}
 
 

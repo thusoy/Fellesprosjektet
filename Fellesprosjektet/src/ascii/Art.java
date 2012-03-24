@@ -57,6 +57,9 @@ public class Art {
 		
 		for(char c: clean.toCharArray()){
 			String[] array = chars.get(c);
+			if (array == null){
+				continue;
+			}
 			for(int i = 0; i < array.length; i++){
 				outer.get(i).append(array[i]);
 			}

@@ -13,6 +13,9 @@ public class Room implements Comparable<Room>{
 	private LinkedHashMap<Date, Date> isOccupied;
 	
 	public Room(String name, int capacity) throws IOException{
+		if (capacity < 1){
+			throw new IllegalArgumentException("Et rom må ha plass til minst én person!");
+		}
 		this.name = name;
 		this.capacity = capacity;
 		isOccupied = new LinkedHashMap<Date, Date>();
@@ -48,7 +51,7 @@ public class Room implements Comparable<Room>{
 	
 	@Override
 	public String toString(){
-		return name;
+		return String.format("%s (%d)", name, capacity);
 	}
 
 	@Override

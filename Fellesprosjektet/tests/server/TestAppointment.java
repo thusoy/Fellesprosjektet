@@ -22,7 +22,7 @@ public class TestAppointment {
 		String[] tablesToTruncate = {"UserMessages"};
 		String query = "TRUNCATE TABLE %s";
 		for(String table: tablesToTruncate){
-			Execute.executeUpdate(String.format(query, table));
+			Execute.update(String.format(query, table));
 		}
 	}
 	
@@ -32,9 +32,9 @@ public class TestAppointment {
 		Date end = new Date(System.currentTimeMillis()+2700);
 		Person creator = new Person("john", "locke", Long.toString(System.currentTimeMillis()), null, "");
 		Appointment app = new Appointment("tannlege", start, end, false, null, creator);
-		Appointment dbApp = Appointment.getAppointment(app.getAppId());
+		Appointment dbApp = Appointment.getAppointment(app.getId());
 		assertEquals("Objektene skal vÊre like!", app, dbApp);
-		Appointment dbApp2 = Appointment.getAppointment(app.getAppId());
+		Appointment dbApp2 = Appointment.getAppointment(app.getId());
 		assertEquals("Objektene skal fortsatt vÊre like!", app, dbApp2);
 	}
 	
@@ -74,9 +74,9 @@ public class TestAppointment {
 		Person john = new Person("john", "high", "lol@3.no", "komtek", "banan");
 		Date date = new Date(System.currentTimeMillis());
 		Appointment a1 = new Appointment("tannlege", date, date, false, null, john);
-		AppointmentHandler.addUserToAppointment(a1.getAppId(), john.getId());
-		AppointmentHandler.updateUserAppointment(a1.getAppId(), john.getId(), true);
-		assertTrue("John kommmer på møtet", AppointmentHandler.getInviteStatusOnUser(a1.getAppId(), john.getId()));
+		AppointmentHandler.addUserToAppointment(a1.getId(), john.getId());
+		AppointmentHandler.updateUserAppointment(a1.getId(), john.getId(), true);
+		assertTrue("John kommmer på møtet", AppointmentHandler.getInviteStatusOnUser(a1.getId(), john.getId()));
 	}
 	
 	@Test
@@ -84,9 +84,9 @@ public class TestAppointment {
 		Person john = new Person("john", "high", "lol@4.no", "komtek", "banan");
 		Date date = new Date(System.currentTimeMillis());
 		Appointment a1 = new Appointment("tannlege", date, date, false, null, john);
-		AppointmentHandler.addUserToAppointment(a1.getAppId(), john.getId());
-		AppointmentHandler.updateUserAppointment(a1.getAppId(), john.getId(), true);
-		assertTrue("John kommmer på møtet", AppointmentHandler.getInviteStatusOnUser(a1.getAppId(), john.getId()));
+		AppointmentHandler.addUserToAppointment(a1.getId(), john.getId());
+		AppointmentHandler.updateUserAppointment(a1.getId(), john.getId(), true);
+		assertTrue("John kommmer på møtet", AppointmentHandler.getInviteStatusOnUser(a1.getId(), john.getId()));
 		a1.delete();
 	}
 	
@@ -98,8 +98,8 @@ public class TestAppointment {
 		Appointment a1 = new Appointment("tannlege", date, date, false, null, john);
 		HashMap<Person, Boolean> participants = new HashMap<Person, Boolean>();
 		participants.put(jo, null);
-		a1.updateParticipants(participants);
+		a1.setParticipants(participants);
 		a1.save();
-		MessageHandler.sendMessageUserHasDenied(a1.getAppId(), jo.getId());
+		MessageHandler.sendMessageUserHasDenied(a1.getId(), jo.getId());
 	}
 }

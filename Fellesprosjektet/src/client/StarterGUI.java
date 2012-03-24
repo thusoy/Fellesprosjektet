@@ -12,12 +12,13 @@ import static client.helpers.IO.getString;
 import static client.helpers.IO.getValidEmail;
 import static client.helpers.IO.getValidNum;
 import static client.helpers.IO.promptChoice;
-import static dateutils.DateUtils.getCurrentWeekNum;
+import gui.SimpleTextGUI;
 
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import server.AppointmentHandler;
@@ -30,25 +31,26 @@ import client.helpers.InvalidLoginException;
 import client.helpers.UserAbortException;
 import dateutils.Day;
 
-public class Starter {
+public class StarterGUI {
 	
+	private SimpleTextGUI gui;
 	private Person user;
 	private int weekNum;
-	private static final String EMPTY_LINES = repeat("\n", 30);
 	
 	public static void main(String[] args) {
 		try {
-			(new Starter()).initAndLogin();
+			(new StarterGUI()).initAndLogin();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 	
-	private Starter(){
+	private StarterGUI(){
 		weekNum = getCurrentWeekNum();
 	}
 	
 	private void initAndLogin() throws IOException {
+		gui = new SimpleTextGUI();
 		printAsciiArt("Login");
 		Person user = null;
 		while (user == null) {
@@ -62,7 +64,7 @@ public class Starter {
 			}
 		}
 		this.user = user;
-		System.out.println(EMPTY_LINES);
+		gui.clear();
 		run();
 	}
 	
@@ -72,7 +74,7 @@ public class Starter {
 			showWeek();
 			int numUnansweredMeetings = AppointmentHandler.getAllUnansweredInvites(user.getId()).size();
 			int numNewMessages = MessageHandler.getUnreadMessagesForUser(user).size();
-			System.out.println("Hva vil du gjøre?");
+			SimpleTextGUI.setInputText("Hva vil du gjøre?");
 			List<String> choices = new ArrayList<String>();
 			for(CalendarFunction cf: allFunc){
 				String description = cf.description;
@@ -86,7 +88,7 @@ public class Starter {
 			try {
 				CalendarFunction cf = allFunc[promptChoice(choices)];
 				if (cf == CalendarFunction.QUIT){
-					System.out.println(EMPTY_LINES);
+					gui.clear();
 					System.out.println("Ha en fortsatt fin dag!");
 					try {
 						Thread.sleep(3000);
@@ -98,10 +100,15 @@ public class Starter {
 				runFunc(cf);
 			} catch (UserAbortException e) {
 			}
-			System.out.println(EMPTY_LINES);
+			gui.clear();
 		}
 	}
 	
+	private int getCurrentWeekNum() {
+		Calendar cal = Calendar.getInstance();
+		return cal.get(Calendar.WEEK_OF_YEAR);
+	}
+
 	public void runFunc(CalendarFunction func) throws IOException, UserAbortException{
 		switch(func){
 		case ADD_APPOINTMENT:
@@ -141,18 +148,14 @@ public class Starter {
 	
 	private void showMessages() throws IOException, UserAbortException {
 		List<Message> unreadMessages = MessageHandler.getUnreadMessagesForUser(user);
-		if (unreadMessages.size() > 0){
-			System.out.println("Hvilken melding vil du lese?");
-			int userInput = promptChoice(unreadMessages);
-			Message selected = unreadMessages.get(userInput);
-			System.out.println(selected.showMessage(user).getContent());
-			if (selected instanceof RejectedMessage){
-				RejectedMessage m = (RejectedMessage) selected;
-				System.out.println("Hva vil du gjøre?");
-				m.getAndExecuteUserResponse(user);
-			}
-		} else {
-			System.out.println("Ingen nye meldinger!");
+		System.out.print("Hvilken melding vil du lese? \n");
+		int userInput = promptChoice(unreadMessages);
+		Message selected = unreadMessages.get(userInput);
+		System.out.println(selected.showMessage(user).getContent());
+		if (selected instanceof RejectedMessage){
+			RejectedMessage m = (RejectedMessage) selected;
+			System.out.println("Hva vil du gjøre?");
+			m.getAndExecuteUserResponse(user);
 		}
 	}
 
