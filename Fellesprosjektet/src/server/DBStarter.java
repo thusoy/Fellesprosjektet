@@ -28,7 +28,7 @@ public class DBStarter extends RmiStarter {
             AppointmentHandler appEngineStub = (AppointmentHandler) UnicastRemoteObject.exportObject(appEngine, 0);
             registry.rebind(AppointmentHandler.SERVICE_NAME, appEngineStub);
             AppointmentHandlerImpl.init();
-//            Appointment.bindToHandler();
+            Appointment.bindToHandler();
             
             MessageHandler msgEngine = new MessageHandlerImpl();
             MessageHandler msgEngineStub = (MessageHandler) UnicastRemoteObject.exportObject(msgEngine, 0);
