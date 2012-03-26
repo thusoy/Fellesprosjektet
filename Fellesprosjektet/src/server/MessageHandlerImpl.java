@@ -34,8 +34,7 @@ public class MessageHandlerImpl extends Handler implements MessageHandler{
 		Date dateSent = msg.getDateSent();
 		String content = msg.getContent();
 		String title = msg.getTitle();
-		long msgId = dbEngine.getUniqueId();
-		msg.setId(msgId);
+		long msgId = msg.getId();
 		Long appId = null;
 		Long rejectingUserId = null;
 		if (msg instanceof RejectedMessage){
