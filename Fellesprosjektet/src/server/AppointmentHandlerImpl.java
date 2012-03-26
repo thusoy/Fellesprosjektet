@@ -164,7 +164,9 @@ public class AppointmentHandlerImpl extends Handler implements AppointmentHandle
 	
 	public void deleteUserFromAppointment(long appId, long msgId) throws IOException {
 		String query = "DELETE FROM UserAppoinments WHERE userId=? AND msgId=?";
-		dbEngine.update(query, appId, msgId);
+		try {
+			dbEngine.update(query, appId, msgId);
+		} catch (NullPointerException e){}
 	}
 	
 	public void updateRoomName(long appId, String roomName) throws IOException {
