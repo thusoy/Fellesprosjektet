@@ -31,10 +31,12 @@ public class Message extends DBCommunicator implements Comparable<Message>, Seri
 	 * @throws IOException
 	 */
 	public Message (String title, String content) throws IOException{
+		bindToHandler();
 		this.title=title;
 		this.content=content;
 		setDateSent(new Date(System.currentTimeMillis()));
 		receivers = new ArrayList<Person>();
+		msgId = msgHandler.getUniqueId();
 		msgHandler.createMessage(this);
 	}
 	

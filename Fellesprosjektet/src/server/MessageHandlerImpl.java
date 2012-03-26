@@ -194,5 +194,10 @@ public class MessageHandlerImpl extends Handler implements MessageHandler{
 		}
 		sendMessageToUser(msg.getId(), app.getCreator().getId());
 	}
+
+	@Override
+	public long getUniqueId() throws IOException, RemoteException {
+		return dbEngine.getUniqueId();
+	}
 	
 }

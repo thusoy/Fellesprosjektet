@@ -32,4 +32,5 @@ public interface PersonHandler extends Remote{
 	
 	public List<Appointment> getFollowAppointments(long userId) throws IOException, RemoteException;
 
+	public long getUniqueId() throws IOException, RemoteException;
 }

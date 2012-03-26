@@ -28,10 +28,12 @@ public class RejectedMessage extends Message {
 		if (!app.getParticipants().containsKey(rejectingUser)){
 			throw new IllegalArgumentException("Brukeren som avslo må være blant de inviterte til avtalen!");
 		}
+		bindToHandler();
 		this.app = app;
 		this.rejectingUser = rejectingUser;
 		this.title = title;
 		this.content = content;
+		this.msgId = msgHandler.getUniqueId();
 		setDateSent(new Date(System.currentTimeMillis()));
 		msgHandler.createMessage(this);
 	}

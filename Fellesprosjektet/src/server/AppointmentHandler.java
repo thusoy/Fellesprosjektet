@@ -15,34 +15,36 @@ public interface AppointmentHandler extends Remote{
 	
 	public void answerInvite(long appId, long userId, Boolean answer) throws RemoteException, IOException;
 	
-	public void updateAppointment(Appointment app) throws IOException;
+	public void updateAppointment(Appointment app) throws IOException, RemoteException;
 	
-	public void deleteAppointment(long appId) throws IOException;
+	public void deleteAppointment(long appId) throws IOException, RemoteException;
 
-	public void deleteAppointmentInvited(long appId) throws IOException;
+	public void deleteAppointmentInvited(long appId) throws IOException, RemoteException;
 	
-	public void updateUserAppointment(long appId, long userId, Boolean bool) throws IOException;
+	public void updateUserAppointment(long appId, long userId, Boolean bool) throws IOException, RemoteException;
 
-	public void addUserToAppointment(long appId, long userId) throws IOException;
+	public void addUserToAppointment(long appId, long userId) throws IOException, RemoteException;
 	
-	public void deleteUserFromAppointment(long appId, long msgId) throws IOException;
+	public void deleteUserFromAppointment(long appId, long msgId) throws IOException, RemoteException;
 	
-	public void updateRoomName(long appId, String roomName) throws IOException;
+	public void updateRoomName(long appId, String roomName) throws IOException, RemoteException;
 	
-	public List<Appointment> getAllByUser(long userId) throws IOException;
+	public List<Appointment> getAllByUser(long userId) throws IOException, RemoteException;
 	
-	public List<Appointment> getAllInvited(long userId) throws IOException;
+	public List<Appointment> getAllInvited(long userId) throws IOException, RemoteException;
 	
-	public List<Appointment> getAllCreated(long userId, int weekNum) throws IOException;
+	public List<Appointment> getAllCreated(long userId, int weekNum) throws IOException, RemoteException;
 	
-	public List<Appointment> getAllInvitedInWeek(long userId, int weekNum) throws IOException;
+	public List<Appointment> getAllInvitedInWeek(long userId, int weekNum) throws IOException, RemoteException;
 	
-	public List<Appointment> getAllUnansweredInvites(long userId) throws IOException;
+	public List<Appointment> getAllUnansweredInvites(long userId) throws IOException, RemoteException;
 	
-	public List<Appointment> getWeekAppointments(long userId, int weekNum) throws IOException;
+	public List<Appointment> getWeekAppointments(long userId, int weekNum) throws IOException, RemoteException;
 	
-	public Map<Long, Boolean> getParticipants(long appId) throws IOException;
+	public Map<Long, Boolean> getParticipants(long appId) throws IOException, RemoteException;
 	
-	public Appointment getAppointment(long appId) throws IOException;
+	public Appointment getAppointment(long appId) throws IOException, RemoteException;
+	
+	public long getUniqueId() throws IOException, RemoteException;
 
 }

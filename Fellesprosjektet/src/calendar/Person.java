@@ -33,6 +33,7 @@ public class Person extends DBCommunicator implements Serializable{
 		if (firstname == null || lastname == null || email == null || password == null)
 			throw new IllegalArgumentException("A person needs no-null values for firstname, " +
 				"lastname, email and password!");
+		bindToHandler();
 		this.firstname = firstname;
 		this.lastname = lastname;
 		this.email = email;
@@ -40,6 +41,7 @@ public class Person extends DBCommunicator implements Serializable{
 		this.department = department;
 		setFirstSalt();
 		setPassword(password);
+		id = personHandler.getUniqueId();
 		personHandler.createUser(this);
 	}
 	
