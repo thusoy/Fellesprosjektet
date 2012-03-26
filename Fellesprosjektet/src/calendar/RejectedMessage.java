@@ -25,6 +25,13 @@ public class RejectedMessage extends Message {
 	
 	public RejectedMessage(String title, String content, Appointment app, Person rejectingUser) throws IOException {
 		super(0);
+		System.out.println(app.getParticipants());
+		System.out.println(rejectingUser);
+		try {
+			wait(10000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 		if (!app.getParticipants().containsKey(rejectingUser)){
 			throw new IllegalArgumentException("Brukeren som avslo må være blant de inviterte til avtalen!");
 		}
@@ -44,6 +51,13 @@ public class RejectedMessage extends Message {
 	
 	public static RejectedMessage recreateRejectedMessage(long msgId, String title, String content, 
 			Date dateSent, Appointment app, Person rejectingUser) throws IOException{
+		System.out.println(app.getParticipants());
+		System.out.println(rejectingUser);
+		try {
+			Thread.sleep(10000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 		if (!app.getParticipants().containsKey(rejectingUser)){
 			throw new IllegalArgumentException("Brukeren som avslo må være blant de inviterte til avtalen!");
 		}
