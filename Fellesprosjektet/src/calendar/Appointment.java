@@ -85,6 +85,8 @@ public class Appointment extends DBCommunicator implements Serializable, Compara
 	}
 	
 	public void save() throws IOException{
+		bindToHandler();
+		appHandler.deleteParticipants(appId, participants);
 		appHandler.updateAppointment(this);
 	}
 	
@@ -164,9 +166,11 @@ public class Appointment extends DBCommunicator implements Serializable, Compara
 	 * @throws IOException 
 	 */
 	public void delete() throws IOException {
+		bindToHandler();
 		appHandler.deleteAppointment(this.appId);
 	}
 	public void deleteAppointmentInvited() throws IOException {
+		bindToHandler();
 		appHandler.deleteAppointmentInvited(this.appId);
 	}
 	
@@ -202,6 +206,7 @@ public class Appointment extends DBCommunicator implements Serializable, Compara
 	}
 
 	public static Appointment getAppointment(long appId) throws IOException {
+		bindToHandler();
 		return appHandler.getAppointment(appId);
 	}
 
