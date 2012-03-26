@@ -25,7 +25,7 @@ public class MessageHandlerImpl extends Handler implements MessageHandler{
 	private static AppointmentHandler appHandler;
 
 	
-	static {
+	public static void init() {
 		personHandler = new PersonHandlerImpl();
 		appHandler = new AppointmentHandlerImpl();
 	}

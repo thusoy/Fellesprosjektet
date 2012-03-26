@@ -81,8 +81,8 @@ public class Room extends DBCommunicator implements Comparable<Room>, Serializab
 
 	@Override
 	public int compareTo(Room other) {
-		return Integer.compare(capacity, other.capacity);
+		Integer thisOne = new Integer(capacity);
+		return thisOne.compareTo(new Integer(other.capacity));
 	}
-	
 	
 }
