@@ -2,11 +2,10 @@ package calendar;
 
 import java.rmi.AccessException;
 import java.rmi.NotBoundException;
+import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-
-import server.Handler;
 
 public abstract class DBCommunicator {
 	private static Registry registry;
@@ -21,10 +20,9 @@ public abstract class DBCommunicator {
 		}
 	}
 	
-	@SuppressWarnings("unchecked")
-	public static <T extends Handler> T getHandler(String serviceName){
+	public static Remote getHandler(String serviceName){
 		try {
-			return (T) registry.lookup(serviceName);
+			return registry.lookup(serviceName);
 		} catch (AccessException e) {
 			e.printStackTrace();
 		} catch (RemoteException e) {

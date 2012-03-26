@@ -8,7 +8,6 @@ import java.sql.ResultSet;
 import java.util.List;
 
 public interface DBHandler extends Remote{
-	public static final String SERVICE_NAME = "DBEngine";
 	
 	public boolean getBoolean(PreparedStatement ps) throws RemoteException, IOException;
 	

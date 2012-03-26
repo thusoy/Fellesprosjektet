@@ -1,13 +1,14 @@
 package server;
 
 import java.io.IOException;
+import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.List;
 import java.util.Map;
 
 import calendar.Appointment;
 
-public interface AppointmentHandler {
+public interface AppointmentHandler extends Remote{
 	public static final String SERVICE_NAME = "APPOINTMENT_HANDLER";
 
 	public void createAppointment(Appointment app) throws RemoteException, IOException;

@@ -31,7 +31,7 @@ public class Appointment extends DBCommunicator implements Serializable, Compara
 	private String roomName;
 	private static AppointmentHandler appHandler;
 	
-	static {
+	public static void bindToHandler(){
 			appHandler = (AppointmentHandler) getHandler(AppointmentHandler.SERVICE_NAME);
 	}
 	

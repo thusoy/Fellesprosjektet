@@ -25,7 +25,7 @@ import dateutils.Day;
 
 public class AppointmentHandlerImpl extends Handler implements AppointmentHandler {
 	
-	public AppointmentHandlerImpl(String serviceName) {
+	public AppointmentHandlerImpl() {
 		super("APPOINTMENT_HANDLER");
 	}
 

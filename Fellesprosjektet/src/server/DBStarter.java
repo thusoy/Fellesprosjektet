@@ -5,8 +5,8 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 
-import rmi.DBHandler;
 import rmi.RmiStarter;
+import calendar.Appointment;
 
 public class DBStarter extends RmiStarter {
 
@@ -17,11 +17,12 @@ public class DBStarter extends RmiStarter {
 	@Override
 	public void doCustomRmiHandling() {
 		try {
-            DBHandler engine = new ExecutionEngine();
-            DBHandler engineStub = (DBHandler) UnicastRemoteObject.exportObject(engine, 0);
-            LocateRegistry.createRegistry(1099);
+			LocateRegistry.createRegistry(1099);
+            AppointmentHandler engine = new AppointmentHandlerImpl();
+            AppointmentHandler engineStub = (AppointmentHandler) UnicastRemoteObject.exportObject(engine, 0);
             Registry registry = LocateRegistry.getRegistry();
-            registry.rebind(DBHandler.SERVICE_NAME, engineStub);
+            registry.rebind(AppointmentHandler.SERVICE_NAME, engineStub);
+            Appointment.bindToHandler();
             InetAddress addr = InetAddress.getLocalHost();
             System.out.println("RMI server running on: " + addr.getHostAddress());
         }
