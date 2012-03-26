@@ -179,7 +179,7 @@ public class AppointmentHandlerImpl extends Handler implements AppointmentHandle
 	
 	public Appointment getAppointment(long appId) throws IOException {	
 		String query = "SELECT appId, title, place, startTime, endTime, description, " +
-				"daysAppearing, endOfRepeatDate, roomName, isPrivate, creatorId FROM Appointment " +
+				"roomName, isPrivate, creatorId FROM Appointment " +
 				"WHERE appId=? ORDER BY startTime";
 		return getListFromQueryAndId(query, appId).get(0);
 	}
@@ -199,7 +199,6 @@ public class AppointmentHandlerImpl extends Handler implements AppointmentHandle
 				boolean isPrivate = rs.getBoolean("isPrivate");
 				long creatorId = rs.getLong("creatorId");
 				Person creator = personHandler.getPerson(creatorId);
-				System.out.println("found person: " + creator);
 				Map<Person, Boolean> participants = convertIdsToPersons(getParticipants(id));
 				Appointment a = recreateAppointment(id, title, startTime, endTime, isPrivate, participants, creator);
 				a.setPlace(place);
@@ -223,14 +222,14 @@ public class AppointmentHandlerImpl extends Handler implements AppointmentHandle
 	
 	public List<Appointment> getAllByUser(long userId) throws IOException {
 		String query = "SELECT appId, title, place, startTime, endTime, description, " +
-				"daysAppearing, endOfRepeatDate, roomName, isPrivate, creatorId FROM Appointment WHERE creatorId=? " + 
+				"roomName, isPrivate, creatorId FROM Appointment WHERE creatorId=? " + 
 				"ORDER BY startTime";
 		return getListFromQueryAndId(query, userId);
 	}
 	
 	public List<Appointment> getAllInvited(long userId) throws IOException {
 		String query = "SELECT appId, title, place, startTime, endTime, description, " +
-				"daysAppearing, endOfRepeatDate, roomName, isPrivate, creatorId FROM Appointment " +
+				"roomName, isPrivate, creatorId FROM Appointment " +
 				"WHERE appId IN (SELECT appId FROM UserAppointments WHERE userId=?) ORDER BY startTime";
 		return getListFromQueryAndId(query, userId);
 	}
@@ -239,7 +238,7 @@ public class AppointmentHandlerImpl extends Handler implements AppointmentHandle
 		Date startOfWeek = getStartOfWeek(weekNum);
 		Date endOfWeek = getEndOfWeek(weekNum);
 		String query = "SELECT appId, title, place, startTime, endTime, description, " +
-				"daysAppearing, endOfRepeatDate, roomName, isPrivate, creatorId FROM Appointment WHERE creatorId=? " + 
+				"roomName, isPrivate, creatorId FROM Appointment WHERE creatorId=? " + 
 				"AND startTime > ? AND endTime < ? ORDER BY startTime";
 			try {
 				PreparedStatement ps = dbEngine.getPreparedStatement(query);
@@ -256,7 +255,7 @@ public class AppointmentHandlerImpl extends Handler implements AppointmentHandle
 		Timestamp startDate = new Timestamp(getStartOfWeek(weekNum).getTime());
 		Timestamp enddate = new Timestamp(getEndOfWeek(weekNum).getTime());
 		String query = "SELECT appId, title, place, startTime, endTime, description, " +
-		"daysAppearing, endOfRepeatDate, roomName, isPrivate, creatorId FROM Appointment " +
+		"roomName, isPrivate, creatorId FROM Appointment " +
 		"WHERE appId IN (SELECT appId FROM UserAppointments WHERE userId=?) AND "+
 		"startTime < ? AND endTime < ? ORDER BY startTime";
 		PreparedStatement ps = dbEngine.getPreparedStatement(query);
@@ -272,7 +271,7 @@ public class AppointmentHandlerImpl extends Handler implements AppointmentHandle
 	
 	public List<Appointment> getAllUnansweredInvites(long userId) throws IOException{
 		String query = "SELECT appId, title, place, startTime, endTime, description, " +
-				"daysAppearing, endOfRepeatDate, roomName, isPrivate, creatorId FROM Appointment " +
+				"roomName, isPrivate, creatorId FROM Appointment " +
 				"WHERE appId IN (SELECT appId FROM UserAppointments WHERE userId=? AND hasAccepted IS NULL) " + 
 				"ORDER BY startTime";
 		return getListFromQueryAndId(query, userId);
@@ -302,7 +301,7 @@ public class AppointmentHandlerImpl extends Handler implements AppointmentHandle
 		Date startOfWeek = getStartOfWeek(weekNum);
 		Date endOfWeek = getEndOfWeek(weekNum);
 		String query = "SELECT appId, title, place, startTime, endTime, description, " +
-				"daysAppearing, endOfRepeatDate, roomName, isPrivate, creatorId FROM Appointment " +
+				"roomName, isPrivate, creatorId FROM Appointment " +
 				"WHERE creatorId=%d AND startTime > ? AND endTime < ? ORDER BY startTime";
 		try {
 			PreparedStatement ps = dbEngine.getPreparedStatement(String.format(query, userId));
