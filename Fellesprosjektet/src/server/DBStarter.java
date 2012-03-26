@@ -7,6 +7,7 @@ import java.rmi.server.UnicastRemoteObject;
 
 import rmi.RmiStarter;
 import calendar.Appointment;
+import calendar.Person;
 
 public class DBStarter extends RmiStarter {
 
@@ -18,13 +19,17 @@ public class DBStarter extends RmiStarter {
 	public void doCustomRmiHandling() {
 		try {
 			LocateRegistry.createRegistry(1099);
-            AppointmentHandler engine = new AppointmentHandlerImpl();
-            AppointmentHandler engineStub = (AppointmentHandler) UnicastRemoteObject.exportObject(engine, 0);
+            AppointmentHandler appEngine= new AppointmentHandlerImpl();
+            AppointmentHandler appEngineStub = (AppointmentHandler) UnicastRemoteObject.exportObject(appEngine, 0);
             Registry registry = LocateRegistry.getRegistry();
-            registry.rebind(AppointmentHandler.SERVICE_NAME, engineStub);
+            registry.rebind(AppointmentHandler.SERVICE_NAME, appEngineStub);
             Appointment.bindToHandler();
-            InetAddress addr = InetAddress.getLocalHost();
-            System.out.println("RMI server running on: " + addr.getHostAddress());
+            
+            PersonHandler personEngine = new PersonHandler();
+            PersonHandler personEngineStub = (PersonHandler) UnicastRemoteObject.exportObject(personEngine, 0);
+            Registry registry = LocateRegistry.getRegistry();
+            registry.rebind(PersonHandler.SERVICE_NAME, personEngineStub);
+            Person.bindToHandler();
         }
         catch(Exception e) {
             e.printStackTrace();
@@ -33,6 +38,8 @@ public class DBStarter extends RmiStarter {
 	
 	public static void main(String[] args) {
 		new DBStarter();
+		InetAddress addr = InetAddress.getLocalHost();
+		System.out.println("RMI server running on: " + addr.getHostAddress());
 	}
 
 }
