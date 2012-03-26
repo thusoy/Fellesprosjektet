@@ -226,6 +226,7 @@ public class AppointmentHandlerImpl extends Handler implements AppointmentHandle
 				boolean isPrivate = rs.getBoolean("isPrivate");
 				long creatorId = rs.getLong("creatorId");
 				Person creator = personHandler.getPerson(creatorId);
+				System.out.println("found person: " + creator);
 				Map<Person, Boolean> participants = convertIdsToPersons(getParticipants(id));
 				Appointment a = recreateAppointment(id, title, startTime, endTime, isPrivate, participants, creator);
 				a.setPlace(place);
