@@ -9,11 +9,8 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
 
 import server.AppointmentHandler;
-import dateutils.Day;
 
 public class Appointment extends DBCommunicator implements Serializable, Comparable<Appointment> {
 	private static final long serialVersionUID = -5442910434292395380L;
@@ -23,8 +20,6 @@ public class Appointment extends DBCommunicator implements Serializable, Compara
 	private String description;
 	private Date startTime;
 	private Date endTime;
-	private Set<Day> daysAppearing;
-	private Date endOfRepeatDate;
 	private boolean isPrivate;
 	private Person creator;
 	private Map<Person, Boolean> participants;
@@ -57,7 +52,6 @@ public class Appointment extends DBCommunicator implements Serializable, Compara
 		this.isPrivate = isPrivate;
 		this.participants = participants != null ? participants : new HashMap<Person, Boolean>();
 		this.description = new String();
-		this.daysAppearing = new TreeSet<Day>();
 		appId = appHandler.getUniqueId();
 		appHandler.createAppointment(this);
 	}
@@ -132,26 +126,6 @@ public class Appointment extends DBCommunicator implements Serializable, Compara
 		this.endTime = stripMsFromTime(endTime);
 	}
 	
-	@Deprecated
-	public Set<Day> getDaysAppearing() {
-		return daysAppearing;
-	}
-	
-	@Deprecated
-	public void setDaysAppearing(Set<Day> daysAppearing) throws IOException {
-		this.daysAppearing = daysAppearing;
-	}
-	
-	@Deprecated
-	public Date getEndOfRepeatDate() {
-		return endOfRepeatDate;
-	}
-	
-	@Deprecated
-	public void setEndOfRepeatDate(Date endOfRepeatDate) throws IOException {
-		this.endOfRepeatDate = endOfRepeatDate;
-	}
-	
 	public boolean isPrivate() {
 		return isPrivate;
 	}
@@ -217,11 +191,7 @@ public class Appointment extends DBCommunicator implements Serializable, Compara
 		result = prime * result + ((appId == null) ? 0 : appId.hashCode());
 		result = prime * result + ((creator == null) ? 0 : creator.hashCode());
 		result = prime * result
-				+ ((daysAppearing == null) ? 0 : daysAppearing.hashCode());
-		result = prime * result
 				+ ((description == null) ? 0 : description.hashCode());
-		result = prime * result
-				+ ((endOfRepeatDate == null) ? 0 : endOfRepeatDate.hashCode());
 		result = prime * result + ((endTime == null) ? 0 : endTime.hashCode());
 		result = prime * result + (isPrivate ? 1231 : 1237);
 		result = prime * result
@@ -254,20 +224,10 @@ public class Appointment extends DBCommunicator implements Serializable, Compara
 				return false;
 		} else if (!creator.equals(other.creator))
 			return false;
-		if (daysAppearing == null) {
-			if (other.daysAppearing != null)
-				return false;
-		} else if (!daysAppearing.equals(other.daysAppearing))
-			return false;
 		if (description == null) {
 			if (other.description != null)
 				return false;
 		} else if (!description.equals(other.description))
-			return false;
-		if (endOfRepeatDate == null) {
-			if (other.endOfRepeatDate != null)
-				return false;
-		} else if (!endOfRepeatDate.equals(other.endOfRepeatDate))
 			return false;
 		if (endTime == null) {
 			if (other.endTime != null)

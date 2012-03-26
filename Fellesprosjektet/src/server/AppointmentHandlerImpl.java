@@ -94,9 +94,8 @@ public class AppointmentHandlerImpl extends Handler implements AppointmentHandle
 			ps.setString(4, description);
 			ps.setString(6, roomName);
 			ps.executeUpdate();
-		} catch (SQLException e1) {
-			e1.printStackTrace();
-			throw new RuntimeException("Feil i SQL!");
+		} catch (SQLException e) {
+			throw new StoopidSQLException(e);
 		}	
 		if (participants != null) {
 			for (Person user: participants.keySet()) {
