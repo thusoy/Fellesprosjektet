@@ -92,7 +92,7 @@ public class AppointmentHandlerImpl extends Handler implements AppointmentHandle
 			ps.setTimestamp(2, new Timestamp(start.getTime()));
 			ps.setTimestamp(3, new Timestamp(end.getTime()));
 			ps.setString(4, description);
-			ps.setString(6, roomName);
+			ps.setString(5, roomName);
 			ps.executeUpdate();
 		} catch (SQLException e) {
 			throw new StoopidSQLException(e);
