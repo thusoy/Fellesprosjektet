@@ -7,12 +7,18 @@ import static hashtools.Hash.createHash;
 
 import java.io.IOException;
 
-import server.Handler;
 import server.PersonHandler;
+import calendar.DBCommunicator;
 import calendar.Person;
 
-public class AuthHelper extends Handler{
+public class AuthHelper extends DBCommunicator{
 
+	private static PersonHandler personHandler;
+	
+	static {
+		personHandler = (PersonHandler) getHandler(PersonHandler.SERVICE_NAME);
+	}
+	
 	public static Person authenticateUser() throws IOException, InvalidLoginException, UserAbortException {
 		String email = getString("E-post: ");
 		String password = getString("Passord: ");
@@ -34,9 +40,7 @@ public class AuthHelper extends Handler{
 	}
 	
 	private static String getSalt(String email) throws IOException{
-		String query = "SELECT salt FROM User WHERE email='%s'";
-		String salt = dbEngine.getString(String.format(query, email));
-		return salt;
+		return personHandler.getSalt(email);
 	}
 	
 	/**
@@ -44,7 +48,7 @@ public class AuthHelper extends Handler{
 	 */
 	private static Person getUserFromEmailAndPassword(String email, String passwordHash) throws IOException{
 		long id = getUserIdFromEmail(email);
-		Person user = PersonHandler.getPerson(id);
+		Person user = personHandler.getPerson(id);
 		if (user.getPasswordHash().equals(passwordHash)){
 			return user;
 		} else {

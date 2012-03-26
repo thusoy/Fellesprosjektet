@@ -6,7 +6,7 @@ import static hashtools.Hash.createHash;
 import java.io.IOException;
 import java.io.Serializable;
 
-import server.PersonHandler;
+import server.PersonHandlerImpl;
 
 public class Person implements Serializable{
 
@@ -39,7 +39,7 @@ public class Person implements Serializable{
 		this.department = department;
 		setFirstSalt();
 		setPassword(password);
-		PersonHandler.createUser(this);
+		PersonHandlerImpl.createUser(this);
 	}
 	
 	private Person(){
@@ -53,7 +53,7 @@ public class Person implements Serializable{
 		p.setDepartment(department);
 		p.setPasswordHash(passwordHash);
 		p.setId(id);
-		String salt = PersonHandler.getSalt(id);
+		String salt = PersonHandlerImpl.getSalt(id);
 		p.salt = salt;
 		return p;
 	}
@@ -71,7 +71,7 @@ public class Person implements Serializable{
 	}
 	
 	public void followPerson(long otherUserId) throws IOException {
-		PersonHandler.followOtherPerson(id, otherUserId);
+		PersonHandlerImpl.followOtherPerson(id, otherUserId);
 	}
 	
 	/**
@@ -134,7 +134,7 @@ public class Person implements Serializable{
 	}
 	
 	public void delete() throws IOException{
-		PersonHandler.deleteUser(id);
+		PersonHandlerImpl.deleteUser(id);
 	}
 
 

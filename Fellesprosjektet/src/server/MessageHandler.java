@@ -83,7 +83,7 @@ public class MessageHandler extends Handler{
 		ResultSet rs = dbEngine.getResultSet(getParticipantsQuery, msgId);
 		try {
 			while (rs.next()){
-				Person p = PersonHandler.getPerson(rs.getLong("userId"));
+				Person p = PersonHandlerImpl.getPerson(rs.getLong("userId"));
 				receivers.add(p);
 			}
 		} catch (SQLException e) {
@@ -114,7 +114,7 @@ public class MessageHandler extends Handler{
 					msg = recreateMessage(id, title, content, dateSent);
 				} else {
 					Long rejectingUserId = rs.getObject("rejectingUser") == null ? null : rs.getLong("rejectingUser");
-					Person rejectingUser = PersonHandler.getPerson(rejectingUserId);
+					Person rejectingUser = PersonHandlerImpl.getPerson(rejectingUserId);
 					Appointment app = AppointmentHandlerImpl.getAppointment(appId);
 					msg = RejectedMessage.recreateRejectedMessage(id, title, content, dateSent, app, rejectingUser);
 				}
@@ -135,7 +135,7 @@ public class MessageHandler extends Handler{
 		try {
 			while(rs.next()){
 				long userId = rs.getLong(1);
-				Person p = PersonHandler.getPerson(userId);
+				Person p = PersonHandlerImpl.getPerson(userId);
 				receivers.add(p);
 			}
 		} catch (SQLException e) {
@@ -175,7 +175,7 @@ public class MessageHandler extends Handler{
 	
 	public static void sendMessageUserHasDenied(long appId, long userId) throws IOException {
 		Appointment app = getAppointment(appId);
-		Person p = PersonHandler.getPerson(userId);
+		Person p = PersonHandlerImpl.getPerson(userId);
 		String content = "%s %s har avslått avtalen '%s'.";
 		String formatted = String.format(content, p.getFirstname(), p.getLastname(), app.getTitle());
 		Message msg = new RejectedMessage("Avslag pŒ avtale", formatted, app, p);

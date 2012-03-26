@@ -5,15 +5,24 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import server.Handler;
+import rmi.DBHandler;
 import server.PersonHandler;
+import calendar.DBCommunicator;
 import calendar.Person;
 
-public class DBHelper extends Handler{
+public class DBHelper extends DBCommunicator{
 
+	private static PersonHandler personHandler;
+	private static DBHandler dbEngine;
+	
+	static {
+		personHandler = (PersonHandler) getHandler(PersonHandler.SERVICE_NAME);
+		dbEngine = (DBHandler) getHandler(DBHandler.SERVICE_NAME);
+	}
+	
 	public static Person getPersonFromEmail(String email) throws IOException{
 		long id = getUserIdFromEmail(email);
-		return PersonHandler.getPerson(id);
+		return personHandler.getPerson(id);
 	}
 	
 	public static long getUserIdFromEmail(String email) throws IOException{

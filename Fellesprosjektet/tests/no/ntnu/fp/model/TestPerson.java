@@ -13,7 +13,7 @@ import org.junit.Test;
 import calendar.Person;
 
 import server.Execute;
-import server.PersonHandler;
+import server.PersonHandlerImpl;
 
 public class TestPerson {
 	
@@ -50,7 +50,7 @@ public class TestPerson {
 	@Test
 	public void testIOWithDb() throws IOException{
 		Person p = new Person("john", "high", "lol", "komtek", "banan");
-		Person dbPerson = PersonHandler.getPerson(p.getId());
+		Person dbPerson = PersonHandlerImpl.getPerson(p.getId());
 		assertEquals("Personene skal være like!", p, dbPerson);
 	}
 	
