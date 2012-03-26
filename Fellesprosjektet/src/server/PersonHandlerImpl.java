@@ -160,4 +160,9 @@ public class PersonHandlerImpl extends Handler implements PersonHandler{
 		}
 	}
 
+	@Override
+	public long getUniqueId() throws IOException, RemoteException {
+		return dbEngine.getUniqueId();
+	}
+
 }

@@ -36,5 +36,5 @@ public interface MessageHandler extends Remote{
 	
 	public void sendMessageUserHasDenied(long appId, long userId) throws IOException, RemoteException;
 	
-
+	public long getUniqueId() throws IOException, RemoteException;
 }

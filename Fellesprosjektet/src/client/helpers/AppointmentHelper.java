@@ -172,6 +172,7 @@ public class AppointmentHelper extends DBCommunicator{
 		
 		Appointment app = new Appointment(title, startdate, enddate, isPrivate, participants, user);
 		setRoomOrPlace(app);
+		System.out.println("Apppid: " + app.getId());
 		app.save();
 		System.out.println("Ny avtale lagret!");
 	}

@@ -347,4 +347,9 @@ public class AppointmentHandlerImpl extends Handler implements AppointmentHandle
 		}
 	}
 
+	@Override
+	public long getUniqueId() throws IOException, RemoteException {
+		return dbEngine.getUniqueId();
+	}
+
 }

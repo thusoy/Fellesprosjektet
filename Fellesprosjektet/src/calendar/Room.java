@@ -19,6 +19,7 @@ public class Room extends DBCommunicator implements Comparable<Room>, Serializab
 		if (capacity < 1){
 			throw new IllegalArgumentException("Et rom må ha plass til minst én person!");
 		}
+		bindToHandler();
 		this.name = name;
 		this.capacity = capacity;
 		roomHandler.createRoom(this);

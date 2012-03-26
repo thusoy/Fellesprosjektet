@@ -35,7 +35,6 @@ public class Appointment extends DBCommunicator implements Serializable, Compara
 			appHandler = (AppointmentHandler) getHandler(AppointmentHandler.SERVICE_NAME);
 	}
 	
-	
 	/**
 	 * Creates an appointment and saves the object to the database.
 	 * @param title
@@ -48,6 +47,7 @@ public class Appointment extends DBCommunicator implements Serializable, Compara
 	 */
 	public Appointment(String title, Date startTime, Date endTime, boolean isPrivate, 
 			Map<Person, Boolean> participants, Person creator) throws IOException {
+		bindToHandler();
 		this.title = title;
 		this.creator = creator;
 		setStartTime(startTime);
@@ -56,6 +56,7 @@ public class Appointment extends DBCommunicator implements Serializable, Compara
 		this.participants = participants != null ? participants : new HashMap<Person, Boolean>();
 		this.description = new String();
 		this.daysAppearing = new TreeSet<Day>();
+		appId = appHandler.getUniqueId();
 		appHandler.createAppointment(this);
 	}
 	

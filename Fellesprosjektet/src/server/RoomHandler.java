@@ -17,5 +17,6 @@ public interface RoomHandler extends Remote{
 	public Room getRoom(String name) throws IOException, RemoteException;
 	
 	public List<Room> availableRooms(Date start, Date end, int capacity) throws IOException, RemoteException;
-
+	
+	public long getUniqueId() throws IOException, RemoteException;
 }

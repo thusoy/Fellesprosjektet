@@ -1,6 +1,7 @@
 package server;
 
 import java.io.IOException;
+import java.rmi.RemoteException;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -60,5 +61,10 @@ public class RoomHandlerImpl extends Handler implements RoomHandler{
 			throw new StoopidSQLException(e);
 		}
 		return rooms;
+	}
+
+	@Override
+	public long getUniqueId() throws IOException, RemoteException {
+		return dbEngine.getUniqueId();
 	}
 }
