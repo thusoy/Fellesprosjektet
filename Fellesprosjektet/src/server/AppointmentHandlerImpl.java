@@ -21,7 +21,6 @@ import calendar.Appointment;
 import calendar.Message;
 import calendar.Person;
 import client.helpers.StoopidSQLException;
-import dateutils.Day;
 
 public class AppointmentHandlerImpl extends Handler implements AppointmentHandler {
 	private static PersonHandler personHandler;
@@ -34,12 +33,9 @@ public class AppointmentHandlerImpl extends Handler implements AppointmentHandle
 	
 	public void createAppointment(Appointment app) throws IOException, RemoteException {
 		String query = "INSERT INTO Appointment(appId, title, place, startTime, endTime, " +
-					"description, daysAppearing, endOfRepeatDate, roomName, isPrivate, " + 
-					"creatorId) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+					"description, roomName, isPrivate, creatorId) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)";
 		Date start = app.getStartTime();
 		Date end = app.getEndTime();
-		String daysAppearing = app.getDaysAppearing().toString();
-		Date endOfRepeat = app.getEndOfRepeatDate();
 		long appId = dbEngine.getUniqueId();
 		app.setAppId(appId);
 		try {
@@ -50,11 +46,9 @@ public class AppointmentHandlerImpl extends Handler implements AppointmentHandle
 			ps.setTimestamp(4, new Timestamp(start.getTime()));
 			ps.setTimestamp(5, new Timestamp(end.getTime()));
 			ps.setString(6, app.getDescription());
-			ps.setString(7, daysAppearing);
-			ps.setDate(8, endOfRepeat);
-			ps.setString(9, app.getRoomName());
-			ps.setBoolean(10, app.isPrivate());
-			ps.setLong(11, app.getCreator().getId());
+			ps.setString(7, app.getRoomName());
+			ps.setBoolean(8, app.isPrivate());
+			ps.setLong(9, app.getCreator().getId());
 			ps.executeUpdate();
 		} catch (SQLException e) {
 			throw new StoopidSQLException(e);
@@ -80,9 +74,6 @@ public class AppointmentHandlerImpl extends Handler implements AppointmentHandle
 		Date start = app.getStartTime();
 		Date end = app.getEndTime();
 		String description = app.getDescription();
-		String rawText = app.getDaysAppearing() != null ? app.getDaysAppearing().toString() : null;
-		String daysAppearing = rawText != null ? rawText : null;
-		Date endOfRepeat = app.getEndOfRepeatDate();
 		String roomName = app.getRoomName();
 		Map<Person, Boolean> participants = app.getParticipants();
 		boolean isPrivate = app.isPrivate();
@@ -91,7 +82,7 @@ public class AppointmentHandlerImpl extends Handler implements AppointmentHandle
 		
 		String query =
 				"UPDATE Appointment SET place=?, title='%s', startTime=?, endTime=?, " +
-				"description=?, daysAppearing=?, endOfRepeatDate=?, roomName=?, isPrivate=%b, " +
+				"description=?, roomName=?, isPrivate=%b, " +
 				" creatorId=%d WHERE appId=%d";		
 
 		try {
@@ -101,9 +92,7 @@ public class AppointmentHandlerImpl extends Handler implements AppointmentHandle
 			ps.setTimestamp(2, new Timestamp(start.getTime()));
 			ps.setTimestamp(3, new Timestamp(end.getTime()));
 			ps.setString(4, description);
-			ps.setString(5, daysAppearing);
-			ps.setDate(6, endOfRepeat);
-			ps.setString(7, roomName);
+			ps.setString(6, roomName);
 			ps.executeUpdate();
 		} catch (SQLException e1) {
 			e1.printStackTrace();
@@ -168,19 +157,6 @@ public class AppointmentHandlerImpl extends Handler implements AppointmentHandle
 		}
 	}
 	
-	private static Boolean getInviteStatusOnUser(long appId, long userId) throws IOException {
-		String query = "SELECT hasAccepted FROM UserAppointments " +
-				"WHERE appId=? AND userId=?";
-		try {
-			ResultSet rs = dbEngine.getResultSet(query, appId, userId);
-			rs.next();
-			Object bool = rs.getObject("hasAccepted");
-			return bool == null ? null : rs.getBoolean("hasAccepted");
-		} catch (SQLException e) {
-			throw new StoopidSQLException(e);
-		}
-	}
-	
 	public void addUserToAppointment(long appId, long userId) throws IOException {
 		String query = "INSERT INTO UserAppointments(appId, userId, hasAccepted) VALUES(?, ?, null)";
 		dbEngine.update(query, appId, userId);
@@ -220,8 +196,6 @@ public class AppointmentHandlerImpl extends Handler implements AppointmentHandle
 				Date startTime = new Date(rs.getTimestamp("startTime").getTime());
 				Date endTime = new Date(rs.getTimestamp("endTime").getTime());
 				String description = rs.getString("description");
-				String daysAppearing = rs.getString("daysAppearing");
-				Date endOfRepeat = rs.getDate("endOfRepeatDate");
 				String roomName = rs.getString("roomName");
 				boolean isPrivate = rs.getBoolean("isPrivate");
 				long creatorId = rs.getLong("creatorId");
@@ -231,8 +205,6 @@ public class AppointmentHandlerImpl extends Handler implements AppointmentHandle
 				Appointment a = recreateAppointment(id, title, startTime, endTime, isPrivate, participants, creator);
 				a.setPlace(place);
 				a.setDescription(description);
-				a.setDaysAppearing(Day.fromSetString(daysAppearing));
-				a.setEndOfRepeatDate(endOfRepeat);
 				a.setRoomName(roomName);
 				appointments.add(a);
 			}

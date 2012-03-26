@@ -68,14 +68,6 @@ public class Message extends DBCommunicator implements Comparable<Message>, Seri
 		return dateSent;
 	}
 	
-	public void addReceiver(Person p) throws IOException{
-		msgHandler.sendMessageToUser(msgId, p.getId());
-		if (receivers == null){
-			receivers = new ArrayList<Person>();
-		}
-		receivers.add(p);
-	}
-	
 	/**
 	 * Sets the given receivers as receivers of the message, and sends it out.
 	 * @param receivers

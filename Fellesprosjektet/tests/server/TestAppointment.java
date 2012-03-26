@@ -1,15 +1,10 @@
 package server;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.sql.Date;
-import java.sql.SQLException;
-import java.util.HashMap;
 
-
-import org.junit.Before;
 import org.junit.Test;
 
 import calendar.Appointment;
@@ -59,15 +54,15 @@ public class TestAppointment {
 //		Date third = new Date(now + 3*dayInMs);
 //	}
 	
-	@Test
-	public void testUpdateAppointment() throws IOException {
-		Person john = new Person("john", "high", "lol@1.no", "komtek", "banan");
-		Date date = new Date(System.currentTimeMillis());
-		Appointment a1 = new Appointment("tannlege", date, date, false, null, john);
-		a1.setTitle("handletur");
-		AppointmentHandlerImpl.updateAppointment(a1);
-		assertTrue("Tittel skal v¾re lik", a1.getTitle().equals("handletur"));
-	}
+//	@Test
+//	public void testUpdateAppointment() throws IOException {
+//		Person john = new Person("john", "high", "lol@1.no", "komtek", "banan");
+//		Date date = new Date(System.currentTimeMillis());
+//		Appointment a1 = new Appointment("tannlege", date, date, false, null, john);
+//		a1.setTitle("handletur");
+//		AppointmentHandlerImpl.updateAppointment(a1);
+//		assertTrue("Tittel skal v¾re lik", a1.getTitle().equals("handletur"));
+//	}
 	
 //	@Test
 //	public void testAcceptInviteAppointment() throws IOException {
@@ -90,16 +85,16 @@ public class TestAppointment {
 //		a1.delete();
 //	}
 	
-	@Test
-	public void testInviteAppointment() throws IOException {
-		Person john = new Person("john", "high", "lol@2.no", "komtek", "banan");
-		Person jo = new Person("jo", "high", "lol@22.no", "komtek", "banan");
-		Date date = new Date(System.currentTimeMillis());
-		Appointment a1 = new Appointment("tannlege", date, date, false, null, john);
-		HashMap<Person, Boolean> participants = new HashMap<Person, Boolean>();
-		participants.put(jo, null);
-		a1.setParticipants(participants);
-		a1.save();
-		MessageHandlerImpl.sendMessageUserHasDenied(a1.getId(), jo.getId());
-	}
+//	@Test
+//	public void testInviteAppointment() throws IOException {
+//		Person john = new Person("john", "high", "lol@2.no", "komtek", "banan");
+//		Person jo = new Person("jo", "high", "lol@22.no", "komtek", "banan");
+//		Date date = new Date(System.currentTimeMillis());
+//		Appointment a1 = new Appointment("tannlege", date, date, false, null, john);
+//		HashMap<Person, Boolean> participants = new HashMap<Person, Boolean>();
+//		participants.put(jo, null);
+//		a1.setParticipants(participants);
+//		a1.save();
+//		MessageHandlerImpl.sendMessageUserHasDenied(a1.getId(), jo.getId());
+//	}
 }

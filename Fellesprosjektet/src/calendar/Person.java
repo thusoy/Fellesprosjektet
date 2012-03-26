@@ -49,6 +49,7 @@ public class Person extends DBCommunicator implements Serializable{
 	}
 	
 	public static Person recreatePerson(long id, String firstname, String lastname, String email, String department, String passwordHash) throws IOException{
+		bindToHandler();
 		Person p = new Person();
 		p.setFirstname(firstname);
 		p.setLastname(lastname);
