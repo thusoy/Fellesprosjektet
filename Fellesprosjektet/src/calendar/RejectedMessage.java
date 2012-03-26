@@ -8,11 +8,16 @@ import java.io.IOException;
 import java.sql.Date;
 import java.util.Arrays;
 
-import server.AppointmentHandlerImpl;
-import server.MessageHandler;
+import server.AppointmentHandler;
 import client.helpers.UserAbortException;
 
 public class RejectedMessage extends Message {
+	
+	private static AppointmentHandler appHandler;
+	
+	public static void bindToHandler(){
+			appHandler = (AppointmentHandler) getHandler(AppointmentHandler.SERVICE_NAME);
+	}
 	
 	private static final long serialVersionUID = -8817341040992007302L;
 	private Appointment app;
@@ -28,7 +33,7 @@ public class RejectedMessage extends Message {
 		this.title = title;
 		this.content = content;
 		setDateSent(new Date(System.currentTimeMillis()));
-		MessageHandler.createMessage(this);
+		msgHandler.createMessage(this);
 	}
 	
 	private RejectedMessage(long id){
@@ -69,8 +74,8 @@ public class RejectedMessage extends Message {
 			deleteAppointment(user, app);
 			break;
 		case 2:
-//			AppointmentHandlerImpl.deleteUserFromAppointment(app.getId(), rejectingUser.getId());
-//			System.out.printf("%s fjernet fra avtalen!\n", rejectingUser);
+			appHandler.deleteUserFromAppointment(app.getId(), rejectingUser.getId());
+			System.out.printf("%s fjernet fra avtalen!\n", rejectingUser);
 		}
 		
 	}

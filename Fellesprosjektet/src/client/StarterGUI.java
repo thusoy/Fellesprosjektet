@@ -21,9 +21,10 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-import server.AppointmentHandlerImpl;
+import server.AppointmentHandler;
 import server.MessageHandler;
 import calendar.Appointment;
+import calendar.DBCommunicator;
 import calendar.Message;
 import calendar.Person;
 import calendar.RejectedMessage;
@@ -31,11 +32,18 @@ import client.helpers.InvalidLoginException;
 import client.helpers.UserAbortException;
 import dateutils.Day;
 
-public class StarterGUI {
+public class StarterGUI extends DBCommunicator{
 	
 	private SimpleTextGUI gui;
 	private Person user;
 	private int weekNum;
+	private static AppointmentHandler appHandler;
+	private static MessageHandler msgHandler;
+	
+	static {
+		appHandler = (AppointmentHandler) getHandler(AppointmentHandler.SERVICE_NAME);
+		msgHandler = (MessageHandler) getHandler(MessageHandler.SERVICE_NAME);
+	}
 	
 	public static void main(String[] args) {
 		try {
@@ -72,8 +80,8 @@ public class StarterGUI {
 		CalendarFunction[] allFunc = CalendarFunction.values();
 		while(true){
 			showWeek();
-			int numUnansweredMeetings = AppointmentHandlerImpl.getAllUnansweredInvites(user.getId()).size();
-			int numNewMessages = MessageHandler.getUnreadMessagesForUser(user).size();
+			int numUnansweredMeetings = appHandler.getAllUnansweredInvites(user.getId()).size();
+			int numNewMessages = msgHandler.getUnreadMessagesForUser(user).size();
 			SimpleTextGUI.setInputText("Hva vil du gjøre?");
 			List<String> choices = new ArrayList<String>();
 			for(CalendarFunction cf: allFunc){
@@ -147,7 +155,7 @@ public class StarterGUI {
 	}
 	
 	private void showMessages() throws IOException, UserAbortException {
-		List<Message> unreadMessages = MessageHandler.getUnreadMessagesForUser(user);
+		List<Message> unreadMessages = msgHandler.getUnreadMessagesForUser(user);
 		System.out.print("Hvilken melding vil du lese? \n");
 		int userInput = promptChoice(unreadMessages);
 		Message selected = unreadMessages.get(userInput);
@@ -160,7 +168,7 @@ public class StarterGUI {
 	}
 
 	private void showInvites() throws IOException, UserAbortException {
-		List<Appointment> allInvited = AppointmentHandlerImpl.getAllUnansweredInvites(user.getId());
+		List<Appointment> allInvited = appHandler.getAllUnansweredInvites(user.getId());
 		System.out.print("Hvilken innkalling vil du svare på? ");
 		int userNum = promptChoice(allInvited);
 		answerInvite(allInvited.get(userNum));
@@ -209,6 +217,7 @@ public class StarterGUI {
 	 * @param appointments
 	 */
 	private List<String>[] splitAppointmentsByDay(List<Appointment> appointments){
+		@SuppressWarnings("unchecked")
 		List<String>[] days = (List<String>[]) new ArrayList[7];
 		for(int i = 0; i < Day.values().length; i++){
 			days[i] = new ArrayList<String>();

@@ -100,6 +100,6 @@ public class TestAppointment {
 		participants.put(jo, null);
 		a1.setParticipants(participants);
 		a1.save();
-		MessageHandler.sendMessageUserHasDenied(a1.getId(), jo.getId());
+		MessageHandlerImpl.sendMessageUserHasDenied(a1.getId(), jo.getId());
 	}
 }

@@ -1,16 +1,19 @@
 package calendar;
 
 import java.io.IOException;
-import java.sql.Date;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.io.Serializable;
 
 import server.RoomHandler;
 
-public class Room implements Comparable<Room>{
+public class Room extends DBCommunicator implements Comparable<Room>, Serializable{
+	private static final long serialVersionUID = -452046361331320586L;
 	private String name;
 	private int capacity;
-	private LinkedHashMap<Date, Date> isOccupied;
+	private static RoomHandler roomHandler;
+	
+	public static void bindToHandler(){
+		roomHandler = (RoomHandler) getHandler(RoomHandler.SERVICE_NAME);
+	}
 	
 	public Room(String name, int capacity) throws IOException{
 		if (capacity < 1){
@@ -18,8 +21,7 @@ public class Room implements Comparable<Room>{
 		}
 		this.name = name;
 		this.capacity = capacity;
-		isOccupied = new LinkedHashMap<Date, Date>();
-		RoomHandler.createRoom(this);
+		roomHandler.createRoom(this);
 	}
 	
 	private Room(){
@@ -29,7 +31,6 @@ public class Room implements Comparable<Room>{
 		Room room = new Room();
 		room.name = name;
 		room.capacity = capacity;
-		room.isOccupied = new LinkedHashMap<Date, Date>();
 		return room;
 	}
 	
@@ -45,10 +46,6 @@ public class Room implements Comparable<Room>{
 		this.capacity = capacity;
 	}
 
-	public Map<Date, Date> getIsOccupied() {
-		return isOccupied;
-	}
-	
 	@Override
 	public String toString(){
 		return String.format("%s (%d)", name, capacity);
@@ -59,8 +56,6 @@ public class Room implements Comparable<Room>{
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + capacity;
-		result = prime * result
-				+ ((isOccupied == null) ? 0 : isOccupied.hashCode());
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
 		return result;
 	}
@@ -75,11 +70,6 @@ public class Room implements Comparable<Room>{
 			return false;
 		Room other = (Room) obj;
 		if (capacity != other.capacity)
-			return false;
-		if (isOccupied == null) {
-			if (other.isOccupied != null)
-				return false;
-		} else if (!isOccupied.equals(other.isOccupied))
 			return false;
 		if (name == null) {
 			if (other.name != null)

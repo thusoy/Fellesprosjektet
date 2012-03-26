@@ -10,7 +10,7 @@ import java.util.List;
 
 import server.MessageHandler;
 
-public class Message implements Comparable<Message>, Serializable {
+public class Message extends DBCommunicator implements Comparable<Message>, Serializable {
 	
 	private static final long serialVersionUID = 5103325888593276747L;
 	protected long msgId;
@@ -18,6 +18,11 @@ public class Message implements Comparable<Message>, Serializable {
 	protected String content;
 	protected String title;
 	private List<Person> receivers;
+	protected static MessageHandler msgHandler;
+	
+	public static void bindToHandler(){
+			msgHandler = (MessageHandler) getHandler(MessageHandler.SERVICE_NAME);
+	}
 	
 	/**
 	 * Created as Message object and saved it to the database.
@@ -30,7 +35,7 @@ public class Message implements Comparable<Message>, Serializable {
 		this.content=content;
 		setDateSent(new Date(System.currentTimeMillis()));
 		receivers = new ArrayList<Person>();
-		MessageHandler.createMessage(this);
+		msgHandler.createMessage(this);
 	}
 	
 	protected Message(long id){
@@ -48,7 +53,7 @@ public class Message implements Comparable<Message>, Serializable {
 	}
 	
 	public Message showMessage(Person user) throws IOException {
-		MessageHandler.setMessageAsRead(msgId, user.getId());
+		msgHandler.setMessageAsRead(msgId, user.getId());
 		return this;
 	}
 	
@@ -61,7 +66,7 @@ public class Message implements Comparable<Message>, Serializable {
 	}
 	
 	public void addReceiver(Person p) throws IOException{
-		MessageHandler.sendMessageToUser(msgId, p.getId());
+		msgHandler.sendMessageToUser(msgId, p.getId());
 		if (receivers == null){
 			receivers = new ArrayList<Person>();
 		}
@@ -74,12 +79,12 @@ public class Message implements Comparable<Message>, Serializable {
 	 * @throws IOException
 	 */
 	public void setReceivers(List<Person> receivers) throws IOException{
-		MessageHandler.deleteOldReceivers(msgId);
+		msgHandler.deleteOldReceivers(msgId);
 		if (receivers == null){
 			this.receivers = new ArrayList<Person>();
 		} else {
 			this.receivers = receivers;
-			MessageHandler.sendMessageToAllParticipants(this);
+			msgHandler.sendMessageToAllParticipants(this);
 		}
 	}
 	

@@ -25,9 +25,11 @@ import dateutils.Day;
 
 public class AppointmentHandlerImpl extends Handler implements AppointmentHandler {
 	private static PersonHandler personHandler;
+	private static MessageHandler msgHandler;
 	
 	public static void init(){
 		personHandler = new PersonHandlerImpl();
+		msgHandler = new MessageHandlerImpl();
 	}
 	
 	public void createAppointment(Appointment app) throws IOException, RemoteException {
@@ -70,7 +72,7 @@ public class AppointmentHandlerImpl extends Handler implements AppointmentHandle
 		String query = "UPDATE UserAppointments SET hasAccepted=%b WHERE userId=? AND appId=?";
 		dbEngine.update(String.format(query, answer), userId, appId);
 		if (answer == false){
-			MessageHandler.sendMessageUserHasDenied(appId, userId);
+			msgHandler.sendMessageUserHasDenied(appId, userId);
 		}
 	}
 	

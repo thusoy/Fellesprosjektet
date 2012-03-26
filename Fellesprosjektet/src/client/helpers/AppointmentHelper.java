@@ -21,7 +21,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import server.AppointmentHandler;
-import server.PersonHandlerImpl;
+import server.PersonHandler;
 import server.RoomHandler;
 import calendar.Appointment;
 import calendar.DBCommunicator;
@@ -33,15 +33,19 @@ public class AppointmentHelper extends DBCommunicator{
 	private static final String DATE_FORMAT_STRING = "dd-MM-yyyy HH:mm";
 	private static final DateFormat DATE_FORMAT =  new SimpleDateFormat(DATE_FORMAT_STRING);
 	private static AppointmentHandler appHandler;
+	private static PersonHandler personHandler;
+	private static RoomHandler roomHandler;
 	
 	static {
 			appHandler = (AppointmentHandler) getHandler(AppointmentHandler.SERVICE_NAME);
+			personHandler = (PersonHandler) getHandler(PersonHandler.SERVICE_NAME);
+			roomHandler = (RoomHandler) getHandler(RoomHandler.SERVICE_NAME);
 	}
 
 	public static List<Appointment> getWeekAppointments(Person user, int weekNum) throws IOException{
 		List<Appointment> appointments = appHandler.getAllCreated(user.getId(), weekNum);
 		List<Appointment> app = appHandler.getAllInvitedInWeek(user.getId(), weekNum);	
-		List<Appointment> apps = PersonHandlerImpl.getFollowAppointments(user.getId(), weekNum);
+		List<Appointment> apps = personHandler.getFollowAppointments(user.getId(), weekNum);
 		appointments.addAll(apps);
 		appointments.addAll(app);
 		Collections.sort(appointments);		
@@ -51,7 +55,7 @@ public class AppointmentHelper extends DBCommunicator{
 	public static List<Appointment> getAllAppointments(Person user) throws IOException{
 		List<Appointment> created = appHandler.getAllByUser(user.getId());
 		List<Appointment> invited = appHandler.getAllInvited(user.getId());		
-		List<Appointment> follows = PersonHandlerImpl.getFollowAppointments(user.getId());
+		List<Appointment> follows = personHandler.getFollowAppointments(user.getId());
 		created.addAll(follows);
 		created.addAll(invited);
 		Set<Appointment> sortedUnique = new TreeSet<Appointment>();
@@ -188,7 +192,7 @@ public class AppointmentHelper extends DBCommunicator{
 	}
 	
 	private static void reserveRoom(Appointment app) throws IOException, UserAbortException {
-		List<Room> rooms = RoomHandler.availableRooms(app.getStartTime(), app.getEndTime(), app.getParticipants().size());
+		List<Room> rooms = roomHandler.availableRooms(app.getStartTime(), app.getEndTime(), app.getParticipants().size());
 		System.out.println("Reserver møterom: ");
 		int chosenRoom = promptChoice(rooms);
 		app.setRoomName(rooms.get(chosenRoom).getName());

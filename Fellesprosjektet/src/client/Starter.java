@@ -41,6 +41,7 @@ public class Starter extends DBCommunicator{
 	
 	static {
 			appHandler = (AppointmentHandler) getHandler(AppointmentHandler.SERVICE_NAME);
+			msgHandler = (MessageHandler) getHandler(MessageHandler.SERVICE_NAME);
 	}
 	
 	public static void main(String[] args) {
@@ -80,7 +81,7 @@ public class Starter extends DBCommunicator{
 		while(true){
 			showWeek();
 			int numUnansweredMeetings = appHandler.getAllUnansweredInvites(user.getId()).size();
-			int numNewMessages = MessageHandler.getUnreadMessagesForUser(user).size();
+			int numNewMessages = msgHandler.getUnreadMessagesForUser(user).size();
 			System.out.println("Hva vil du gjøre?");
 			List<String> choices = new ArrayList<String>();
 			for(CalendarFunction cf: allFunc){
@@ -149,7 +150,7 @@ public class Starter extends DBCommunicator{
 	}
 	
 	private void showMessages() throws IOException, UserAbortException {
-		List<Message> unreadMessages = MessageHandler.getUnreadMessagesForUser(user);
+		List<Message> unreadMessages = msgHandler.getUnreadMessagesForUser(user);
 		if (unreadMessages.size() > 0){
 			System.out.println("Hvilken melding vil du lese?");
 			int userInput = promptChoice(unreadMessages);
@@ -215,6 +216,7 @@ public class Starter extends DBCommunicator{
 	 * @param appointments
 	 */
 	private List<String>[] splitAppointmentsByDay(List<Appointment> appointments){
+		@SuppressWarnings("unchecked")
 		List<String>[] days = (List<String>[]) new ArrayList[7];
 		for(int i = 0; i < Day.values().length; i++){
 			days[i] = new ArrayList<String>();
