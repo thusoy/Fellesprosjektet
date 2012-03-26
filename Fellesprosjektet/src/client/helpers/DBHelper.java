@@ -1,11 +1,7 @@
 package client.helpers;
 
 import java.io.IOException;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 
-import rmi.DBHandler;
 import server.PersonHandler;
 import calendar.DBCommunicator;
 import calendar.Person;
@@ -13,11 +9,9 @@ import calendar.Person;
 public class DBHelper extends DBCommunicator{
 
 	private static PersonHandler personHandler;
-	private static DBHandler dbEngine;
 	
 	static {
 		personHandler = (PersonHandler) getHandler(PersonHandler.SERVICE_NAME);
-		dbEngine = (DBHandler) getHandler(DBHandler.SERVICE_NAME);
 	}
 	
 	public static Person getPersonFromEmail(String email) throws IOException{
@@ -26,31 +20,10 @@ public class DBHelper extends DBCommunicator{
 	}
 	
 	public static long getUserIdFromEmail(String email) throws IOException{
-		String query = "SELECT userId FROM User WHERE email=?";
-		try {
-			PreparedStatement ps = dbEngine.getPreparedStatement(query);
-			ps.setString(1, email);
-			ResultSet rs = ps.executeQuery();
-			if (rs.next()){
-				return rs.getLong("userId");
-			}
-			throw new IllegalArgumentException("Ugyldig e-postadresse!");
-		} catch (SQLException e) {
-			e.printStackTrace();
-			throw new IllegalArgumentException("Ugyldig e-postadresse!"); 
-		}
+		return personHandler.getUserIdFromEmail(email);
 	}
 	
 	public static boolean isValidEmail(String email) throws IOException{
-		String query = "SELECT * FROM User WHERE email=?";
-		try {
-			PreparedStatement ps = dbEngine.getPreparedStatement(query);
-			ps.setString(1, email);
-			ResultSet rs = ps.executeQuery();
-			return rs.next();
-		} catch (SQLException e) {
-			e.printStackTrace();
-			throw new RuntimeException("Feil i sQL!");
-		}
+		return personHandler.isValidEmail(email);
 	}
 }

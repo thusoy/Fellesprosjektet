@@ -129,4 +129,35 @@ public class PersonHandlerImpl extends Handler implements PersonHandler{
 		return list;
 	}
 
+	@Override
+	public boolean isValidEmail(String email) throws RemoteException, IOException {
+		String query = "SELECT * FROM User WHERE email=?";
+		try {
+			PreparedStatement ps = dbEngine.getPreparedStatement(query);
+			ps.setString(1, email);
+			ResultSet rs = ps.executeQuery();
+			return rs.next();
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new RuntimeException("Feil i sQL!");
+		}
+	}
+
+	@Override
+	public long getUserIdFromEmail(String email) throws RemoteException, IOException {
+		String query = "SELECT userId FROM User WHERE email=?";
+		try {
+			PreparedStatement ps = dbEngine.getPreparedStatement(query);
+			ps.setString(1, email);
+			ResultSet rs = ps.executeQuery();
+			if (rs.next()){
+				return rs.getLong("userId");
+			}
+			throw new IllegalArgumentException("Ugyldig e-postadresse!");
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new IllegalArgumentException("Ugyldig e-postadresse!"); 
+		}
+	}
+
 }

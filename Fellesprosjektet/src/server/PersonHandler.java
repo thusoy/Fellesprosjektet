@@ -22,6 +22,10 @@ public interface PersonHandler extends Remote{
 	
 	public String getSalt(String email) throws RemoteException, IOException;
 	
+	public boolean isValidEmail(String email) throws RemoteException, IOException;
+	
+	public long getUserIdFromEmail(String email) throws RemoteException, IOException;
+	
 	public void followOtherPerson(long userId, long otherUserId) throws RemoteException, IOException;
 	
 	public List<Appointment> getFollowAppointments(long userId, int weekNum) throws IOException, RemoteException;

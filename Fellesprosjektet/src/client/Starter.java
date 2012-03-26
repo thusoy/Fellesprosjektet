@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import server.AppointmentHandler;
-import server.AppointmentHandlerImpl;
 import server.MessageHandler;
 import calendar.Appointment;
 import calendar.DBCommunicator;
