@@ -24,9 +24,10 @@ import client.helpers.StoopidSQLException;
 import dateutils.Day;
 
 public class AppointmentHandlerImpl extends Handler implements AppointmentHandler {
+	private static PersonHandler personHandler;
 	
 	public AppointmentHandlerImpl() {
-		super("APPOINTMENT_HANDLER");
+		personHandler = new PersonHandlerImpl();
 	}
 
 	public void createAppointment(Appointment app) throws IOException, RemoteException {
@@ -228,7 +229,7 @@ public class AppointmentHandlerImpl extends Handler implements AppointmentHandle
 				String roomName = rs.getString("roomName");
 				boolean isPrivate = rs.getBoolean("isPrivate");
 				long creatorId = rs.getLong("creatorId");
-				Person creator = PersonHandler.getPerson(creatorId);
+				Person creator = personHandler.getPerson(creatorId);
 				Map<Person, Boolean> participants = convertIdsToPersons(getParticipants(id));
 				Appointment a = recreateAppointment(id, title, startTime, endTime, isPrivate, participants, creator);
 				a.setPlace(place);
@@ -247,7 +248,7 @@ public class AppointmentHandlerImpl extends Handler implements AppointmentHandle
 	private static Map<Person, Boolean> convertIdsToPersons(Map<Long, Boolean> participants) throws IOException{
 		Map<Person, Boolean> out = new HashMap<Person, Boolean>();
 		for (Long i: participants.keySet()){
-			out.put(PersonHandler.getPerson(i), participants.get(i));
+			out.put(personHandler.getPerson(i), participants.get(i));
 		}
 		return out;
 	}

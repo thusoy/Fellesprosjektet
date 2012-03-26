@@ -157,4 +157,19 @@ public class ExecutionEngine implements DBHandler{
 		}
 	} 
 	
+	public String getString(String query, String field) throws IOException{
+		PreparedStatement ps = getPreparedStatement(query);
+		try {
+			ps.setString(1, field);
+			ResultSet rs = ps.executeQuery();
+			if (rs.next()){
+				return rs.getString(1);
+			} else {
+				throw new IllegalArgumentException("Empty resultset!");
+			}
+		} catch (SQLException e) {
+			throw new StoopidSQLException(e);
+		}
+	} 
+	
 }

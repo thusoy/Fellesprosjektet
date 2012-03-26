@@ -8,6 +8,7 @@ import java.sql.ResultSet;
 import java.util.List;
 
 public interface DBHandler extends Remote{
+	public static final String SERVICE_NAME = "DB_HANDLER";
 	
 	public boolean getBoolean(PreparedStatement ps) throws RemoteException, IOException;
 	
@@ -28,5 +29,7 @@ public interface DBHandler extends Remote{
 	public String getString(String query, long id) throws RemoteException, IOException;
 	
 	public int getInt(String query, String field) throws RemoteException, IOException;
+	
+	public String getString(String query, String field) throws IOException, RemoteException;
 		
 }

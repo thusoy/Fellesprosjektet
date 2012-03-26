@@ -21,7 +21,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import server.AppointmentHandler;
-import server.PersonHandler;
+import server.PersonHandlerImpl;
 import server.RoomHandler;
 import calendar.Appointment;
 import calendar.DBCommunicator;
@@ -41,7 +41,7 @@ public class AppointmentHelper extends DBCommunicator{
 	public static List<Appointment> getWeekAppointments(Person user, int weekNum) throws IOException{
 		List<Appointment> appointments = appHandler.getAllCreated(user.getId(), weekNum);
 		List<Appointment> app = appHandler.getAllInvitedInWeek(user.getId(), weekNum);	
-		List<Appointment> apps = PersonHandler.getFollowAppointments(user.getId(), weekNum);
+		List<Appointment> apps = PersonHandlerImpl.getFollowAppointments(user.getId(), weekNum);
 		appointments.addAll(apps);
 		appointments.addAll(app);
 		Collections.sort(appointments);		
@@ -51,7 +51,7 @@ public class AppointmentHelper extends DBCommunicator{
 	public static List<Appointment> getAllAppointments(Person user) throws IOException{
 		List<Appointment> created = appHandler.getAllByUser(user.getId());
 		List<Appointment> invited = appHandler.getAllInvited(user.getId());		
-		List<Appointment> follows = PersonHandler.getFollowAppointments(user.getId());
+		List<Appointment> follows = PersonHandlerImpl.getFollowAppointments(user.getId());
 		created.addAll(follows);
 		created.addAll(invited);
 		Set<Appointment> sortedUnique = new TreeSet<Appointment>();
