@@ -3,8 +3,6 @@ package server;
 import static calendar.Appointment.recreateAppointment;
 import static dateutils.DateUtils.getEndOfWeek;
 import static dateutils.DateUtils.getStartOfWeek;
-import static server.Execute.getUniqueId;
-import static server.Execute.update;
 
 import java.io.IOException;
 import java.rmi.RemoteException;
@@ -19,17 +17,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import rmi.DBAccess;
 import calendar.Appointment;
 import calendar.Message;
 import calendar.Person;
 import client.helpers.StoopidSQLException;
 import dateutils.Day;
 
-public class AppointmentHandler implements DBAccess {
-	public static final String SERVICE_NAME = "AppointmentHandler";
+public class AppointmentHandler extends Handler {
 	
-	public void createAppointment(Appointment app) throws IOException, RemoteException {
+	public static void createAppointment(Appointment app) throws IOException, RemoteException {
 		String query = "INSERT INTO Appointment(appId, title, place, startTime, endTime, " +
 					"description, daysAppearing, endOfRepeatDate, roomName, isPrivate, " + 
 					"creatorId) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
@@ -37,10 +33,10 @@ public class AppointmentHandler implements DBAccess {
 		Date end = app.getEndTime();
 		String daysAppearing = app.getDaysAppearing().toString();
 		Date endOfRepeat = app.getEndOfRepeatDate();
-		long appId = getUniqueId();
+		long appId = dbEngine.getUniqueId();
 		app.setAppId(appId);
 		try {
-			PreparedStatement ps = Execute.getPreparedStatement(query);
+			PreparedStatement ps = dbEngine.getPreparedStatement(query);
 			ps.setLong(1, appId);
 			ps.setString(2, app.getTitle());
 			ps.setString(3, app.getPlace());
@@ -70,6 +66,14 @@ public class AppointmentHandler implements DBAccess {
 		return new ArrayList<Appointment>();
 	}
 	
+	public static void answerInvite(long appId, long userId, Boolean answer) throws RemoteException, IOException{
+		String query = "UPDATE UserAppointments SET hasAccepted=%b WHERE userId=? AND appId=?";
+		dbEngine.update(String.format(query, answer), userId, appId);
+		if (answer == false){
+			MessageHandler.sendMessageUserHasDenied(appId, userId);
+		}
+	}
+	
 	public static void updateAppointment(Appointment app) throws IOException {
 		String place = app.getPlace();
 		String title = app.getTitle();
@@ -92,7 +96,7 @@ public class AppointmentHandler implements DBAccess {
 
 		try {
 			String formatted = String.format(query, title, isPrivate, creatorId, appId);
-			PreparedStatement ps = Execute.getPreparedStatement(formatted);
+			PreparedStatement ps = dbEngine.getPreparedStatement(formatted);
 			ps.setString(1, place);
 			ps.setTimestamp(2, new Timestamp(start.getTime()));
 			ps.setTimestamp(3, new Timestamp(end.getTime()));
@@ -119,8 +123,8 @@ public class AppointmentHandler implements DBAccess {
 		msg.setReceivers(receivers);
 		String appQuery = "DELETE FROM Appointment WHERE appId=?";
 		String userAppQuery = "DELETE FROM UserAppointments WHERE appId=?";
-		update(appQuery, appId);
-		update(userAppQuery, appId);
+		dbEngine.update(appQuery, appId);
+		dbEngine.update(userAppQuery, appId);
 	}
 	
 	public static void deleteAppointmentInvited(long appId) throws IOException {
@@ -129,7 +133,7 @@ public class AppointmentHandler implements DBAccess {
 		List<Person> receivers = mapKeysToList(app.getParticipants());
 		msg.setReceivers(receivers);
 		String query = "DELETE FROM UserAppointments WHERE appId=?";
-		update(query, appId);
+		dbEngine.update(query, appId);
 	}
 	
 	private static <T, S> List<T> mapKeysToList(Map<T, S> map){
@@ -143,13 +147,13 @@ public class AppointmentHandler implements DBAccess {
 	public static void updateUserAppointment(long appId, long userId, Boolean bool) throws IOException {
 		String query = "UPDATE UserAppointments SET hasAccepted=%s WHERE userId=? AND appId=?";
 		String boolString = bool == null ? "null" : bool ? "true" : "false";
-		update(String.format(query, boolString), userId, appId);
+		dbEngine.update(String.format(query, boolString), userId, appId);
 	}
 	
 	public static Map<Long, Boolean> getParticipants(long appId) throws IOException {
 		String query = "SELECT userId, hasAccepted FROM UserAppointments WHERE appId=?";
 		try {
-			PreparedStatement ps = Execute.getPreparedStatement(query);
+			PreparedStatement ps = dbEngine.getPreparedStatement(query);
 			ps.setLong(1, appId);
 			ResultSet rs = ps.executeQuery();
 			Map<Long, Boolean> output = new HashMap<Long, Boolean>();
@@ -167,10 +171,10 @@ public class AppointmentHandler implements DBAccess {
 		String query = "SELECT hasAccepted FROM UserAppointments " +
 				"WHERE appId=? AND userId=?";
 		try {
-			PreparedStatement ps = Execute.getPreparedStatement(query);
+			PreparedStatement ps = dbEngine.getPreparedStatement(query);
 			ps.setLong(1, appId);
 			ps.setLong(2, userId);
-			return Execute.getBoolean(ps);
+			return dbEngine.getBoolean(ps);
 		} catch (SQLException e) {
 			throw new RuntimeException("Feil i SQL!");
 		}
@@ -181,24 +185,24 @@ public class AppointmentHandler implements DBAccess {
 			getInviteStatusOnUser(appId, userId);
 		} catch (RuntimeException e){
 			String query = "INSERT INTO UserAppointments(appId, userId, hasAccepted) VALUES(?, ?, null)";
-			update(query, appId, userId);
+			dbEngine.update(query, appId, userId);
 		}
 	}
 	
 	public static void deleteUserFromAppointment(long appId, long msgId) throws IOException {
 		String query = "DELETE FROM UserAppoinments WHERE userId=? AND msgId=?";
-		update(query, appId, msgId);
+		dbEngine.update(query, appId, msgId);
 	}
 	
 	public static void updateRoomName(long appId, String roomName) throws IOException {
 		String query = "UPDATE Appointment SET roomName=? WHERE appId=?";
-		PreparedStatement ps = Execute.getPreparedStatement(query);
+		PreparedStatement ps = dbEngine.getPreparedStatement(query);
 		try {
 			ps.setString(1, roomName);
 		} catch (SQLException e) {
 			throw new StoopidSQLException(e);
 		}
-		update(ps, appId);	
+		dbEngine.update(ps, appId);	
 	}
 	
 	public static Appointment getAppointment(long appId) throws IOException {	
@@ -269,7 +273,7 @@ public class AppointmentHandler implements DBAccess {
 				"daysAppearing, endOfRepeatDate, roomName, isPrivate, creatorId FROM Appointment WHERE creatorId=? " + 
 				"AND startTime > ? AND endTime < ? ORDER BY startTime";
 			try {
-				PreparedStatement ps = Execute.getPreparedStatement(query);
+				PreparedStatement ps = dbEngine.getPreparedStatement(query);
 				ps.setLong(1, userId);
 				ps.setTimestamp(2, new Timestamp(startOfWeek.getTime()));
 				ps.setTimestamp(3, new Timestamp(endOfWeek.getTime()));
@@ -286,7 +290,7 @@ public class AppointmentHandler implements DBAccess {
 		"daysAppearing, endOfRepeatDate, roomName, isPrivate, creatorId FROM Appointment " +
 		"WHERE appId IN (SELECT appId FROM UserAppointments WHERE userId=?) AND "+
 		"startTime < ? AND endTime < ? ORDER BY startTime";
-		PreparedStatement ps = Execute.getPreparedStatement(query);
+		PreparedStatement ps = dbEngine.getPreparedStatement(query);
 		try {
 			ps.setLong(1, userId);
 			ps.setTimestamp(2, startDate);
@@ -315,7 +319,7 @@ public class AppointmentHandler implements DBAccess {
 	private static List<Appointment> getListFromQueryAndId(String query, long... ids) throws IOException{
 		PreparedStatement ps;
 		try {
-			ps = Execute.getPreparedStatement(query);
+			ps = dbEngine.getPreparedStatement(query);
 			for(int i = 0; i < ids.length; i++){
 				ps.setLong(i + 1, ids[i]);
 			}
@@ -345,7 +349,7 @@ public class AppointmentHandler implements DBAccess {
 				"daysAppearing, endOfRepeatDate, roomName, isPrivate, creatorId FROM Appointment " +
 				"WHERE creatorId=%d AND startTime > ? AND endTime < ? ORDER BY startTime";
 		try {
-			PreparedStatement ps = Execute.getPreparedStatement(String.format(query, userId));
+			PreparedStatement ps = dbEngine.getPreparedStatement(String.format(query, userId));
 			ps.setTimestamp(1, new Timestamp(startOfWeek.getTime()));
 			ps.setDate(2, endOfWeek);
 			return getAppointmentsFromPreparedStatement(ps);

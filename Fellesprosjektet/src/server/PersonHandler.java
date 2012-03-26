@@ -1,9 +1,9 @@
 package server;
 
 import static calendar.Person.recreatePerson;
-import static server.Execute.update;
 
 import java.io.IOException;
+import java.rmi.RemoteException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -15,13 +15,13 @@ import calendar.Person;
 import client.helpers.StoopidSQLException;
 
 
-public class PersonHandler {
+public class PersonHandler extends Handler{
 
 	public static void createUser(Person person) throws IOException{
 		String query = "INSERT INTO User(userId, email, firstname, lastname, department, " +
 					"passwordHash, salt) VALUES(?, ?, ?, ?, ?, ?, ?)";
 		try {
-			PreparedStatement ps = Execute.getPreparedStatement(query);
+			PreparedStatement ps = dbEngine.getPreparedStatement(query);
 			ps.setLong(1, person.getId());
 			ps.setString(2, person.getEmail());
 			ps.setString(3, person.getFirstname());
@@ -38,13 +38,13 @@ public class PersonHandler {
 	
 	public static void deleteUser(long personId) throws IOException{
 		String query = "DELETE FROM User WHERE userId=?";
-		update(query, personId);
+		dbEngine.update(query, personId);
 	}
 
 	public static Person getPerson(long personId) throws IOException {
 		String query = "SELECT userId, email, firstname, lastname, department, " + 
 					"passwordHash, salt FROM User WHERE userId=?";
-		PreparedStatement ps = Execute.getPreparedStatement(query);
+		PreparedStatement ps = dbEngine.getPreparedStatement(query);
 		try {
 			ps.setLong(1, personId);
 		} catch (SQLException e) {
@@ -56,6 +56,15 @@ public class PersonHandler {
 		} else {
 			throw new IllegalArgumentException("Fant ikke person med den id-en!");
 		}
+	}
+	
+	public static String getSalt(long userId) throws RemoteException, IOException{
+		return dbEngine.getString("SELECT salt FROM User WHERE userId=?", userId);
+	}
+	
+	public static void followOtherPerson(long userId, long otherUserId) throws RemoteException, IOException{
+		String query = "INSERT INTO UserCalendars(userId, followsUserId) VALUES(?, ?)";
+		dbEngine.update(query, userId, otherUserId);
 	}
 	
 	public static List<Appointment> getFollowAppointments(long userId, int weekNum) throws IOException {
@@ -81,10 +90,10 @@ public class PersonHandler {
 	private static List<Long> getFollowingIds(long userId) throws IOException{
 		String query = "SELECT followsUserId FROM UserCalendars WHERE userId=?";
 		List<Long> ids;
-		PreparedStatement ps = Execute.getPreparedStatement(query);
+		PreparedStatement ps = dbEngine.getPreparedStatement(query);
 		try {
 			ps.setLong(1, userId);
-			ids = Execute.getListOfLongs(ps);
+			ids = dbEngine.getListOfLongs(ps);
 		} catch (SQLException e) {
 			throw new StoopidSQLException(e);
 		}

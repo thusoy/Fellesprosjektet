@@ -3,15 +3,16 @@ package calendar;
 import static dateutils.DateUtils.stripMsFromTime;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 
-import server.Execute;
 import server.MessageHandler;
 
-public class Message implements Comparable<Message> {
+public class Message implements Comparable<Message>, Serializable {
 	
+	private static final long serialVersionUID = 5103325888593276747L;
 	protected long msgId;
 	protected Date dateSent;
 	protected String content;
@@ -73,8 +74,7 @@ public class Message implements Comparable<Message> {
 	 * @throws IOException
 	 */
 	public void setReceivers(List<Person> receivers) throws IOException{
-		String deleteQuery = "DELETE FROM UserMessages WHERE msgId=?";
-		Execute.update(deleteQuery, msgId);
+		MessageHandler.deleteOldReceivers(msgId);
 		if (receivers == null){
 			this.receivers = new ArrayList<Person>();
 		} else {

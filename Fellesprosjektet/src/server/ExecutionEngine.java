@@ -9,19 +9,25 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import rmi.DBHandler;
 import client.helpers.StoopidSQLException;
 
-public class Execute {
-	private static long nextId = System.currentTimeMillis();
+public class ExecutionEngine implements DBHandler{
+	private static long nextId;
 	private static final String driver = "com.mysql.jdbc.Driver";
 	private static final String database = "jdbc:mysql://mysql.stud.ntnu.no/tarjeikl_fp33";
 	private static Connection conn = null;
 	
-	public static long getUniqueId(){
+	public ExecutionEngine() throws IOException{
+		setUpConnection();
+		nextId = System.currentTimeMillis();
+	}
+	
+	public long getUniqueId(){
 		return nextId++;
 	}
 	
-	public static PreparedStatement getPreparedStatement(String query) throws IOException{
+	public PreparedStatement getPreparedStatement(String query) throws IOException{
 		setUpConnection();
 		try {
 			return conn.prepareStatement(query);
@@ -30,7 +36,7 @@ public class Execute {
 		}
 	}
 	
-	private static void setUpConnection() throws IOException{
+	private void setUpConnection() throws IOException{
 		try {
 			Class.forName(driver);
 		} catch (ClassNotFoundException e2) {
@@ -55,7 +61,7 @@ public class Execute {
 		}
 	}
 	
-	public static boolean getBoolean(PreparedStatement ps) throws IOException{
+	public boolean getBoolean(PreparedStatement ps) throws IOException{
 		try {
 			ResultSet rs = ps.executeQuery();
 			if (rs.next()){
@@ -68,12 +74,12 @@ public class Execute {
 		}
 	}
 	
-	public static void update(String query, long... ids) throws IOException{
+	public void update(String query, long... ids) throws IOException{
 		PreparedStatement  ps = getPreparedStatement(query);
 		update(ps, ids);
 	}
 	
-	public static void update(PreparedStatement ps, long... ids) throws IOException{
+	public void update(PreparedStatement ps, long... ids) throws IOException{
 		try {
 			for(int i = 0; i < ids.length; i++){
 				ps.setLong(i + 1, ids[i]);
@@ -84,7 +90,7 @@ public class Execute {
 		}
 	}
 	
-	public static ResultSet getResultSet(String query, long... ids) throws IOException{
+	public ResultSet getResultSet(String query, long... ids) throws IOException{
 		try {
 			PreparedStatement ps = getPreparedStatement(query);
 			for(int i = 0; i < ids.length; i++){
@@ -96,7 +102,7 @@ public class Execute {
 		}
 	}
 	
-	public static List<Long> getListOfLongs(PreparedStatement ps) throws IOException {
+	public List<Long> getListOfLongs(PreparedStatement ps) throws IOException {
 		try {
 			ResultSet rs = ps.executeQuery();
 			List<Long> output = new ArrayList<Long>();
@@ -109,12 +115,12 @@ public class Execute {
 		}
 	}
 	
-	public static String getString(String query) throws IOException{
+	public String getString(String query) throws IOException{
 		PreparedStatement ps = getPreparedStatement(query);
 		return getString(ps);
 	}
 	
-	public static String getString(String query, long id) throws IOException{
+	public String getString(String query, long id) throws IOException{
 		PreparedStatement ps = getPreparedStatement(query);
 		try {
 			ps.setLong(1, id);
@@ -136,7 +142,7 @@ public class Execute {
 		}
 	}
 	
-	public static int getInt(String query, String field) throws IOException{
+	public int getInt(String query, String field) throws IOException{
 		PreparedStatement ps = getPreparedStatement(query);
 		try {
 			ps.setString(1, field);

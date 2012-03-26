@@ -2,9 +2,9 @@ package server;
 
 import static calendar.Message.recreateMessage;
 import static server.AppointmentHandler.getAppointment;
-import static server.Execute.getUniqueId;
 
 import java.io.IOException;
+import java.rmi.RemoteException;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -20,13 +20,13 @@ import calendar.Person;
 import calendar.RejectedMessage;
 import client.helpers.StoopidSQLException;
 
-public class MessageHandler {
+public class MessageHandler extends Handler{
 	
 	public static void createMessage(Message msg) throws IOException {
 		Date dateSent = msg.getDateSent();
 		String content = msg.getContent();
 		String title = msg.getTitle();
-		long msgId = getUniqueId();
+		long msgId = dbEngine.getUniqueId();
 		msg.setId(msgId);
 		Long appId = null;
 		Long rejectingUserId = null;
@@ -38,7 +38,7 @@ public class MessageHandler {
 		String query = "INSERT INTO Message(msgId, dateSent, content, title, appointment, rejectingUser) " + 
 						"VALUES(%d, ?, ?, '%s', ?, ?)";
 		try {
-			PreparedStatement ps = Execute.getPreparedStatement(String.format(query, msgId, title));
+			PreparedStatement ps = dbEngine.getPreparedStatement(String.format(query, msgId, title));
 			ps.setTimestamp(1, new Timestamp(dateSent.getTime()));
 			ps.setString(2, content);
 			ps.setObject(3, appId, Types.BIGINT);
@@ -49,9 +49,14 @@ public class MessageHandler {
 		}
 	}
 	
+	public static void deleteOldReceivers(long msgId) throws RemoteException, IOException{
+		String deleteQuery = "DELETE FROM UserMessages WHERE msgId=?";
+		dbEngine.update(deleteQuery, msgId);
+	}
+	
 	public static void sendMessageToUser(long msgId, long userId) throws IOException {
 		String query = "INSERT INTO UserMessages(userId, msgId, hasBeenRead) VALUES(?, ?, false)";
-		Execute.update(query, userId, msgId);
+		dbEngine.update(query, userId, msgId);
 	}
 	
 	public static void sendMessageToAllParticipants(Message msg) throws IOException {
@@ -63,19 +68,19 @@ public class MessageHandler {
 	
 	public static void setMessageAsRead(long msgId, long userId) throws IOException {
 		String query = "UPDATE UserMessages SET hasBeenRead=%b WHERE msgId=? AND userId=?";
-		Execute.update(String.format(query, true), msgId, userId);
+		dbEngine.update(String.format(query, true), msgId, userId);
 	}
 
 	public static Message getMessage(long msgId) throws IOException {
 		String query = "SELECT msgId, title, content, dateSent, appointment, rejectingUser FROM Message WHERE msgId=?";
-		ResultSet rs = Execute.getResultSet(query, msgId);
+		ResultSet rs = dbEngine.getResultSet(query, msgId);
 		return getMessagesFromResultSet(rs).get(0);
 	}
 	
 	public static List<Person> getReceiversOfMessage(long msgId) throws IOException{
 		String getParticipantsQuery = "SELECT msgId, userId, hasBeenRead FROM UserMessages WHERE msgId=?";
 		List<Person> receivers = new ArrayList<Person>();
-		ResultSet rs = Execute.getResultSet(getParticipantsQuery, msgId);
+		ResultSet rs = dbEngine.getResultSet(getParticipantsQuery, msgId);
 		try {
 			while (rs.next()){
 				Person p = PersonHandler.getPerson(rs.getLong("userId"));
@@ -91,7 +96,7 @@ public class MessageHandler {
 	public static List<Message> getUnreadMessagesForUser(Person p) throws IOException{
 		String query = "SELECT msgId, title, content, dateSent, appointment, rejectingUser FROM Message " + 
 				"WHERE msgId IN (SELECT msgId FROM UserMessages WHERE userId=? AND hasBeenRead=false)"; 
-		ResultSet rs = Execute.getResultSet(query, p.getId());
+		ResultSet rs = dbEngine.getResultSet(query, p.getId());
 		return getMessagesFromResultSet(rs);
 	}
 	
@@ -126,7 +131,7 @@ public class MessageHandler {
 	private static List<Person> getReceivers(long msgId) throws IOException{
 		String query = "SELECT userId FROM UserMessages WHERE msgId=?";
 		List<Person> receivers = new ArrayList<Person>();
-		ResultSet rs = Execute.getResultSet(query, msgId);
+		ResultSet rs = dbEngine.getResultSet(query, msgId);
 		try {
 			while(rs.next()){
 				long userId = rs.getLong(1);
@@ -141,11 +146,11 @@ public class MessageHandler {
 	
 	public static boolean getHasBeenRead(long msgId, long userId) throws IOException{
 		String query = "SELECT hasBeenRead FROM UserMessages WHERE msgId=? AND userId=?";
-		PreparedStatement ps = Execute.getPreparedStatement(query);
+		PreparedStatement ps = dbEngine.getPreparedStatement(query);
 		try {
 			ps.setLong(1, msgId);
 			ps.setLong(2, userId);
-			return Execute.getBoolean(ps);
+			return dbEngine.getBoolean(ps);
 		} catch (SQLException e) {
 			throw new StoopidSQLException(e);
 		}

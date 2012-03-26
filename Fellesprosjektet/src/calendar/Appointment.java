@@ -13,8 +13,6 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import server.AppointmentHandler;
-import server.Execute;
-import server.MessageHandler;
 import dateutils.Day;
 
 public class Appointment implements Serializable, Comparable<Appointment> {
@@ -70,14 +68,9 @@ public class Appointment implements Serializable, Comparable<Appointment> {
 		return app;
 	}
 
-	//TODO SQl har ingenting i modellen å gjøre! Bør separeres til handlern.
 	public void answerInvite(Person user, Boolean answer) throws IOException{
 		participants.put(user, answer);
-		String query = "UPDATE UserAppointments SET hasAccepted=%b WHERE userId=? AND appId=?";
-		Execute.update(String.format(query, answer), user.getId(), appId);
-		if (answer == false){
-			MessageHandler.sendMessageUserHasDenied(appId, user.getId());
-		}
+		AppointmentHandler.answerInvite(appId, user.getId(), answer);
 	}
 	
 	public void save() throws IOException{
@@ -125,28 +118,35 @@ public class Appointment implements Serializable, Comparable<Appointment> {
 	public void setEndTime(Date endTime) throws IOException {
 		this.endTime = stripMsFromTime(endTime);
 	}
+	
 	@Deprecated
 	public Set<Day> getDaysAppearing() {
 		return daysAppearing;
 	}
+	
 	@Deprecated
 	public void setDaysAppearing(Set<Day> daysAppearing) throws IOException {
 		this.daysAppearing = daysAppearing;
 	}
+	
 	@Deprecated
 	public Date getEndOfRepeatDate() {
 		return endOfRepeatDate;
 	}
+	
 	@Deprecated
 	public void setEndOfRepeatDate(Date endOfRepeatDate) throws IOException {
 		this.endOfRepeatDate = endOfRepeatDate;
 	}
+	
 	public boolean isPrivate() {
 		return isPrivate;
 	}
+	
 	public void setPrivate(boolean isPrivate) throws IOException {
 		this.isPrivate = isPrivate;
 	}
+	
 	/**
 	 * Server sender ut melding til alle deltakere om at appointment'en er slettet. 
 	 * Deretter blir appointment-objektet slettet.
