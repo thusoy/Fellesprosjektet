@@ -48,9 +48,6 @@ public class RejectedMessage extends Message {
 			Date dateSent, Appointment app, Person rejectingUser) throws IOException{
 		System.out.println(app.getParticipants());
 		System.out.println(rejectingUser);
-		if (!app.getParticipants().containsKey(rejectingUser)){
-			throw new IllegalArgumentException("Brukeren som avslo må være blant de inviterte til avtalen!");
-		}
 		RejectedMessage m = new RejectedMessage(msgId);
 		m.setDateSent(dateSent);
 		m.msgId = msgId;
