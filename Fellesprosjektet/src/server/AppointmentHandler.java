@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import calendar.Appointment;
+import calendar.Person;
 
 public interface AppointmentHandler extends Remote{
 	public static final String SERVICE_NAME = "APPOINTMENT_HANDLER";
@@ -29,6 +30,10 @@ public interface AppointmentHandler extends Remote{
 	
 	public void updateRoomName(long appId, String roomName) throws IOException, RemoteException;
 	
+	public void deleteParticipants(long appId, Map<Person, Boolean> participants) throws IOException, RemoteException;
+	
+	public long getUniqueId() throws IOException, RemoteException;
+	
 	public List<Appointment> getAllByUser(long userId) throws IOException, RemoteException;
 	
 	public List<Appointment> getAllInvited(long userId) throws IOException, RemoteException;
@@ -45,6 +50,6 @@ public interface AppointmentHandler extends Remote{
 	
 	public Appointment getAppointment(long appId) throws IOException, RemoteException;
 	
-	public long getUniqueId() throws IOException, RemoteException;
+
 
 }

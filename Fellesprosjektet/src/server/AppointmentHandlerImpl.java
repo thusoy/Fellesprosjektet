@@ -353,4 +353,12 @@ public class AppointmentHandlerImpl extends Handler implements AppointmentHandle
 		return dbEngine.getUniqueId();
 	}
 
+	@Override
+	public void deleteParticipants(long appId, Map<Person, Boolean> participants) throws IOException, RemoteException {
+		String query = "DELETE FROM UserAppointments WHERE appId=? AND userId=?";
+		for(Person user: participants.keySet()){
+			dbEngine.update(query, appId, user.getId());
+		}
+	}
+
 }

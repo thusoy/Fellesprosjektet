@@ -73,8 +73,6 @@ public class AppointmentHelper extends DBCommunicator{
 		int appointmentNo = promptChoice(appointments);
 		Appointment app = appointments.get(appointmentNo);
 		printAsciiArt(app.getTitle());
-		System.out.println("app: " + app);
-		System.out.println("creator: " + app.getCreator());
 		System.out.printf("Eier av avtalen: %s\n", app.getCreator().fullName());
 		System.out.printf("Sted: %s\n", app.getPlace());
 		System.out.printf("Start: %s\n", DATE_FORMAT.format(app.getStartTime()));
@@ -114,7 +112,6 @@ public class AppointmentHelper extends DBCommunicator{
 		app.setParticipants(getParticipants(user));
 		app.setDescription(getString("Skriv inn beskrivelse: "));
 		setRoomOrPlace(app);
-		
 		app.save();
 		System.out.println("Avtalen er endret.");
 		if (!app.getParticipants().isEmpty()) {
