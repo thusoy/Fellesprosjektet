@@ -12,7 +12,7 @@ import java.util.List;
 import calendar.Room;
 import client.helpers.StoopidSQLException;
 
-public class RoomHandler {
+public class RoomHandler extends Handler{
 	
 	public static void createRoom(Room room) throws IOException {
 		String name = room.getName();
@@ -20,12 +20,12 @@ public class RoomHandler {
 		
 		String query =
 				"INSERT INTO Room(name, capacity) VALUES('%s', %d)";
-		Execute.update(String.format(query, name, capacity));
+		dbEngine.update(String.format(query, name, capacity));
 	}
 	
 	public static Room getRoom(String name) throws IOException {
 		String query = "Select capacity FROM Room WHERE name=?";
-		int capacity = Execute.getInt(query, name);
+		int capacity = dbEngine.getInt(query, name);
 		Room room = Room.recreateRoom(name, capacity);
 		return room;
 	}
@@ -35,7 +35,7 @@ public class RoomHandler {
 					"(SELECT roomName FROM Appointment WHERE appId NOT IN " + 
 						"(SELECT appId FROM Appointment WHERE endTime < ? OR startTime > ?) AND " +
 					"roomName IS NOT NULL) AND capacity >= ? ORDER BY capacity";
-		PreparedStatement ps = Execute.getPreparedStatement(query);
+		PreparedStatement ps = dbEngine.getPreparedStatement(query);
 		try {
 			ps.setTimestamp(1, new Timestamp(start.getTime()));
 			ps.setTimestamp(2, new Timestamp(end.getTime()));

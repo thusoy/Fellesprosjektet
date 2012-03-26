@@ -14,6 +14,7 @@ import client.helpers.UserAbortException;
 
 public class RejectedMessage extends Message {
 	
+	private static final long serialVersionUID = -8817341040992007302L;
 	private Appointment app;
 	private Person rejectingUser;
 	

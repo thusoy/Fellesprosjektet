@@ -5,7 +5,7 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 
-import rmi.DBAccess;
+import rmi.DBHandler;
 import rmi.RmiStarter;
 
 public class DBStarter extends RmiStarter {
@@ -17,13 +17,13 @@ public class DBStarter extends RmiStarter {
 	@Override
 	public void doCustomRmiHandling() {
 		try {
-            DBAccess engine = new AppointmentHandler();
-            DBAccess engineStub = (DBAccess) UnicastRemoteObject.exportObject(engine, 0);
-            InetAddress addr = InetAddress.getLocalHost();
-            System.out.println("RMI server address: " + addr.getHostAddress());
+            DBHandler engine = new ExecutionEngine();
+            DBHandler engineStub = (DBHandler) UnicastRemoteObject.exportObject(engine, 0);
             LocateRegistry.createRegistry(1099);
             Registry registry = LocateRegistry.getRegistry();
-            registry.rebind(AppointmentHandler.SERVICE_NAME, engineStub);
+            registry.rebind(DBHandler.SERVICE_NAME, engineStub);
+            InetAddress addr = InetAddress.getLocalHost();
+            System.out.println("RMI server running on: " + addr.getHostAddress());
         }
         catch(Exception e) {
             e.printStackTrace();

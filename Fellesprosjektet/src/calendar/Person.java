@@ -4,12 +4,13 @@ import static hashtools.Hash.SHA512;
 import static hashtools.Hash.createHash;
 
 import java.io.IOException;
+import java.io.Serializable;
 
-import server.Execute;
 import server.PersonHandler;
 
-public class Person {
+public class Person implements Serializable{
 
+	private static final long serialVersionUID = 7083773845221209444L;
 	private String firstname;
 	private String lastname;
 	private String email;
@@ -52,7 +53,7 @@ public class Person {
 		p.setDepartment(department);
 		p.setPasswordHash(passwordHash);
 		p.setId(id);
-		String salt = Execute.getString("SELECT salt FROM User WHERE userId=?", id);
+		String salt = PersonHandler.getSalt(id);
 		p.salt = salt;
 		return p;
 	}
@@ -70,8 +71,7 @@ public class Person {
 	}
 	
 	public void followPerson(long otherUserId) throws IOException {
-		String query = "INSERT INTO UserCalendars(userId, followsUserId) VALUES(?, ?)";
-		Execute.update(query, id, otherUserId);
+		PersonHandler.followOtherPerson(id, otherUserId);
 	}
 	
 	/**

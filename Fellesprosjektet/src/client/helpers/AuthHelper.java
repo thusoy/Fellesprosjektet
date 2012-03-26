@@ -7,11 +7,11 @@ import static hashtools.Hash.createHash;
 
 import java.io.IOException;
 
-import server.Execute;
+import server.Handler;
 import server.PersonHandler;
 import calendar.Person;
 
-public class AuthHelper {
+public class AuthHelper extends Handler{
 
 	public static Person authenticateUser() throws IOException, InvalidLoginException, UserAbortException {
 		String email = getString("E-post: ");
@@ -35,7 +35,7 @@ public class AuthHelper {
 	
 	private static String getSalt(String email) throws IOException{
 		String query = "SELECT salt FROM User WHERE email='%s'";
-		String salt = Execute.getString(String.format(query, email));
+		String salt = dbEngine.getString(String.format(query, email));
 		return salt;
 	}
 	
