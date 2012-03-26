@@ -5,23 +5,18 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
-import java.sql.SQLException;
 
-import org.junit.Before;
 import org.junit.Test;
 
 import calendar.Person;
 
-import server.Execute;
-import server.PersonHandlerImpl;
-
 public class TestPerson {
 	
-	@Before
-	public void truncateUser() throws IOException, SQLException{
-		String query = "TRUNCATE TABLE User";
-		Execute.update(query);
-	}
+//	@Before
+//	public void truncateUser() throws IOException, SQLException{
+//		String query = "TRUNCATE TABLE User";
+//		Execute.update(query);
+//	}
 	
 	@Test
 	public void testUniquePasswordHashes() throws IOException {
@@ -47,12 +42,12 @@ public class TestPerson {
 		}
 	}
 	
-	@Test
-	public void testIOWithDb() throws IOException{
-		Person p = new Person("john", "high", "lol", "komtek", "banan");
-		Person dbPerson = PersonHandlerImpl.getPerson(p.getId());
-		assertEquals("Personene skal være like!", p, dbPerson);
-	}
+//	@Test
+//	public void testIOWithDb() throws IOException{
+//		Person p = new Person("john", "high", "lol", "komtek", "banan");
+//		Person dbPerson = PersonHandlerImpl.getPerson(p.getId());
+//		assertEquals("Personene skal være like!", p, dbPerson);
+//	}
 	
 	@Test (expected=IllegalArgumentException.class)
 	public void testNullFirstname() throws IOException{
