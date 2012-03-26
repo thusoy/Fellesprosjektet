@@ -20,7 +20,7 @@ public interface AppointmentHandler extends Remote{
 	
 	public void deleteAppointment(long appId) throws IOException, RemoteException;
 
-	public void deleteAppointmentInvited(long appId) throws IOException, RemoteException;
+	public void deleteAppointmentInvited(long appId, long userId) throws IOException, RemoteException;
 	
 	public void updateUserAppointment(long appId, long userId, Boolean bool) throws IOException, RemoteException;
 

@@ -12,13 +12,17 @@ import static client.helpers.IO.getString;
 import static client.helpers.IO.getValidEmail;
 import static client.helpers.IO.getValidNum;
 import static client.helpers.IO.promptChoice;
+import static client.helpers.StringUtils.center;
+import static client.helpers.StringUtils.padLeft;
+import static client.helpers.StringUtils.padRight;
+import static client.helpers.StringUtils.repeat;
+import static dateutils.DateUtils.getCurrentWeekNum;
 import gui.SimpleTextGUI;
 
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
 import server.AppointmentHandler;
@@ -43,6 +47,11 @@ public class StarterGUI extends DBCommunicator{
 	static {
 		appHandler = (AppointmentHandler) getHandler(AppointmentHandler.SERVICE_NAME);
 		msgHandler = (MessageHandler) getHandler(MessageHandler.SERVICE_NAME);
+//		try {
+//			new Person("trine", "myklebust", "trine@gmail.com", "indøk", "trine");
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
 	}
 	
 	public static void main(String[] args) {
@@ -72,17 +81,17 @@ public class StarterGUI extends DBCommunicator{
 			}
 		}
 		this.user = user;
-		gui.clear();
 		run();
 	}
 	
 	private void run() throws IOException{
+		gui.clear();
 		CalendarFunction[] allFunc = CalendarFunction.values();
 		while(true){
 			showWeek();
 			int numUnansweredMeetings = appHandler.getAllUnansweredInvites(user.getId()).size();
 			int numNewMessages = msgHandler.getUnreadMessagesForUser(user).size();
-			SimpleTextGUI.setInputText("Hva vil du gjøre?");
+			System.out.println("Hva vil du gjøre?");
 			List<String> choices = new ArrayList<String>();
 			for(CalendarFunction cf: allFunc){
 				String description = cf.description;
@@ -94,6 +103,7 @@ public class StarterGUI extends DBCommunicator{
 				choices.add(description);
 			}
 			try {
+				SimpleTextGUI.setInputText("Gjør et valg: ");
 				CalendarFunction cf = allFunc[promptChoice(choices)];
 				if (cf == CalendarFunction.QUIT){
 					gui.clear();
@@ -112,11 +122,6 @@ public class StarterGUI extends DBCommunicator{
 		}
 	}
 	
-	private int getCurrentWeekNum() {
-		Calendar cal = Calendar.getInstance();
-		return cal.get(Calendar.WEEK_OF_YEAR);
-	}
-
 	public void runFunc(CalendarFunction func) throws IOException, UserAbortException{
 		switch(func){
 		case ADD_APPOINTMENT:
@@ -156,14 +161,20 @@ public class StarterGUI extends DBCommunicator{
 	
 	private void showMessages() throws IOException, UserAbortException {
 		List<Message> unreadMessages = msgHandler.getUnreadMessagesForUser(user);
-		System.out.print("Hvilken melding vil du lese? \n");
-		int userInput = promptChoice(unreadMessages);
-		Message selected = unreadMessages.get(userInput);
-		System.out.println(selected.showMessage(user).getContent());
-		if (selected instanceof RejectedMessage){
-			RejectedMessage m = (RejectedMessage) selected;
-			System.out.println("Hva vil du gjøre?");
-			m.getAndExecuteUserResponse(user);
+		if (unreadMessages.size() > 0){
+			System.out.println("Hvilken melding vil du lese?");
+			int userInput = promptChoice(unreadMessages);
+			Message selected = unreadMessages.get(userInput);
+			System.out.println(selected.showMessage(user).getContent());
+			
+			if (selected instanceof RejectedMessage){
+				RejectedMessage m = (RejectedMessage) selected;
+				System.out.println("Hva vil du gjøre?");
+				m.getAndExecuteUserResponse(user);
+			}
+			getString("Trykk enter for å gå videre.");
+		} else {
+			System.out.println("Ingen nye meldinger!");
 		}
 	}
 
@@ -225,7 +236,6 @@ public class StarterGUI extends DBCommunicator{
 		Day previous = null;
 		String timeFormat = "H:mm";
 		DateFormat df = new SimpleDateFormat(timeFormat);
-		printAsciiArt(String.format("Uke %d", weekNum));
 		int index = 0;
 		for(Appointment app: appointments){
 			Day thisDay = Day.fromDate(app.getStartTime());
@@ -238,7 +248,8 @@ public class StarterGUI extends DBCommunicator{
 		return days;
 	}
 	
-	private static void printCalendar(List<String>[] dayEvents){
+	private void printCalendar(List<String>[] dayEvents){
+		printAsciiArt(String.format("Uke %d", weekNum));
 		int columnWidth = 25;
 		boolean foundMore = true;
 		StringBuilder first = new StringBuilder();
@@ -262,48 +273,4 @@ public class StarterGUI extends DBCommunicator{
 		}
 	}
 	
-	private static String center(String input, int width, char fillChar){
-		int length = input.length();
-		if (length < width){
-			int padding = (width - length)/2;
-			String blank = repeat(Character.toString(fillChar), padding);
-			String output = blank + input + blank; 
-			boolean isOdd = width % 2 == 0;
-			return isOdd ? output : output.substring(0, width-1);
-		} else {
-			return input.substring(0, width-3) + "...";
-		}
-	}
-	
-	private static String padRight(String input, int width){
-		int length = input.length();
-		if (length <= width){
-			int padding = width - length;
-			String blank = repeat(" ", padding);
-			String output = input + blank; 
-			return output;
-		} else {
-			return input.substring(0, width-4) + "... ";
-		}
-	}
-	
-	private static String padLeft(String input, int width){
-		int length = input.length();
-		if (length <= width){
-			int padding = width - length;
-			String blank = repeat(" ", padding);
-			String output = blank + input; 
-			return output;
-		} else {
-			return input.substring(0, width-4) + "... ";
-		}
-	}
-	
-	private static String repeat(String input, int times){
-		if (times <= 0){
-			return "";
-		}
-		return String.format(String.format("%%0%dd", times), 0).replace("0", input);
-	}
-
 }

@@ -84,7 +84,6 @@ public class SimpleTextGUI implements KeyListener {
 		}
 	}
 	
-	
 	@Override
 	public void keyPressed(KeyEvent e) {
 	}

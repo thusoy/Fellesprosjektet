@@ -45,14 +45,16 @@ public class AuthHelper extends DBCommunicator{
 	
 	/**
 	 * Kjøres SERVERSIDE!
+	 * @throws InvalidLoginException 
 	 */
-	private static Person getUserFromEmailAndPassword(String email, String passwordHash) throws IOException{
+	private static Person getUserFromEmailAndPassword(String email, String passwordHash) 
+			throws IOException, InvalidLoginException{
 		long id = getUserIdFromEmail(email);
 		Person user = personHandler.getPerson(id);
 		if (user.getPasswordHash().equals(passwordHash)){
 			return user;
 		} else {
-			throw new IllegalArgumentException("Wrong password!");
+			throw new InvalidLoginException();
 		}
 	}
 	

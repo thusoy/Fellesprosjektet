@@ -143,9 +143,9 @@ public class Appointment extends DBCommunicator implements Serializable, Compara
 		bindToHandler();
 		appHandler.deleteAppointment(this.appId);
 	}
-	public void deleteAppointmentInvited() throws IOException {
+	public void deleteAppointmentInvited(long userId) throws IOException {
 		bindToHandler();
-		appHandler.deleteAppointmentInvited(this.appId);
+		appHandler.deleteAppointmentInvited(this.appId, userId);
 	}
 	
 	public Map<Person, Boolean> getParticipants() {

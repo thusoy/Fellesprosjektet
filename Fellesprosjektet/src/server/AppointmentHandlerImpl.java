@@ -20,6 +20,7 @@ import java.util.Map;
 import calendar.Appointment;
 import calendar.Message;
 import calendar.Person;
+import calendar.RejectedMessage;
 import client.helpers.StoopidSQLException;
 
 public class AppointmentHandlerImpl extends Handler implements AppointmentHandler {
@@ -115,13 +116,15 @@ public class AppointmentHandlerImpl extends Handler implements AppointmentHandle
 		dbEngine.update(userAppQuery, appId);
 	}
 	
-	public void deleteAppointmentInvited(long appId) throws IOException {
+	public void deleteAppointmentInvited(long appId, long userId) throws IOException {
 		Appointment app = getAppointment(appId);
-		Message msg = new Message("Avslag: " + app.getTitle(), "En person har avslått møtet");
+		Person rejecter = personHandler.getPerson(userId);
+		Message msg = new RejectedMessage("Avslag: " + app.getTitle(), "En person har avslått møtet", app, rejecter);
 		List<Person> receivers = mapKeysToList(app.getParticipants());
+		receivers.add(app.getCreator());
 		msg.setReceivers(receivers);
-		String query = "DELETE FROM UserAppointments WHERE appId=?";
-		dbEngine.update(query, appId);
+		String query = "DELETE FROM UserAppointments WHERE appId=? AND userId=?";
+		dbEngine.update(query, appId, userId);
 	}
 	
 	private static <T, S> List<T> mapKeysToList(Map<T, S> map){

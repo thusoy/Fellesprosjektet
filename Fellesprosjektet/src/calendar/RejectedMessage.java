@@ -78,6 +78,7 @@ public class RejectedMessage extends Message {
 		case 2:
 			appHandler.deleteUserFromAppointment(app.getId(), rejectingUser.getId());
 			System.out.printf("%s fjernet fra avtalen!\n", rejectingUser);
+			break;
 		}
 		
 	}

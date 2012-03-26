@@ -16,9 +16,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Scanner;
-import java.util.Set;
-import java.util.TreeSet;
 
 import server.AppointmentHandler;
 import server.PersonHandler;
@@ -49,7 +46,7 @@ public class AppointmentHelper extends DBCommunicator{
 		appointments.addAll(apps);
 		appointments.addAll(app);
 		Collections.sort(appointments);		
-		return appointments;
+		return removeDupesAndSort(appointments);
 	}
 	
 	public static List<Appointment> getAllAppointments(Person user) throws IOException{
@@ -62,11 +59,12 @@ public class AppointmentHelper extends DBCommunicator{
 	}
 	
 	private static List<Appointment> removeDupesAndSort(List<Appointment> apps){
-		Set<Appointment> sortedUnique = new TreeSet<Appointment>();
-		sortedUnique.addAll(apps);
-		List<Appointment> unique = new ArrayList<Appointment>(sortedUnique);
-		Collections.sort(unique);
-		return unique;
+		return apps;
+//		Set<Appointment> sortedUnique = new TreeSet<Appointment>();
+//		sortedUnique.addAll(apps);
+//		List<Appointment> unique = new ArrayList<Appointment>(sortedUnique);
+//		Collections.sort(unique);
+//		return unique;
 	}
 	
 	public static void showAppointment(Person user) throws IOException, UserAbortException {
@@ -89,9 +87,7 @@ public class AppointmentHelper extends DBCommunicator{
 			String answerString = answer == null ? "har ikke svart" : answer ? "kommer" : "kommer ikke";
 			System.out.printf("\t%s: %s.\n", p.fullName(), answerString);
 		}
-		Scanner scanner = new Scanner(System.in);
-		System.out.println("Trykk enter for å fortsette");
-		scanner.nextLine();
+		getString("Trykk enter for å fortsette");
 	}
 	
 	public static void changeAppointment(Person user) throws IOException, UserAbortException {
@@ -147,7 +143,7 @@ public class AppointmentHelper extends DBCommunicator{
 		if (user.equals(app.getCreator())){
 			app.delete();
 		}else {
-			app.deleteAppointmentInvited();
+			app.deleteAppointmentInvited(user.getId());
 		}
 		System.out.println("Avtalen er slettet");
 	}
@@ -188,6 +184,7 @@ public class AppointmentHelper extends DBCommunicator{
 			}
 		} else {
 			String place = getString("Skriv inn sted: ");
+			System.out.println("sted: " + place);
 			app.setPlace(place);
 		}
 	}
