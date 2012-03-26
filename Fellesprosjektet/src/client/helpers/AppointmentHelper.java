@@ -73,7 +73,9 @@ public class AppointmentHelper extends DBCommunicator{
 		int appointmentNo = promptChoice(appointments);
 		Appointment app = appointments.get(appointmentNo);
 		printAsciiArt(app.getTitle());
-		System.out.printf("Eier av avtalen: %s %s\n", app.getCreator().getFirstname(), app.getCreator().getLastname());
+		System.out.println("app: " + app);
+		System.out.println("creator: " + app.getCreator());
+		System.out.printf("Eier av avtalen: %s\n", app.getCreator().fullName());
 		System.out.printf("Sted: %s\n", app.getPlace());
 		System.out.printf("Start: %s\n", DATE_FORMAT.format(app.getStartTime()));
 		System.out.printf("Slutt: %s\n", DATE_FORMAT.format(app.getEndTime()));

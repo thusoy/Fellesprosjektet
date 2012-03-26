@@ -55,6 +55,7 @@ public class Message extends DBCommunicator implements Comparable<Message>, Seri
 	}
 	
 	public Message showMessage(Person user) throws IOException {
+		bindToHandler();
 		msgHandler.setMessageAsRead(msgId, user.getId());
 		return this;
 	}

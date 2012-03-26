@@ -32,7 +32,9 @@ public class Appointment extends DBCommunicator implements Serializable, Compara
 	private static AppointmentHandler appHandler;
 	
 	public static void bindToHandler(){
+		if (appHandler == null){
 			appHandler = (AppointmentHandler) getHandler(AppointmentHandler.SERVICE_NAME);
+		}
 	}
 	
 	/**
@@ -72,10 +74,12 @@ public class Appointment extends DBCommunicator implements Serializable, Compara
 		app.setEndTime(endTime);
 		app.setPrivate(isPrivate);
 		app.setParticipants(participants);
+		app.creator = creator;
 		return app;
 	}
 
 	public void answerInvite(Person user, Boolean answer) throws IOException{
+		bindToHandler();
 		participants.put(user, answer);
 		appHandler.answerInvite(appId, user.getId(), answer);
 	}

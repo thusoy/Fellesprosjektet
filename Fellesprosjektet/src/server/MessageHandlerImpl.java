@@ -186,12 +186,15 @@ public class MessageHandlerImpl extends Handler implements MessageHandler{
 		Person p = personHandler.getPerson(userId);
 		String content = "%s %s har avslått avtalen '%s'.";
 		String formatted = String.format(content, p.getFirstname(), p.getLastname(), app.getTitle());
-		Message msg = new RejectedMessage("Avslag pŒ avtale", formatted, app, p);
+		Message msg = new RejectedMessage("Avslag på avtale", formatted, app, p);
+		System.out.println("msg: " + msg);
 		for (Person user: app.getParticipants().keySet()) {
 			if (user.getId() != userId){
 				sendMessageToUser(msg.getId(), user.getId());
 			}
 		}
+		System.out.println("App: " + app);
+		System.out.println("creator: " + app.getCreator());
 		sendMessageToUser(msg.getId(), app.getCreator().getId());
 	}
 

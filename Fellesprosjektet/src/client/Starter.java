@@ -156,11 +156,13 @@ public class Starter extends DBCommunicator{
 			int userInput = promptChoice(unreadMessages);
 			Message selected = unreadMessages.get(userInput);
 			System.out.println(selected.showMessage(user).getContent());
+			
 			if (selected instanceof RejectedMessage){
 				RejectedMessage m = (RejectedMessage) selected;
 				System.out.println("Hva vil du gjøre?");
 				m.getAndExecuteUserResponse(user);
 			}
+			getString("Trykk enter for å gå videre.");
 		} else {
 			System.out.println("Ingen nye meldinger!");
 		}
