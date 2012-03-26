@@ -182,12 +182,8 @@ public class AppointmentHandlerImpl extends Handler implements AppointmentHandle
 	}
 	
 	public void addUserToAppointment(long appId, long userId) throws IOException {
-		try {
-			getInviteStatusOnUser(appId, userId);
-		} catch (RuntimeException e){
-			String query = "INSERT INTO UserAppointments(appId, userId, hasAccepted) VALUES(?, ?, null)";
-			dbEngine.update(query, appId, userId);
-		}
+		String query = "INSERT INTO UserAppointments(appId, userId, hasAccepted) VALUES(?, ?, null)";
+		dbEngine.update(query, appId, userId);
 	}
 	
 	public void deleteUserFromAppointment(long appId, long msgId) throws IOException {
