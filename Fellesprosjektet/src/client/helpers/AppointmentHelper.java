@@ -58,12 +58,14 @@ public class AppointmentHelper extends DBCommunicator{
 		List<Appointment> follows = personHandler.getFollowAppointments(user.getId());
 		created.addAll(follows);
 		created.addAll(invited);
+		return removeDupesAndSort(created);
+	}
+	
+	private static List<Appointment> removeDupesAndSort(List<Appointment> apps){
 		Set<Appointment> sortedUnique = new TreeSet<Appointment>();
-		sortedUnique.addAll(created);
+		sortedUnique.addAll(apps);
 		List<Appointment> unique = new ArrayList<Appointment>(sortedUnique);
 		Collections.sort(unique);
-		System.out.println("Størrelse før: " + created.size());
-		System.out.println("Størrelse etter: " + unique.size());
 		return unique;
 	}
 	
@@ -159,7 +161,7 @@ public class AppointmentHelper extends DBCommunicator{
 		List<Appointment> ownApps = appHandler.getAllByUser(userId);
 		List<Appointment> participatesInApps = appHandler.getAllInvited(userId);
 		ownApps.addAll(participatesInApps);
-		return ownApps;
+		return removeDupesAndSort(ownApps);
 	}
 	
 	public static void addNewAppointment(Person user) throws IOException, UserAbortException {
@@ -171,7 +173,6 @@ public class AppointmentHelper extends DBCommunicator{
 		
 		Appointment app = new Appointment(title, startdate, enddate, isPrivate, participants, user);
 		setRoomOrPlace(app);
-		System.out.println("Apppid: " + app.getId());
 		app.save();
 		System.out.println("Ny avtale lagret!");
 	}
@@ -192,7 +193,8 @@ public class AppointmentHelper extends DBCommunicator{
 	}
 	
 	private static void reserveRoom(Appointment app) throws IOException, UserAbortException {
-		List<Room> rooms = roomHandler.availableRooms(app.getStartTime(), app.getEndTime(), app.getParticipants().size());
+		int numParticipants = app.getParticipants().size() + 1; //remember the creator too!
+		List<Room> rooms = roomHandler.availableRooms(app.getStartTime(), app.getEndTime(), numParticipants);
 		System.out.println("Reserver møterom: ");
 		int chosenRoom = promptChoice(rooms);
 		app.setRoomName(rooms.get(chosenRoom).getName());
