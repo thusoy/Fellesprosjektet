@@ -75,6 +75,7 @@ public class Person extends DBCommunicator implements Serializable{
 	}
 	
 	public void followPerson(long otherUserId) throws IOException {
+		bindToHandler();
 		personHandler.followOtherPerson(id, otherUserId);
 	}
 	
