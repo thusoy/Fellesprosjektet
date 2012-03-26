@@ -22,8 +22,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import server.AppointmentHandler;
+import server.AppointmentHandlerImpl;
 import server.MessageHandler;
 import calendar.Appointment;
+import calendar.DBCommunicator;
 import calendar.Message;
 import calendar.Person;
 import calendar.RejectedMessage;
@@ -31,10 +33,16 @@ import client.helpers.InvalidLoginException;
 import client.helpers.UserAbortException;
 import dateutils.Day;
 
-public class Starter {
+public class Starter extends DBCommunicator{
 	private Person user;
 	private int weekNum;
 	private static final String EMPTY_LINES = repeat("\n", 30);
+	private static AppointmentHandler appHandler;
+	private static MessageHandler msgHandler;
+	
+	static {
+			appHandler = (AppointmentHandler) getHandler(AppointmentHandler.SERVICE_NAME);
+	}
 	
 	public static void main(String[] args) {
 		try {
@@ -72,7 +80,7 @@ public class Starter {
 		CalendarFunction[] allFunc = CalendarFunction.values();
 		while(true){
 			showWeek();
-			int numUnansweredMeetings = AppointmentHandler.getAllUnansweredInvites(user.getId()).size();
+			int numUnansweredMeetings = appHandler.getAllUnansweredInvites(user.getId()).size();
 			int numNewMessages = MessageHandler.getUnreadMessagesForUser(user).size();
 			System.out.println("Hva vil du gjøre?");
 			List<String> choices = new ArrayList<String>();
@@ -159,7 +167,7 @@ public class Starter {
 	}
 
 	private void showInvites() throws IOException, UserAbortException {
-		List<Appointment> allInvited = AppointmentHandler.getAllUnansweredInvites(user.getId());
+		List<Appointment> allInvited = appHandler.getAllUnansweredInvites(user.getId());
 		System.out.print("Hvilken innkalling vil du svare på? ");
 		int userNum = promptChoice(allInvited);
 		answerInvite(allInvited.get(userNum));

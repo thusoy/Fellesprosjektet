@@ -15,7 +15,7 @@ import java.util.TreeSet;
 import server.AppointmentHandler;
 import dateutils.Day;
 
-public class Appointment implements Serializable, Comparable<Appointment> {
+public class Appointment extends DBCommunicator implements Serializable, Comparable<Appointment> {
 	private static final long serialVersionUID = -5442910434292395380L;
 	private Long appId = null;
 	private String place;
@@ -29,6 +29,12 @@ public class Appointment implements Serializable, Comparable<Appointment> {
 	private Person creator;
 	private Map<Person, Boolean> participants;
 	private String roomName;
+	private static AppointmentHandler appHandler;
+	
+	static {
+			appHandler = (AppointmentHandler) getHandler(AppointmentHandler.SERVICE_NAME);
+	}
+	
 	
 	/**
 	 * Creates an appointment and saves the object to the database.
@@ -50,7 +56,7 @@ public class Appointment implements Serializable, Comparable<Appointment> {
 		this.participants = participants != null ? participants : new HashMap<Person, Boolean>();
 		this.description = new String();
 		this.daysAppearing = new TreeSet<Day>();
-		AppointmentHandler.createAppointment(this);
+		appHandler.createAppointment(this);
 	}
 	
 	private Appointment(long appId){
@@ -70,11 +76,11 @@ public class Appointment implements Serializable, Comparable<Appointment> {
 
 	public void answerInvite(Person user, Boolean answer) throws IOException{
 		participants.put(user, answer);
-		AppointmentHandler.answerInvite(appId, user.getId(), answer);
+		appHandler.answerInvite(appId, user.getId(), answer);
 	}
 	
 	public void save() throws IOException{
-		AppointmentHandler.updateAppointment(this);
+		appHandler.updateAppointment(this);
 	}
 	
 	public void setAppId(long appId) {
@@ -153,10 +159,10 @@ public class Appointment implements Serializable, Comparable<Appointment> {
 	 * @throws IOException 
 	 */
 	public void delete() throws IOException {
-		AppointmentHandler.deleteAppointment(this.appId);
+		appHandler.deleteAppointment(this.appId);
 	}
 	public void deleteAppointmentInvited() throws IOException {
-		AppointmentHandler.deleteAppointmentInvited(this.appId);
+		appHandler.deleteAppointmentInvited(this.appId);
 	}
 	
 	public Map<Person, Boolean> getParticipants() {
@@ -191,7 +197,7 @@ public class Appointment implements Serializable, Comparable<Appointment> {
 	}
 
 	public static Appointment getAppointment(long appId) throws IOException {
-		return AppointmentHandler.getAppointment(appId);
+		return appHandler.getAppointment(appId);
 	}
 
 	@Override

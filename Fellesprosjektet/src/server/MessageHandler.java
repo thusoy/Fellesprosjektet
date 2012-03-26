@@ -1,7 +1,7 @@
 package server;
 
 import static calendar.Message.recreateMessage;
-import static server.AppointmentHandler.getAppointment;
+import static server.AppointmentHandlerImpl.getAppointment;
 
 import java.io.IOException;
 import java.rmi.RemoteException;
@@ -115,7 +115,7 @@ public class MessageHandler extends Handler{
 				} else {
 					Long rejectingUserId = rs.getObject("rejectingUser") == null ? null : rs.getLong("rejectingUser");
 					Person rejectingUser = PersonHandler.getPerson(rejectingUserId);
-					Appointment app = AppointmentHandler.getAppointment(appId);
+					Appointment app = AppointmentHandlerImpl.getAppointment(appId);
 					msg = RejectedMessage.recreateRejectedMessage(id, title, content, dateSent, app, rejectingUser);
 				}
 				msg.setReceivers(getReceivers(id));
