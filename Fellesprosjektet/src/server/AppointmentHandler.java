@@ -1,362 +1,47 @@
 package server;
 
-import static calendar.Appointment.recreateAppointment;
-import static dateutils.DateUtils.getEndOfWeek;
-import static dateutils.DateUtils.getStartOfWeek;
-
 import java.io.IOException;
 import java.rmi.RemoteException;
-import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import calendar.Appointment;
-import calendar.Message;
-import calendar.Person;
-import client.helpers.StoopidSQLException;
-import dateutils.Day;
 
-public class AppointmentHandler extends Handler {
-	
-	public static void createAppointment(Appointment app) throws IOException, RemoteException {
-		String query = "INSERT INTO Appointment(appId, title, place, startTime, endTime, " +
-					"description, daysAppearing, endOfRepeatDate, roomName, isPrivate, " + 
-					"creatorId) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-		Date start = app.getStartTime();
-		Date end = app.getEndTime();
-		String daysAppearing = app.getDaysAppearing().toString();
-		Date endOfRepeat = app.getEndOfRepeatDate();
-		long appId = dbEngine.getUniqueId();
-		app.setAppId(appId);
-		try {
-			PreparedStatement ps = dbEngine.getPreparedStatement(query);
-			ps.setLong(1, appId);
-			ps.setString(2, app.getTitle());
-			ps.setString(3, app.getPlace());
-			ps.setTimestamp(4, new Timestamp(start.getTime()));
-			ps.setTimestamp(5, new Timestamp(end.getTime()));
-			ps.setString(6, app.getDescription());
-			ps.setString(7, daysAppearing);
-			ps.setDate(8, endOfRepeat);
-			ps.setString(9, app.getRoomName());
-			ps.setBoolean(10, app.isPrivate());
-			ps.setLong(11, app.getCreator().getId());
-			ps.executeUpdate();
-		} catch (SQLException e) {
-			throw new StoopidSQLException(e);
-		}
-		
-		Map<Person, Boolean> participants = app.getParticipants();
-		if (participants != null) {
-			for (Person user: participants.keySet()) {
-				AppointmentHandler.addUserToAppointment(appId, user.getId());
-			}
-		}
-	}
-	
-	public List<Appointment> rmiTest() throws RemoteException{
-		System.out.println("running remote task!");
-		return new ArrayList<Appointment>();
-	}
-	
-	public static void answerInvite(long appId, long userId, Boolean answer) throws RemoteException, IOException{
-		String query = "UPDATE UserAppointments SET hasAccepted=%b WHERE userId=? AND appId=?";
-		dbEngine.update(String.format(query, answer), userId, appId);
-		if (answer == false){
-			MessageHandler.sendMessageUserHasDenied(appId, userId);
-		}
-	}
-	
-	public static void updateAppointment(Appointment app) throws IOException {
-		String place = app.getPlace();
-		String title = app.getTitle();
-		Date start = app.getStartTime();
-		Date end = app.getEndTime();
-		String description = app.getDescription();
-		String rawText = app.getDaysAppearing() != null ? app.getDaysAppearing().toString() : null;
-		String daysAppearing = rawText != null ? rawText : null;
-		Date endOfRepeat = app.getEndOfRepeatDate();
-		String roomName = app.getRoomName();
-		Map<Person, Boolean> participants = app.getParticipants();
-		boolean isPrivate = app.isPrivate();
-		long appId = app.getId();
-		long creatorId = app.getCreator() != null ? app.getCreator().getId() : 0;
-		
-		String query =
-				"UPDATE Appointment SET place=?, title='%s', startTime=?, endTime=?, " +
-				"description=?, daysAppearing=?, endOfRepeatDate=?, roomName=?, isPrivate=%b, " +
-				" creatorId=%d WHERE appId=%d";		
+public interface AppointmentHandler {
+	public static final String SERVICE_NAME = "APPOINTMENT_HANDLER";
 
-		try {
-			String formatted = String.format(query, title, isPrivate, creatorId, appId);
-			PreparedStatement ps = dbEngine.getPreparedStatement(formatted);
-			ps.setString(1, place);
-			ps.setTimestamp(2, new Timestamp(start.getTime()));
-			ps.setTimestamp(3, new Timestamp(end.getTime()));
-			ps.setString(4, description);
-			ps.setString(5, daysAppearing);
-			ps.setDate(6, endOfRepeat);
-			ps.setString(7, roomName);
-			ps.executeUpdate();
-		} catch (SQLException e1) {
-			e1.printStackTrace();
-			throw new RuntimeException("Feil i SQL!");
-		}	
-		if (participants != null) {
-			for (Person user: participants.keySet()) {
-				AppointmentHandler.addUserToAppointment(appId, user.getId());
-			}
-		}
-	}
+	public void createAppointment(Appointment app) throws RemoteException, IOException;
 	
-	public static void deleteAppointment(long appId) throws IOException {
-		Appointment app = getAppointment(appId);
-		Message msg = new Message("Slettet avtale " + app.getTitle(), "Denne avtalen er blitt slettet");
-		List<Person> receivers = Arrays.asList(app.getParticipants().keySet().toArray(new Person[0]));
-		msg.setReceivers(receivers);
-		String appQuery = "DELETE FROM Appointment WHERE appId=?";
-		String userAppQuery = "DELETE FROM UserAppointments WHERE appId=?";
-		dbEngine.update(appQuery, appId);
-		dbEngine.update(userAppQuery, appId);
-	}
+	public void answerInvite(long appId, long userId, Boolean answer) throws RemoteException, IOException;
 	
-	public static void deleteAppointmentInvited(long appId) throws IOException {
-		Appointment app = getAppointment(appId);
-		Message msg = new Message("Avslag: " + app.getTitle(), "En person har avslått møtet");
-		List<Person> receivers = mapKeysToList(app.getParticipants());
-		msg.setReceivers(receivers);
-		String query = "DELETE FROM UserAppointments WHERE appId=?";
-		dbEngine.update(query, appId);
-	}
+	public void updateAppointment(Appointment app) throws IOException;
 	
-	private static <T, S> List<T> mapKeysToList(Map<T, S> map){
-		List<T> list = new ArrayList<T>();
-		for(T t: map.keySet()){
-			list.add(t);
-		}
-		return list;
-	}
+	public void deleteAppointment(long appId) throws IOException;
+
+	public void deleteAppointmentInvited(long appId) throws IOException;
 	
-	public static void updateUserAppointment(long appId, long userId, Boolean bool) throws IOException {
-		String query = "UPDATE UserAppointments SET hasAccepted=%s WHERE userId=? AND appId=?";
-		String boolString = bool == null ? "null" : bool ? "true" : "false";
-		dbEngine.update(String.format(query, boolString), userId, appId);
-	}
+	public void updateUserAppointment(long appId, long userId, Boolean bool) throws IOException;
+
+	public void addUserToAppointment(long appId, long userId) throws IOException;
 	
-	public static Map<Long, Boolean> getParticipants(long appId) throws IOException {
-		String query = "SELECT userId, hasAccepted FROM UserAppointments WHERE appId=?";
-		try {
-			PreparedStatement ps = dbEngine.getPreparedStatement(query);
-			ps.setLong(1, appId);
-			ResultSet rs = ps.executeQuery();
-			Map<Long, Boolean> output = new HashMap<Long, Boolean>();
-			while(rs.next()){
-				Boolean answer = rs.getObject(2) != null ? rs.getBoolean(2) : null;
-				output.put(rs.getLong(1), answer);	
-			}
-			return output;
-		} catch (SQLException e) {
-			e.printStackTrace();
-			throw new RuntimeException("Feil i SQL!");
-		}
-	}
-	public static Boolean getInviteStatusOnUser(long appId, long userId) throws IOException {
-		String query = "SELECT hasAccepted FROM UserAppointments " +
-				"WHERE appId=? AND userId=?";
-		try {
-			PreparedStatement ps = dbEngine.getPreparedStatement(query);
-			ps.setLong(1, appId);
-			ps.setLong(2, userId);
-			return dbEngine.getBoolean(ps);
-		} catch (SQLException e) {
-			throw new RuntimeException("Feil i SQL!");
-		}
-	}
+	public void deleteUserFromAppointment(long appId, long msgId) throws IOException;
 	
-	public static void addUserToAppointment(long appId, long userId) throws IOException {
-		try {
-			getInviteStatusOnUser(appId, userId);
-		} catch (RuntimeException e){
-			String query = "INSERT INTO UserAppointments(appId, userId, hasAccepted) VALUES(?, ?, null)";
-			dbEngine.update(query, appId, userId);
-		}
-	}
+	public void updateRoomName(long appId, String roomName) throws IOException;
 	
-	public static void deleteUserFromAppointment(long appId, long msgId) throws IOException {
-		String query = "DELETE FROM UserAppoinments WHERE userId=? AND msgId=?";
-		dbEngine.update(query, appId, msgId);
-	}
+	public List<Appointment> getAllByUser(long userId) throws IOException;
 	
-	public static void updateRoomName(long appId, String roomName) throws IOException {
-		String query = "UPDATE Appointment SET roomName=? WHERE appId=?";
-		PreparedStatement ps = dbEngine.getPreparedStatement(query);
-		try {
-			ps.setString(1, roomName);
-		} catch (SQLException e) {
-			throw new StoopidSQLException(e);
-		}
-		dbEngine.update(ps, appId);	
-	}
+	public List<Appointment> getAllInvited(long userId) throws IOException;
 	
-	public static Appointment getAppointment(long appId) throws IOException {	
-		String query = "SELECT appId, title, place, startTime, endTime, description, " +
-				"daysAppearing, endOfRepeatDate, roomName, isPrivate, creatorId FROM Appointment " +
-				"WHERE appId=? ORDER BY startTime";
-		return getListFromQueryAndId(query, appId).get(0);
-	}
+	public List<Appointment> getAllCreated(long userId, int weekNum) throws IOException;
 	
-	private static List<Appointment> getAppointmentsFromPreparedStatement(PreparedStatement ps) throws IOException{
-		List<Appointment> appointments = new ArrayList<Appointment>();
-		try {
-			ResultSet rs = ps.executeQuery();
-			while(rs.next()){
-				long id = rs.getLong("appId");
-				String title = rs.getString("title");
-				String place = rs.getString("place");
-				Date startTime = new Date(rs.getTimestamp("startTime").getTime());
-				Date endTime = new Date(rs.getTimestamp("endTime").getTime());
-				String description = rs.getString("description");
-				String daysAppearing = rs.getString("daysAppearing");
-				Date endOfRepeat = rs.getDate("endOfRepeatDate");
-				String roomName = rs.getString("roomName");
-				boolean isPrivate = rs.getBoolean("isPrivate");
-				long creatorId = rs.getLong("creatorId");
-				Person creator = PersonHandler.getPerson(creatorId);
-				Map<Person, Boolean> participants = convertIdsToPersons(getParticipants(id));
-				Appointment a = recreateAppointment(id, title, startTime, endTime, isPrivate, participants, creator);
-				a.setPlace(place);
-				a.setDescription(description);
-				a.setDaysAppearing(Day.fromSetString(daysAppearing));
-				a.setEndOfRepeatDate(endOfRepeat);
-				a.setRoomName(roomName);
-				appointments.add(a);
-			}
-		} catch (SQLException e) {
-			throw new StoopidSQLException(e);
-		}
-		return appointments;
-	}
+	public List<Appointment> getAllInvitedInWeek(long userId, int weekNum) throws IOException;
 	
-	private static Map<Person, Boolean> convertIdsToPersons(Map<Long, Boolean> participants) throws IOException{
-		Map<Person, Boolean> out = new HashMap<Person, Boolean>();
-		for (Long i: participants.keySet()){
-			out.put(PersonHandler.getPerson(i), participants.get(i));
-		}
-		return out;
-	}
+	public List<Appointment> getAllUnansweredInvites(long userId) throws IOException;
 	
-	public static List<Appointment> getAllByUser(long userId) throws IOException {
-		String query = "SELECT appId, title, place, startTime, endTime, description, " +
-				"daysAppearing, endOfRepeatDate, roomName, isPrivate, creatorId FROM Appointment WHERE creatorId=? " + 
-				"ORDER BY startTime";
-		return getListFromQueryAndId(query, userId);
-	}
+	public List<Appointment> getWeekAppointments(long userId, int weekNum) throws IOException;
 	
-	public static List<Appointment> getAllInvited(long userId) throws IOException {
-		String query = "SELECT appId, title, place, startTime, endTime, description, " +
-				"daysAppearing, endOfRepeatDate, roomName, isPrivate, creatorId FROM Appointment " +
-				"WHERE appId IN (SELECT appId FROM UserAppointments WHERE userId=?) ORDER BY startTime";
-		return getListFromQueryAndId(query, userId);
-	}
+	public Map<Long, Boolean> getParticipants(long appId) throws IOException;
 	
-	public static List<Appointment> getAllCreated(long userId, int weekNum) throws IOException {
-		Date startOfWeek = getStartOfWeek(weekNum);
-		Date endOfWeek = getEndOfWeek(weekNum);
-		String query = "SELECT appId, title, place, startTime, endTime, description, " +
-				"daysAppearing, endOfRepeatDate, roomName, isPrivate, creatorId FROM Appointment WHERE creatorId=? " + 
-				"AND startTime > ? AND endTime < ? ORDER BY startTime";
-			try {
-				PreparedStatement ps = dbEngine.getPreparedStatement(query);
-				ps.setLong(1, userId);
-				ps.setTimestamp(2, new Timestamp(startOfWeek.getTime()));
-				ps.setTimestamp(3, new Timestamp(endOfWeek.getTime()));
-				return getAppointmentsFromPreparedStatement(ps);
-			} catch (SQLException e) {
-				throw new StoopidSQLException(e);
-			}
-	}
-	
-	public static List<Appointment> getAllInvitedInWeek(long userId, int weekNum) throws IOException {
-		Timestamp startDate = new Timestamp(getStartOfWeek(weekNum).getTime());
-		Timestamp enddate = new Timestamp(getEndOfWeek(weekNum).getTime());
-		String query = "SELECT appId, title, place, startTime, endTime, description, " +
-		"daysAppearing, endOfRepeatDate, roomName, isPrivate, creatorId FROM Appointment " +
-		"WHERE appId IN (SELECT appId FROM UserAppointments WHERE userId=?) AND "+
-		"startTime < ? AND endTime < ? ORDER BY startTime";
-		PreparedStatement ps = dbEngine.getPreparedStatement(query);
-		try {
-			ps.setLong(1, userId);
-			ps.setTimestamp(2, startDate);
-			ps.setTimestamp(3, enddate);
-		} catch (SQLException e) {
-			throw new StoopidSQLException(e);
-		}
-		return getAppointmentsFromPreparedStatement(ps);
-	}
-	
-	public static List<Appointment> getAllUnansweredInvites(long userId) throws IOException{
-		String query = "SELECT appId, title, place, startTime, endTime, description, " +
-				"daysAppearing, endOfRepeatDate, roomName, isPrivate, creatorId FROM Appointment " +
-				"WHERE appId IN (SELECT appId FROM UserAppointments WHERE userId=? AND hasAccepted IS NULL) " + 
-				"ORDER BY startTime";
-		return getListFromQueryAndId(query, userId);
-	}
-	
-	/**
-	 * Henter ut fra queryen en liste med Appointments. Queryes må ha like mange ? som 
-	 * elementer i ids. (som hører til et id-felt) 
-	 * @param query
-	 * @param ids
-	 * @throws IOException
-	 */
-	private static List<Appointment> getListFromQueryAndId(String query, long... ids) throws IOException{
-		PreparedStatement ps;
-		try {
-			ps = dbEngine.getPreparedStatement(query);
-			for(int i = 0; i < ids.length; i++){
-				ps.setLong(i + 1, ids[i]);
-			}
-		} catch (SQLException e) {
-			throw new StoopidSQLException(e);
-		}
-		return getAppointmentsFromPreparedStatement(ps);
-	}
-	
-	public static List<Appointment> idsToApps(List<Long> appIds, int weekNum) throws IOException{
-		List<Appointment> apps = new ArrayList<Appointment>();
-		Date startOfWeek = getStartOfWeek(weekNum);
-		Date endOfWeek = getEndOfWeek(weekNum);
-		for(long appId: appIds){
-			Appointment ap = getAppointment(appId);
-			if (ap.getStartTime().after(startOfWeek) && ap.getEndTime().before(endOfWeek)){
-				apps.add(ap);
-			}
-		}
-		return apps;
-	}
-	
-	public static List<Appointment> getWeekAppointments(long userId, int weekNum) throws IOException {
-		Date startOfWeek = getStartOfWeek(weekNum);
-		Date endOfWeek = getEndOfWeek(weekNum);
-		String query = "SELECT appId, title, place, startTime, endTime, description, " +
-				"daysAppearing, endOfRepeatDate, roomName, isPrivate, creatorId FROM Appointment " +
-				"WHERE creatorId=%d AND startTime > ? AND endTime < ? ORDER BY startTime";
-		try {
-			PreparedStatement ps = dbEngine.getPreparedStatement(String.format(query, userId));
-			ps.setTimestamp(1, new Timestamp(startOfWeek.getTime()));
-			ps.setDate(2, endOfWeek);
-			return getAppointmentsFromPreparedStatement(ps);
-		} catch (SQLException e) {
-			e.printStackTrace();
-			throw new RuntimeException("Feil i SQL, stoopid!");
-		}
-	}
+	public Appointment getAppointment(long appId) throws IOException;
 
 }

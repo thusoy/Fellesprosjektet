@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-import server.AppointmentHandler;
+import server.AppointmentHandlerImpl;
 import server.MessageHandler;
 import calendar.Appointment;
 import calendar.Message;
@@ -72,7 +72,7 @@ public class StarterGUI {
 		CalendarFunction[] allFunc = CalendarFunction.values();
 		while(true){
 			showWeek();
-			int numUnansweredMeetings = AppointmentHandler.getAllUnansweredInvites(user.getId()).size();
+			int numUnansweredMeetings = AppointmentHandlerImpl.getAllUnansweredInvites(user.getId()).size();
 			int numNewMessages = MessageHandler.getUnreadMessagesForUser(user).size();
 			SimpleTextGUI.setInputText("Hva vil du gjøre?");
 			List<String> choices = new ArrayList<String>();
@@ -160,7 +160,7 @@ public class StarterGUI {
 	}
 
 	private void showInvites() throws IOException, UserAbortException {
-		List<Appointment> allInvited = AppointmentHandler.getAllUnansweredInvites(user.getId());
+		List<Appointment> allInvited = AppointmentHandlerImpl.getAllUnansweredInvites(user.getId());
 		System.out.print("Hvilken innkalling vil du svare på? ");
 		int userNum = promptChoice(allInvited);
 		answerInvite(allInvited.get(userNum));

@@ -1,22 +1,21 @@
 package server;
 
-import java.rmi.NotBoundException;
-import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
+import java.io.IOException;
 
 import rmi.DBHandler;
 
 public abstract class Handler {
 	protected static DBHandler dbEngine;
+	public static String SERVICE_NAME;
+	
+	public Handler(String serviceName){
+		SERVICE_NAME = serviceName;
+	}
 	
 	static {
 		try {
-			Registry registry = LocateRegistry.getRegistry("129.241.126.61");
-			dbEngine = (DBHandler) registry.lookup(DBHandler.SERVICE_NAME);
-		} catch (RemoteException e) {
-			e.printStackTrace();
-		} catch (NotBoundException e) {
+			dbEngine = new ExecutionEngine();
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}

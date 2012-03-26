@@ -10,7 +10,7 @@ import rmi.RmiStarter;
 public class DBStarter extends RmiStarter {
 
 	public DBStarter() {
-		super(AppointmentHandler.class);
+		super(AppointmentHandlerImpl.class);
 	}
 
 	@Override

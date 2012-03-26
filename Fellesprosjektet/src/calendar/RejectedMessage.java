@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.sql.Date;
 import java.util.Arrays;
 
-import server.AppointmentHandler;
+import server.AppointmentHandlerImpl;
 import server.MessageHandler;
 import client.helpers.UserAbortException;
 
@@ -69,8 +69,8 @@ public class RejectedMessage extends Message {
 			deleteAppointment(user, app);
 			break;
 		case 2:
-			AppointmentHandler.deleteUserFromAppointment(app.getId(), rejectingUser.getId());
-			System.out.printf("%s fjernet fra avtalen!\n", rejectingUser);
+//			AppointmentHandlerImpl.deleteUserFromAppointment(app.getId(), rejectingUser.getId());
+//			System.out.printf("%s fjernet fra avtalen!\n", rejectingUser);
 		}
 		
 	}

@@ -71,8 +71,8 @@ public class PersonHandler extends Handler{
 		List<Long> ids = getFollowingIds(userId);
 		List<Appointment> apps = new ArrayList<Appointment>();
 		for (long id: ids) {
-			apps.addAll(AppointmentHandler.getAllCreated(id, weekNum));
-			apps.addAll(AppointmentHandler.getAllInvitedInWeek(id, weekNum));
+			apps.addAll(AppointmentHandlerImpl.getAllCreated(id, weekNum));
+			apps.addAll(AppointmentHandlerImpl.getAllInvitedInWeek(id, weekNum));
 		}
 		return apps;
 	}
@@ -81,8 +81,8 @@ public class PersonHandler extends Handler{
 		List<Long> ids = getFollowingIds(userId);
 		List<Appointment> apps = new ArrayList<Appointment>();
 		for (long id: ids) {
-			apps.addAll(AppointmentHandler.getAllByUser(id));
-			apps.addAll(AppointmentHandler.getAllInvited(id));
+			apps.addAll(AppointmentHandlerImpl.getAllByUser(id));
+			apps.addAll(AppointmentHandlerImpl.getAllInvited(id));
 		}
 		return apps;
 	}

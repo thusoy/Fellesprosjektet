@@ -24,17 +24,23 @@ import server.AppointmentHandler;
 import server.PersonHandler;
 import server.RoomHandler;
 import calendar.Appointment;
+import calendar.DBCommunicator;
 import calendar.Message;
 import calendar.Person;
 import calendar.Room;
 
-public class AppointmentHelper {
+public class AppointmentHelper extends DBCommunicator{
 	private static final String DATE_FORMAT_STRING = "dd-MM-yyyy HH:mm";
 	private static final DateFormat DATE_FORMAT =  new SimpleDateFormat(DATE_FORMAT_STRING);
+	private static AppointmentHandler appHandler;
+	
+	static {
+			appHandler = (AppointmentHandler) getHandler(AppointmentHandler.SERVICE_NAME);
+	}
 
 	public static List<Appointment> getWeekAppointments(Person user, int weekNum) throws IOException{
-		List<Appointment> appointments = AppointmentHandler.getAllCreated(user.getId(), weekNum);
-		List<Appointment> app = AppointmentHandler.getAllInvitedInWeek(user.getId(), weekNum);	
+		List<Appointment> appointments = appHandler.getAllCreated(user.getId(), weekNum);
+		List<Appointment> app = appHandler.getAllInvitedInWeek(user.getId(), weekNum);	
 		List<Appointment> apps = PersonHandler.getFollowAppointments(user.getId(), weekNum);
 		appointments.addAll(apps);
 		appointments.addAll(app);
@@ -43,8 +49,8 @@ public class AppointmentHelper {
 	}
 	
 	public static List<Appointment> getAllAppointments(Person user) throws IOException{
-		List<Appointment> created = AppointmentHandler.getAllByUser(user.getId());
-		List<Appointment> invited = AppointmentHandler.getAllInvited(user.getId());		
+		List<Appointment> created = appHandler.getAllByUser(user.getId());
+		List<Appointment> invited = appHandler.getAllInvited(user.getId());		
 		List<Appointment> follows = PersonHandler.getFollowAppointments(user.getId());
 		created.addAll(follows);
 		created.addAll(invited);
@@ -83,7 +89,7 @@ public class AppointmentHelper {
 	}
 	
 	public static void changeAppointment(Person user) throws IOException, UserAbortException {
-		List<Appointment> appointments = AppointmentHandler.getAllByUser(user.getId());
+		List<Appointment> appointments = appHandler.getAllByUser(user.getId());
 		System.out.println("Hvilken avtale vil du endre på?");
 		int userChoice = promptChoice(appointments);
 		Appointment app = appointments.get(userChoice);
@@ -124,7 +130,7 @@ public class AppointmentHelper {
 		List<Appointment> appointments = getAllAppointmentsInvolved(userId);
 		int choice = promptChoice(appointments);
 		long appId = appointments.get(choice).getId();
-		Appointment app = AppointmentHandler.getAppointment(appId);
+		Appointment app = appHandler.getAppointment(appId);
 		deleteAppointmentHelper(user, app);
 	}
 	
@@ -147,8 +153,8 @@ public class AppointmentHelper {
 	 * @throws IOException
 	 */
 	private static List<Appointment> getAllAppointmentsInvolved(long userId) throws IOException {
-		List<Appointment> ownApps = AppointmentHandler.getAllByUser(userId);
-		List<Appointment> participatesInApps = AppointmentHandler.getAllInvited(userId);
+		List<Appointment> ownApps = appHandler.getAllByUser(userId);
+		List<Appointment> participatesInApps = appHandler.getAllInvited(userId);
 		ownApps.addAll(participatesInApps);
 		return ownApps;
 	}

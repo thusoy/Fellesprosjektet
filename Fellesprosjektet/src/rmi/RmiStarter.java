@@ -6,7 +6,7 @@ public abstract class RmiStarter {
      *
      * @param classToAddToServerCodebase a class that should be in the java.rmi.server.codebase property.
      */
-    public RmiStarter(Class classToAddToServerCodebase) {
+    public RmiStarter(@SuppressWarnings("rawtypes") Class classToAddToServerCodebase) {
 
         System.setProperty("java.rmi.server.codebase", classToAddToServerCodebase
             .getProtectionDomain().getCodeSource().getLocation().toString());
