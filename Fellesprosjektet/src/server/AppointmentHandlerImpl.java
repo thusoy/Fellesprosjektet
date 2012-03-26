@@ -37,11 +37,9 @@ public class AppointmentHandlerImpl extends Handler implements AppointmentHandle
 					"description, roomName, isPrivate, creatorId) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)";
 		Date start = app.getStartTime();
 		Date end = app.getEndTime();
-		long appId = dbEngine.getUniqueId();
-		app.setAppId(appId);
 		try {
 			PreparedStatement ps = dbEngine.getPreparedStatement(query);
-			ps.setLong(1, appId);
+			ps.setLong(1, app.getId());
 			ps.setString(2, app.getTitle());
 			ps.setString(3, app.getPlace());
 			ps.setTimestamp(4, new Timestamp(start.getTime()));
@@ -57,7 +55,7 @@ public class AppointmentHandlerImpl extends Handler implements AppointmentHandle
 		
 		Map<Person, Boolean> participants = app.getParticipants();
 		for (Person user: participants.keySet()) {
-			addUserToAppointment(appId, user.getId());
+			addUserToAppointment(app.getId(), user.getId());
 		}
 	}
 	
