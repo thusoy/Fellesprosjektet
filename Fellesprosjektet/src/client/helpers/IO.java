@@ -12,7 +12,7 @@ import java.util.Collection;
 import java.util.Scanner;
 
 public class IO {
-	private static final boolean useGUI = true;
+	private static final boolean useGUI = false;
 
 	public static String getString(String display) throws UserAbortException{
 		String userInput;

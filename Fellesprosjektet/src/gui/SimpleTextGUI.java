@@ -40,7 +40,7 @@ public class SimpleTextGUI implements KeyListener {
         TextAreaOutputStream taos = new TextAreaOutputStream(textArea, 60);
         PrintStream ps = new PrintStream( taos );
         System.setOut(ps);
-        System.setErr(ps);
+//        System.setErr(ps);
 		return new JScrollPane(textArea);
 	}
 	
