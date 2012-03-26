@@ -26,10 +26,10 @@ import dateutils.Day;
 public class AppointmentHandlerImpl extends Handler implements AppointmentHandler {
 	private static PersonHandler personHandler;
 	
-	public AppointmentHandlerImpl() {
+	public static void init(){
 		personHandler = new PersonHandlerImpl();
 	}
-
+	
 	public void createAppointment(Appointment app) throws IOException, RemoteException {
 		String query = "INSERT INTO Appointment(appId, title, place, startTime, endTime, " +
 					"description, daysAppearing, endOfRepeatDate, roomName, isPrivate, " + 

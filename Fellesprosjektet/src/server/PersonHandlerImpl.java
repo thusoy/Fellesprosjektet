@@ -17,7 +17,7 @@ import client.helpers.StoopidSQLException;
 public class PersonHandlerImpl extends Handler implements PersonHandler{
 	private static AppointmentHandler appHandler;
 	
-	public PersonHandlerImpl() {
+	public static void init(){
 		appHandler = new AppointmentHandlerImpl();
 	}
 

@@ -6,9 +6,9 @@ import static hashtools.Hash.createHash;
 import java.io.IOException;
 import java.io.Serializable;
 
-import server.PersonHandlerImpl;
+import server.PersonHandler;
 
-public class Person implements Serializable{
+public class Person extends DBCommunicator implements Serializable{
 
 	private static final long serialVersionUID = 7083773845221209444L;
 	private String firstname;
@@ -18,6 +18,7 @@ public class Person implements Serializable{
 	private String passwordHash;
 	private String salt;
 	private long id;
+	private static PersonHandler personHandler;
 
 	/**
 	 * Constructs a new Person and saved the object to the database.
@@ -39,7 +40,7 @@ public class Person implements Serializable{
 		this.department = department;
 		setFirstSalt();
 		setPassword(password);
-		PersonHandlerImpl.createUser(this);
+		personHandler.createUser(this);
 	}
 	
 	private Person(){
@@ -53,7 +54,7 @@ public class Person implements Serializable{
 		p.setDepartment(department);
 		p.setPasswordHash(passwordHash);
 		p.setId(id);
-		String salt = PersonHandlerImpl.getSalt(id);
+		String salt = personHandler.getSalt(id);
 		p.salt = salt;
 		return p;
 	}
@@ -71,7 +72,7 @@ public class Person implements Serializable{
 	}
 	
 	public void followPerson(long otherUserId) throws IOException {
-		PersonHandlerImpl.followOtherPerson(id, otherUserId);
+		personHandler.followOtherPerson(id, otherUserId);
 	}
 	
 	/**
@@ -134,7 +135,7 @@ public class Person implements Serializable{
 	}
 	
 	public void delete() throws IOException{
-		PersonHandlerImpl.deleteUser(id);
+		personHandler.deleteUser(id);
 	}
 
 
@@ -209,6 +210,10 @@ public class Person implements Serializable{
 	
 	public String fullName(){
 		return String.format("%s %s", firstname, lastname);
+	}
+
+	public static void bindToHandler() {
+		personHandler = (PersonHandler) getHandler(PersonHandler.SERVICE_NAME);
 	}
 
 }
