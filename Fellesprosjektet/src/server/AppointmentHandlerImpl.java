@@ -61,10 +61,8 @@ public class AppointmentHandlerImpl extends Handler implements AppointmentHandle
 		}
 		
 		Map<Person, Boolean> participants = app.getParticipants();
-		if (participants != null) {
-			for (Person user: participants.keySet()) {
-				addUserToAppointment(appId, user.getId());
-			}
+		for (Person user: participants.keySet()) {
+			addUserToAppointment(appId, user.getId());
 		}
 	}
 	
