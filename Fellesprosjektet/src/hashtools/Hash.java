@@ -12,7 +12,7 @@ public class Hash {
 		try {
 			md = MessageDigest.getInstance("SHA-512");
 		} catch (NoSuchAlgorithmException e) {
-			throw new RuntimeException("Your stupid! Select a valid hash algorithm!");
+			throw new RuntimeException("You're stupid! Select a valid hash algorithm!");
 		}
 		byte[] bytes = rawtext.getBytes();
 		int localrounds = rounds;

@@ -15,11 +15,15 @@ import static client.helpers.IO.promptChoice;
 import static dateutils.DateUtils.getCurrentWeekNum;
 
 import java.io.IOException;
+import java.rmi.NotBoundException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import rmi.DBAccess;
 import server.AppointmentHandler;
 import server.MessageHandler;
 import calendar.Appointment;
@@ -31,7 +35,7 @@ import client.helpers.UserAbortException;
 import dateutils.Day;
 
 public class Starter {
-	
+	private DBAccess AppHandler;
 	private Person user;
 	private int weekNum;
 	private static final String EMPTY_LINES = repeat("\n", 30);
@@ -41,6 +45,8 @@ public class Starter {
 			(new Starter()).initAndLogin();
 		} catch (IOException e) {
 			e.printStackTrace();
+		} catch (NotBoundException e) {
+			e.printStackTrace();
 		}
 	}
 	
@@ -48,7 +54,9 @@ public class Starter {
 		weekNum = getCurrentWeekNum();
 	}
 	
-	private void initAndLogin() throws IOException {
+	private void initAndLogin() throws IOException, NotBoundException {
+		Registry registry = LocateRegistry.getRegistry();
+		AppHandler = (DBAccess) registry.lookup(AppointmentHandler.SERVICE_NAME);
 		printAsciiArt("Login");
 		Person user = null;
 		while (user == null) {

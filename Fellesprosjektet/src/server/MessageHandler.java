@@ -158,6 +158,7 @@ public class MessageHandler {
 			MessageHandler.sendMessageToUser(msg.getId(), user.getId());
 		}
 	}
+	
 	public static void sendMessageUpdateInfo(long appId) throws IOException {
 		Appointment ap = getAppointment(appId);
 		Message msg = new Message("Endring i avtalen: "+ap.getTitle(),
@@ -181,4 +182,5 @@ public class MessageHandler {
 		}
 		MessageHandler.sendMessageToUser(msg.getId(), app.getCreator().getId());
 	}
+	
 }

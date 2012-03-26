@@ -7,6 +7,7 @@ import static server.Execute.getUniqueId;
 import static server.Execute.update;
 
 import java.io.IOException;
+import java.rmi.RemoteException;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -18,15 +19,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import rmi.DBAccess;
 import calendar.Appointment;
 import calendar.Message;
 import calendar.Person;
 import client.helpers.StoopidSQLException;
 import dateutils.Day;
 
-public class AppointmentHandler {
+public class AppointmentHandler implements DBAccess {
+	public static final String SERVICE_NAME = "AppointmentHandler";
 	
-	public static void createAppointment(Appointment app) throws IOException {
+	public void createAppointment(Appointment app) throws IOException, RemoteException {
 		String query = "INSERT INTO Appointment(appId, title, place, startTime, endTime, " +
 					"description, daysAppearing, endOfRepeatDate, roomName, isPrivate, " + 
 					"creatorId) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
@@ -60,6 +63,11 @@ public class AppointmentHandler {
 				AppointmentHandler.addUserToAppointment(appId, user.getId());
 			}
 		}
+	}
+	
+	public List<Appointment> rmiTest() throws RemoteException{
+		System.out.println("running remote task!");
+		return new ArrayList<Appointment>();
 	}
 	
 	public static void updateAppointment(Appointment app) throws IOException {
