@@ -24,6 +24,8 @@ public class DBStarter extends RmiStarter {
 			LocateRegistry.createRegistry(1099);
 			Registry registry = LocateRegistry.getRegistry();
 			
+			InetAddress addr = InetAddress.getLocalHost();
+			System.out.println("RMI server running on: " + addr.getHostAddress());
             AppointmentHandler appEngine= new AppointmentHandlerImpl();
             AppointmentHandler appEngineStub = (AppointmentHandler) UnicastRemoteObject.exportObject(appEngine, 0);
             registry.rebind(AppointmentHandler.SERVICE_NAME, appEngineStub);
@@ -53,12 +55,6 @@ public class DBStarter extends RmiStarter {
 	
 	public static void main(String[] args) {
 		new DBStarter();
-		try {
-			InetAddress addr = InetAddress.getLocalHost();
-			System.out.println("RMI server running on: " + addr.getHostAddress());
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-		}
 	}
 
 }
