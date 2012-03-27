@@ -4,13 +4,14 @@
  * TODO To change the template for this generated file go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-package no.ntnu.fp.net.co;
+package no.ntnu.fp.net;
 
 import java.io.EOFException;
 import java.io.IOException;
 
 import no.ntnu.fp.net.admin.Log;
 import no.ntnu.fp.net.co.Connection;
+import no.ntnu.fp.net.co.ConnectionImpl;
 
 /**
  * Simplest possible test application, server part.

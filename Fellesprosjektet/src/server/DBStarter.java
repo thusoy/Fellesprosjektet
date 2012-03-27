@@ -1,7 +1,6 @@
 package server;
 
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
@@ -55,6 +54,7 @@ public class DBStarter extends RmiStarter {
 	
 	public static void main(String[] args) {
 		new DBStarter();
+		System.out.println("Accepting incoming.");
 	}
 
 }
