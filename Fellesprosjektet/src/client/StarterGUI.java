@@ -169,8 +169,11 @@ public class StarterGUI extends DBCommunicator{
 			
 			if (selected instanceof RejectedMessage){
 				RejectedMessage m = (RejectedMessage) selected;
-				System.out.println("Hva vil du gjøre?");
-				m.getAndExecuteUserResponse(user);
+				Appointment cause = m.getApp();
+				if (cause.getCreator().equals(user)){
+					System.out.println("Hva vil du gjøre?");
+					m.getAndExecuteUserResponse(user);
+				}
 			}
 			getString("Trykk enter for å gå videre.");
 		} else {
@@ -242,7 +245,14 @@ public class StarterGUI extends DBCommunicator{
 			if (thisDay != previous){
 				index = thisDay.dayInWeek() - 1;
 			}
-			days[index].add(String.format("%s - %s", padLeft(df.format(app.getStartTime()), 5), app.getTitle()));
+			String output;
+			if (app.getCreator().equals(user)){
+				output = String.format("%s %s", padLeft(df.format(app.getStartTime()), 5), app.getTitle());
+			} else {
+				output = String.format("%s (%s) %s ", padLeft(df.format(app.getStartTime()), 5), 
+						app.getCreator().getFirstname(), app.getTitle());
+			}
+			days[index].add(output);
 			previous = thisDay;
 		}
 		return days;

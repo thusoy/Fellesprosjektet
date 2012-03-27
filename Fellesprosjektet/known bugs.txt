@@ -1,3 +1,6 @@
 AppointmentHelper:
     removeDupesAndSort fjerner litt mer enn den skal, så alle appointments dukker ikke opp i vis og slett-listene.
     setRoomOrPlace funker i changeAppointment, men ikke i create, så man kan ikke taste inn rom eller sted ved opprettelse, kun ved endring.
+    
+MessageHandlerImpl:
+    klarer ikke vise rejectedmessages hvor appointmenten har blitt slettet.
