@@ -24,7 +24,18 @@ public class Settings {
 	
 	// Hide the constructor to signalize that the class should not be instantiated.
 	private Settings(){};
-
+	
+	public static void setErrorFree() throws SAXException, IOException{
+		setErrors(false);
+		setLoss(0);
+		setDelay(0);
+		setGhost(0);
+		setPayload(0);
+		setHeader(0);
+		setOnlyData(true);
+		setSimpleConnection(false);
+	}
+	
 	public static void setErrors(boolean errors) throws SAXException, IOException{
 		setField("errors", Boolean.toString(errors));
 	}
@@ -41,7 +52,7 @@ public class Settings {
 	
 	public static void setGhost(double ghost) throws SAXException, IOException{
 		validRatio(ghost, "Ghost-package-ratioen");
-		setField("delay", Double.toString(ghost));
+		setField("ghost", Double.toString(ghost));
 	}
 	
 	public static void setPayload(double payload) throws SAXException, IOException{

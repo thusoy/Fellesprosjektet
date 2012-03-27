@@ -10,9 +10,12 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.net.InetAddress;
 
+import org.xml.sax.SAXException;
+
 import no.ntnu.fp.net.admin.Log;
 import no.ntnu.fp.net.co.Connection;
 import no.ntnu.fp.net.co.ConnectionImpl;
+import no.ntnu.fp.net.co.Settings;
 
 /**
  * Simplest possible test application, server part.
@@ -32,6 +35,13 @@ public class TestCoServer {
    * Program Entry Point.
    */
   public static void main (String args[]){
+	  try {
+		Settings.setErrorFree();
+	} catch (SAXException e1) {
+		e1.printStackTrace();
+	} catch (IOException e1) {
+		e1.printStackTrace();
+	}
 
     // Create log
     Log.setLogName("Server");
@@ -43,7 +53,6 @@ public class TestCoServer {
     try {
     	System.out.printf("Server listening on %s.\n", InetAddress.getLocalHost().getHostAddress());
     	conn = server.accept();
-
       try {
 		while (true) {
 		  String msg = conn.receive();

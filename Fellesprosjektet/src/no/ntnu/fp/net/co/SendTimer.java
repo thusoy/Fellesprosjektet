@@ -49,7 +49,9 @@ public class SendTimer extends TimerTask {
     public void run() {
         try {
             Log.writeToLog(packet, "Sending this datagram (try: " + ++tries + ")", "SendTimer");
-            
+            if (tries > 1){
+            	System.out.println("RETRANSMIT! ********************");
+            }
             socket.send(packet);
         }
         catch (ClException e) {

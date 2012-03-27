@@ -12,14 +12,13 @@ import java.net.UnknownHostException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.zip.CRC32;
+import java.util.Timer;
 
 import no.ntnu.fp.net.admin.Log;
 import no.ntnu.fp.net.cl.ClException;
 import no.ntnu.fp.net.cl.ClSocket;
 import no.ntnu.fp.net.cl.KtnDatagram;
 import no.ntnu.fp.net.cl.KtnDatagram.Flag;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
  * Implementation of the Connection-interface. <br>
@@ -99,11 +98,8 @@ public class ConnectionImpl extends AbstractConnection {
     		System.out.println("Still waiting for ack...");
     	}
     	System.out.println("answer: " + answer);
-    	isValid(answer);
-    	
-    	
-    	KtnDatagram outgoing = constructInternalPacket(Flag.ACK);
-    	sendAck(outgoing, false);
+
+    	sendAck(answer);
     	
     	this.state = State.ESTABLISHED;
     }
@@ -127,10 +123,7 @@ public class ConnectionImpl extends AbstractConnection {
     	this.remoteAddress = packet.getSrc_addr();
     	this.remotePort = packet.getSrc_port();
     	Log.writeToLog(packet, "Packet received!", "FroM!");
-    	KtnDatagram outgoingPacket = constructInternalPacket(Flag.SYN_ACK);
     	this.state = State.ESTABLISHED;
-    	System.out.println("The packet we're going to send: " + outgoingPacket);
-    	KtnDatagram incomingAck = sendDataPacketWithRetransmit(outgoingPacket);
 //    	while( (incomingAck = receiveAck()) == null){
 //    		try {
 //				Thread.sleep(100);
@@ -139,8 +132,8 @@ public class ConnectionImpl extends AbstractConnection {
 //			}
 //    		System.out.println("Trying to receive packet again...");
 //    	}
-		if (isValid(incomingAck)){
-			sendSynAck(incomingAck);
+		if (isValid(packet)){
+			sendSynAck(packet);
 			return this;
 		} else {
 			System.out.println("invalid packet!");
@@ -185,30 +178,77 @@ public class ConnectionImpl extends AbstractConnection {
      * @see AbstractConnection#sendAck(KtnDatagram, boolean)
      */
     public String receive() throws ConnectException, IOException {
-        throw new NotImplementedException();
+        try{
+        	KtnDatagram packet = receivePacket(false);
+        	System.out.println("Server got packet: " + packet);
+        	System.out.println("packet flag: " + packet.getFlag());
+        	if (isValid(packet)){
+        		System.out.println("Valid packet received!");
+        		sendAck(packet);
+        	} else {
+        		System.out.println("invalid packet received!");
+        	}
+        	
+        	return packet.getPayloadAsBytes().toString();
+        } catch (EOFException e){
+        	KtnDatagram fin = disconnectRequest;
+        	sendAck(fin);
+        	this.state = State.CLOSE_WAIT;
+        	throw e;
+        }
     }
 
-    /**
+	/**
      * Close the connection.
      * 
      * @see Connection#close()
      */
     public void close() throws IOException {
+    	boolean client = state == State.ESTABLISHED;
+    	if (client){
+    		KtnDatagram packet = sendFinAndReturnAck(client);
+    		this.state = State.FIN_WAIT_2;
+    		System.out.println("RUNNING RECEIVE FIN!");
+    		KtnDatagram fin = receiveFin();
+    		sendAck(fin);
+    		System.out.println("FINACK SENT!");
+    		this.state = State.TIME_WAIT;
+    		try {
+    			Thread.sleep(3000);
+    		} catch (InterruptedException e1) {
+    			e1.printStackTrace();
+    		}
+    		this.state = State.CLOSED;
+    	} else {
+    		KtnDatagram ack = sendFinAndReturnAck(client);
+    		this.state = State.CLOSED;
+    	}
+    }
+    
+    private KtnDatagram receiveFin() throws IOException{
+    	KtnDatagram packet;
+		while(true){
+			packet = receivePacket(true);
+			if (packet.getFlag() == Flag.FIN){
+				return packet;
+			}
+		}
+    }
+    
+    private KtnDatagram sendFinAndReturnAck(boolean isClient) throws EOFException, IOException{
     	KtnDatagram finDatagram = constructInternalPacket(Flag.FIN);
-        
-        KtnDatagram ack = sendDataPacketWithRetransmit(finDatagram);
-        isValid(ack);
-        this.state = State.FIN_WAIT_1;      
-        KtnDatagram answer1 = receiveAck();
-        this.state = State.FIN_WAIT_2;
-        KtnDatagram answer2 = null;
-        try {
-        	answer2 = receiveAck();
-        } catch (EOFException e) {
-        	sendAck(answer2, false);
-        }
-        this.state = State.TIME_WAIT;
-        
+    	
+    	Timer timer = new Timer();
+    	timer.scheduleAtFixedRate(new SendTimer(new ClSocket(), finDatagram), 0, RETRANSMIT);
+    	if (isClient){
+    		this.state = State.FIN_WAIT_1;
+    	} else {
+    		this.state = State.LAST_ACK;
+    	}
+    	KtnDatagram ack = receiveAck();
+    	timer.cancel();
+    	
+    	return ack;
     }
 
     /**
@@ -221,20 +261,8 @@ public class ConnectionImpl extends AbstractConnection {
      */
     protected boolean isValid(KtnDatagram packet) {
         long packetChecksum = packet.getChecksum();
-        long actualChecksum = calculateChecksum(packet);
+        long actualChecksum = packet.calculateChecksum();
         return actualChecksum == packetChecksum; 
     }
 
-	private static long calculateChecksum(KtnDatagram packet) {
-		CRC32 crc = new CRC32();
-		System.out.println("calculated: " + packet.calculateChecksum());
-		System.out.println("bytes: " + packet.getPayloadAsBytes());
-		byte[] bytes = packet.getPayloadAsBytes();
-		if (bytes != null){
-			crc.update(packet.getPayloadAsBytes());
-			return crc.getValue();
-		} else {
-			return packet.calculateChecksum();
-		}
-	}      
 }
