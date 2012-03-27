@@ -12,7 +12,7 @@ public abstract class DBCommunicator {
 	
 	static {
 		try {
-			registry = LocateRegistry.getRegistry("129.241.126.61");
+			registry = LocateRegistry.getRegistry("78.91.44.182");
 		} catch (RemoteException e) {
 			System.err.println("Klarte ikke finne RMI-registeret!");
 			e.printStackTrace();
