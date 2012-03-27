@@ -8,6 +8,7 @@ package no.ntnu.fp.net;
 
 import java.io.EOFException;
 import java.io.IOException;
+import java.net.InetAddress;
 
 import no.ntnu.fp.net.admin.Log;
 import no.ntnu.fp.net.co.Connection;
@@ -40,18 +41,20 @@ public class TestCoServer {
     // each new connection lives in its own instance
     Connection conn;
     try {
-      conn = server.accept();
+    	System.out.printf("Server listening on %s.\n", InetAddress.getLocalHost().getHostAddress());
+    	conn = server.accept();
 
       try {
-	while (true) {
-	  String msg = conn.receive();
-	  Log.writeToLog("Message got through to server: " + msg,
-			 "TestServer");
-	}
+		while (true) {
+		  String msg = conn.receive();
+		  System.out.println("Server got message: " + msg);
+		  Log.writeToLog("Message got through to server: " + msg,
+				 "TestServer");
+		}
       } catch (EOFException e){
-	Log.writeToLog("Got close request (EOFException), closing.",
-		       "TestServer");
-	conn.close();
+			Log.writeToLog("Got close request (EOFException), closing.",
+				       "TestServer");
+			conn.close();
       }
 
       System.out.println("SERVER TEST FINISHED");

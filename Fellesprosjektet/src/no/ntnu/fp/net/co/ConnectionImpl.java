@@ -11,6 +11,7 @@ import java.net.UnknownHostException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.zip.CRC32;
 
 import no.ntnu.fp.net.admin.Log;
 import no.ntnu.fp.net.cl.ClException;
@@ -76,7 +77,7 @@ public class ConnectionImpl extends AbstractConnection {
     public void connect(InetAddress remoteAddress, int remotePort) throws IOException,
             SocketTimeoutException {
     	ClSocket a2 = new ClSocket();
-    	this.remoteAddress = remoteAddress.toString();
+    	this.remoteAddress = remoteAddress.getHostAddress();
     	this.remotePort = remotePort;
     	KtnDatagram datagram = constructInternalPacket(Flag.SYN);
     	
@@ -87,7 +88,17 @@ public class ConnectionImpl extends AbstractConnection {
 		}
     	this.state = State.SYN_SENT;
     	
-    	KtnDatagram answer = receiveAck();
+    	KtnDatagram answer;
+    	while ( (answer = receiveAck()) == null){
+    		try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+    		System.out.println("Still waiting for ack...");
+    	}
+    	System.out.println("answer: " + answer);
+    	isValid(answer);
     	
     	KtnDatagram outgoing = constructInternalPacket(Flag.ACK);
     	sendAck(outgoing, false);
@@ -115,16 +126,32 @@ public class ConnectionImpl extends AbstractConnection {
     	this.remotePort = packet.getSrc_port();
     	Log.writeToLog(packet, "Packet received!", "FroM!");
     	KtnDatagram outgoingPacket = constructInternalPacket(Flag.SYN_ACK);
-    	outgoingPacket.setPayload("hellow!");
-    	System.out.println("The packet were going to send: " + outgoingPacket.getDest_addr() + outgoingPacket.getDest_port() + outgoingPacket.getSeq_nr());
-    	sendAck(outgoingPacket, true);
-    	KtnDatagram incoming = receiveAck();
-		if (isValid(incoming)){
+    	this.state = State.ESTABLISHED;
+    	System.out.println("The packet we're going to send: " + outgoingPacket);
+    	KtnDatagram incomingAck = sendDataPacketWithRetransmit(outgoingPacket);
+//    	while( (incomingAck = receiveAck()) == null){
+//    		try {
+//				Thread.sleep(100);
+//			} catch (InterruptedException e) {
+//				e.printStackTrace();
+//			}
+//    		System.out.println("Trying to receive packet again...");
+//    	}
+		if (isValid(incomingAck)){
+			sendSynAck(incomingAck);
 			return this;
 		} else {
-			// gjør noe fornuftig
+			System.out.println("invalid packet!");
 		}
     	return this;
+    }
+    
+    private void sendAck(KtnDatagram packet) throws ConnectException, IOException{
+    	sendAck(packet, false);
+    }
+    
+    private void sendSynAck(KtnDatagram packet) throws ConnectException, IOException{
+    	sendAck(packet, true);
     }
     	
     /**
@@ -140,7 +167,11 @@ public class ConnectionImpl extends AbstractConnection {
      * @see no.ntnu.fp.net.co.Connection#send(String)
      */
     public void send(String msg) throws ConnectException, IOException {
-        throw new NotImplementedException();
+        if (state != State.ESTABLISHED){
+        	throw new IllegalStateException("Forbindelsen må være åpnet for å kunne sende!");
+        }
+        KtnDatagram packet = constructDataPacket(msg);
+        sendDataPacketWithRetransmit(packet);
     }
 
     /**
@@ -173,6 +204,21 @@ public class ConnectionImpl extends AbstractConnection {
      * @return true if packet is free of errors, false otherwise.
      */
     protected boolean isValid(KtnDatagram packet) {
-        throw new NotImplementedException();
+        long packetChecksum = packet.getChecksum();
+        long actualChecksum = calculateChecksum(packet);
+        return actualChecksum == packetChecksum; 
     }
+
+	private static long calculateChecksum(KtnDatagram packet) {
+		CRC32 crc = new CRC32();
+		System.out.println("calculated: " + packet.calculateChecksum());
+		System.out.println("bytes: " + packet.getPayloadAsBytes());
+		byte[] bytes = packet.getPayloadAsBytes();
+		if (bytes != null){
+			crc.update(packet.getPayloadAsBytes());
+			return crc.getValue();
+		} else {
+			return packet.calculateChecksum();
+		}
+	}      
 }

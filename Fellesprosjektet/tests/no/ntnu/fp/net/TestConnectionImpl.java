@@ -6,12 +6,14 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.SocketTimeoutException;
 
+import org.junit.Test;
+
 import no.ntnu.fp.net.co.ConnectionImpl;
 
 public class TestConnectionImpl {
 	private static final int port = 1337;
 
-//	@Test
+	@Test
 	public void testConnection() throws SocketTimeoutException, IOException {
 		System.out.println("Starting server...");
 		ServerImpl server = new ServerImpl(port);
@@ -27,7 +29,7 @@ public class TestConnectionImpl {
 		server.close();
 	}
 	
-//	@Test
+	@Test
 	public void testSendAndRecieveData() throws SocketTimeoutException, IOException{
 		ServerImpl server = new ServerImpl(port);
 		ConnectionImpl client = new ConnectionImpl(port);
