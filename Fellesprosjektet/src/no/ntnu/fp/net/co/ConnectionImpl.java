@@ -179,7 +179,6 @@ public class ConnectionImpl extends AbstractConnection {
      * @see AbstractConnection#sendAck(KtnDatagram, boolean)
      */
     public String receive() throws ConnectException, IOException {
-<<<<<<< HEAD
         try{
         	KtnDatagram packet = receivePacket(false);
         	System.out.println("Server got packet: " + packet);
@@ -198,12 +197,6 @@ public class ConnectionImpl extends AbstractConnection {
         	this.state = State.CLOSE_WAIT;
         	throw e;
         }
-=======
-        KtnDatagram packet = receivePacket(false);
-        String payload = (String) packet.getPayload();
-        sendAck(packet);
-        return payload;
->>>>>>> branch 'master' of https://Ullteppe@github.com/Ullteppe/Fellesprosjektet.git
     }
 
 	/**
@@ -245,7 +238,6 @@ public class ConnectionImpl extends AbstractConnection {
     
     private KtnDatagram sendFinAndReturnAck(boolean isClient) throws EOFException, IOException{
     	KtnDatagram finDatagram = constructInternalPacket(Flag.FIN);
-<<<<<<< HEAD
     	
     	Timer timer = new Timer();
     	timer.scheduleAtFixedRate(new SendTimer(new ClSocket(), finDatagram), 0, RETRANSMIT);
@@ -258,22 +250,6 @@ public class ConnectionImpl extends AbstractConnection {
     	timer.cancel();
     	
     	return ack;
-=======
-        
-        KtnDatagram ack = sendDataPacketWithRetransmit(finDatagram);
-        isValid(ack);
-        this.state = State.FIN_WAIT_1;      
-        KtnDatagram answer1 = receiveAck();
-        this.state = State.FIN_WAIT_2;
-        KtnDatagram answer2 = null;
-        try {
-        	answer2 = receiveAck();
-        } catch (EOFException e) {
-        	sendSynAck(answer2);
-        }
-        this.state = State.TIME_WAIT;
-        
->>>>>>> branch 'master' of https://Ullteppe@github.com/Ullteppe/Fellesprosjektet.git
     }
 
     /**
