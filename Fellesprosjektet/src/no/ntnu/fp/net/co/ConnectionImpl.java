@@ -3,6 +3,7 @@
  */
 package no.ntnu.fp.net.co;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.net.InetAddress;
@@ -89,6 +90,7 @@ public class ConnectionImpl extends AbstractConnection {
     	
     	KtnDatagram answer = receiveAck();
     	
+    	
     	KtnDatagram outgoing = constructInternalPacket(Flag.ACK);
     	sendAck(outgoing, false);
     	
@@ -161,7 +163,21 @@ public class ConnectionImpl extends AbstractConnection {
      * @see Connection#close()
      */
     public void close() throws IOException {
-        throw new NotImplementedException();
+    	KtnDatagram finDatagram = constructInternalPacket(Flag.FIN);
+        
+        KtnDatagram ack = sendDataPacketWithRetransmit(finDatagram);
+        isValid(ack);
+        this.state = State.FIN_WAIT_1;      
+        KtnDatagram answer1 = receiveAck();
+        this.state = State.FIN_WAIT_2;
+        KtnDatagram answer2 = null;
+        try {
+        	answer2 = receiveAck();
+        } catch (EOFException e) {
+        	sendAck(answer2, false);
+        }
+        this.state = State.TIME_WAIT;
+        
     }
 
     /**
