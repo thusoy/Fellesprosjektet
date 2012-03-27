@@ -174,6 +174,7 @@ public class ConnectionImpl extends AbstractConnection {
         }
         KtnDatagram packet = constructDataPacket(msg);
         sendDataPacketWithRetransmit(packet);
+        KtnDatagram ack = receiveAck();
     }
 
     /**
@@ -185,7 +186,7 @@ public class ConnectionImpl extends AbstractConnection {
      * @see AbstractConnection#sendAck(KtnDatagram, boolean)
      */
     public String receive() throws ConnectException, IOException {
-        throw new NotImplementedException();
+        
     }
 
     /**
@@ -205,7 +206,7 @@ public class ConnectionImpl extends AbstractConnection {
         try {
         	answer2 = receiveAck();
         } catch (EOFException e) {
-        	sendAck(answer2, false);
+        	sendSynAck(answer2);
         }
         this.state = State.TIME_WAIT;
         
