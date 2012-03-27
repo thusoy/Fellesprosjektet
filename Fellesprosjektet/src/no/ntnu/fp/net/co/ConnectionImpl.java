@@ -188,6 +188,7 @@ public class ConnectionImpl extends AbstractConnection {
     public String receive() throws ConnectException, IOException {
         KtnDatagram packet = receivePacket(false);
         String payload = (String) packet.getPayload();
+        sendAck(packet);
         return payload;
     }
 
