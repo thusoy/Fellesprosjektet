@@ -36,7 +36,7 @@ public class TestCoServer {
    */
   public static void main (String args[]){
 	  try {
-		Settings.setErrorFree();
+		Settings.setErrors();
 	} catch (SAXException e1) {
 		e1.printStackTrace();
 	} catch (IOException e1) {

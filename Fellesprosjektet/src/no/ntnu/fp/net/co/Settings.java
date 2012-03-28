@@ -118,4 +118,12 @@ public class Settings {
 		Transformer transformer = factory.newTransformer();
 		transformer.transform(source, result);
 	}
+
+	public static void setErrors() throws SAXException, IOException {
+		setErrors(true);
+		setLoss(0.8);
+		setDelay(0.7);
+		setHeader(0.8);
+		setPayload(0.8);
+	}
 }
