@@ -84,7 +84,12 @@ public class ConnectionImpl extends AbstractConnection {
     	this.state = State.SYN_SENT;
     	
     	KtnDatagram answer;
-    	while ( (answer = receiveAck()) == null){
+    	int tries = 5;
+    	while ( (answer = receiveAck()) == null && !isValid(answer)){
+    		tries--;
+    		if(tries > 0 ){
+    			throw new IOException("Couldn't connect to server!");
+    		}
     		try {
 				Thread.sleep(100);
 			} catch (InterruptedException e) {
@@ -116,9 +121,19 @@ public class ConnectionImpl extends AbstractConnection {
 		return this;
     }
     
+    /**
+     * Receive a valid non-internal packet.
+     * 
+     * @throws EOFException
+     * @throws IOException
+     */
     private KtnDatagram receiveValidPacket() throws EOFException, IOException{
     	KtnDatagram packet;
-    	while( (packet = receivePacket(false)) == null && !isValid(packet)){
+    	while(true) {
+    		packet = receivePacket(false);
+    		if (isValid(packet)){
+    			break;
+    		}
     		try {
 				Thread.sleep(100);
 			} catch (InterruptedException e) {
@@ -149,14 +164,14 @@ public class ConnectionImpl extends AbstractConnection {
     }
     	
     /**
-     * Send a message from the application.
+     * Send a message from the application. T
      * 
      * @param msg
      *            - the String to be sent.
      * @throws ConnectException
      *             If no connection exists.
      * @throws IOException
-     *             If no ACK was received.
+     *             If no ACK was received in 5 tries or wrong ACK was received.
      * @see AbstractConnection#sendDataPacketWithRetransmit(KtnDatagram)
      * @see no.ntnu.fp.net.co.Connection#send(String)
      */
@@ -165,8 +180,15 @@ public class ConnectionImpl extends AbstractConnection {
         	throw new IllegalStateException("Forbindelsen må være åpnet for å kunne sende! Var i " + state);
         }
         KtnDatagram packet = constructDataPacket(msg);
-        KtnDatagram ack = sendDataPacketWithRetransmit(packet);
-        
+        KtnDatagram ack;
+        int tries = 5;
+        while(tries > 0){
+        	ack = sendDataPacketWithRetransmit(packet);
+        	tries--;
+        	if(isValid(ack)){
+        		break;
+        	}
+        }
     }
 
     /**
@@ -181,10 +203,12 @@ public class ConnectionImpl extends AbstractConnection {
         try{
         	KtnDatagram packet = receiveValidPacket();
     		sendAck(packet);
-    		System.out.println("RECEIVED DATA: " + packet);
-    		System.out.println("packet flag: " + packet.getFlag());
-        	return (String) packet.getPayload();
+    		String message = (String) packet.getPayload();
+			System.out.println("RECEIVED DATA IN RECEIVE: " + message);
+			System.out.println("packet flag: " + packet.getFlag());
+			return message;
         } catch (EOFException e){
+        	System.out.println("GOT DISCONNECT!");
         	KtnDatagram fin = disconnectRequest;
         	sendAck(fin);
         	this.state = State.CLOSE_WAIT;
@@ -262,12 +286,19 @@ public class ConnectionImpl extends AbstractConnection {
     		System.out.println("NULL PACKET!");
     		return false;
     	}
+    	int ackNr = packet.getAck();
+    	if(ackNr != -1 && ackNr != lastDataPacketSent.getSeq_nr()){
+    		System.out.println("MOTTOK FEIL ACK!");
+    		return false;
+    	}
         if(packet.getChecksum() != packet.calculateChecksum()){
         	System.out.println("************** FANT BITFEIL ******************");
         	return false;
         }
         if(!myAddress.equals(packet.getDest_addr())){
         	System.out.println("************** FANT GHOST *********************");
+        	System.out.println("FORVENTET: " + myAddress);
+        	System.out.println("MOTTOK TIL: " + packet.getDest_addr());
         	return false;
         }
         KtnDatagram lastPacket = lastValidPacketReceived;
