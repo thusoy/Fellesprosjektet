@@ -10,12 +10,9 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.net.InetAddress;
 
-import org.xml.sax.SAXException;
-
 import no.ntnu.fp.net.admin.Log;
 import no.ntnu.fp.net.co.Connection;
 import no.ntnu.fp.net.co.ConnectionImpl;
-import no.ntnu.fp.net.co.Settings;
 
 /**
  * Simplest possible test application, server part.
@@ -35,14 +32,6 @@ public class TestCoServer {
    * Program Entry Point.
    */
   public static void main (String args[]){
-	  try {
-		Settings.setErrors();
-	} catch (SAXException e1) {
-		e1.printStackTrace();
-	} catch (IOException e1) {
-		e1.printStackTrace();
-	}
-
     // Create log
     Log.setLogName("Server");
 
@@ -57,6 +46,7 @@ public class TestCoServer {
 		while (true) {
 		  String msg = conn.receive();
 		  System.out.println("Server got message: " + msg);
+		  conn.send("Got this: " + msg);
 		  Log.writeToLog("Message got through to server: " + msg,
 				 "TestServer");
 		}

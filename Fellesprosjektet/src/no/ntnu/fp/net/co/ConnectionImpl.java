@@ -15,7 +15,6 @@ import java.util.Map;
 import java.util.Timer;
 
 import no.ntnu.fp.net.admin.Log;
-import no.ntnu.fp.net.cl.ClException;
 import no.ntnu.fp.net.cl.ClSocket;
 import no.ntnu.fp.net.cl.KtnDatagram;
 import no.ntnu.fp.net.cl.KtnDatagram.Flag;
@@ -108,21 +107,16 @@ public class ConnectionImpl extends AbstractConnection {
      */
     public Connection accept() throws IOException, SocketTimeoutException {
     	this.state = State.LISTEN;
-    	KtnDatagram packet = receiveInternalPacket();
+    	KtnDatagram packet = receiveValidInternalPacket();
     	this.remoteAddress = packet.getSrc_addr();
     	this.remotePort = packet.getSrc_port();
     	Log.writeToLog(packet, "Packet received!", "FroM!");
     	this.state = State.ESTABLISHED;
-		if (isValid(packet)){
-			sendSynAck(packet);
-			return this;
-		} else {
-			System.out.println("invalid packet!");
-		}
-    	return this;
+		sendSynAck(packet);
+		return this;
     }
     
-    private KtnDatagram receivePacket() throws EOFException, IOException{
+    private KtnDatagram receiveValidPacket() throws EOFException, IOException{
     	KtnDatagram packet;
     	while( (packet = receivePacket(false)) == null && !isValid(packet)){
     		try {
@@ -134,7 +128,7 @@ public class ConnectionImpl extends AbstractConnection {
     	return packet;
     }
     
-    private KtnDatagram receiveInternalPacket() throws EOFException, IOException{
+    private KtnDatagram receiveValidInternalPacket() throws EOFException, IOException{
     	KtnDatagram packet;
     	while( (packet = receivePacket(true)) == null && !isValid(packet)){
     		try {
@@ -168,11 +162,11 @@ public class ConnectionImpl extends AbstractConnection {
      */
     public void send(String msg) throws ConnectException, IOException {
         if (state != State.ESTABLISHED){
-        	throw new IllegalStateException("Forbindelsen må være åpnet for å kunne sende!");
+        	throw new IllegalStateException("Forbindelsen må være åpnet for å kunne sende! Var i " + state);
         }
         KtnDatagram packet = constructDataPacket(msg);
-        sendDataPacketWithRetransmit(packet);
-        KtnDatagram ack = receiveAck();
+        KtnDatagram ack = sendDataPacketWithRetransmit(packet);
+        
     }
 
     /**
@@ -185,16 +179,10 @@ public class ConnectionImpl extends AbstractConnection {
      */
     public String receive() throws ConnectException, IOException {
         try{
-        	KtnDatagram packet = receivePacket();
-        	System.out.println("Server got packet: " + packet);
-        	System.out.println("packet flag: " + packet.getFlag());
-        	if (isValid(packet)){
-        		System.out.println("Valid packet received!");
-        		sendAck(packet);
-        	} else {
-        		System.out.println("invalid packet received!");
-        	}
-        	
+        	KtnDatagram packet = receiveValidPacket();
+    		sendAck(packet);
+    		System.out.println("RECEIVED DATA: " + packet);
+    		System.out.println("packet flag: " + packet.getFlag());
         	return (String) packet.getPayload();
         } catch (EOFException e){
         	KtnDatagram fin = disconnectRequest;
@@ -234,7 +222,7 @@ public class ConnectionImpl extends AbstractConnection {
     private KtnDatagram receiveFin() throws IOException{
     	KtnDatagram packet;
 		while(true){
-			packet = receiveInternalPacket();
+			packet = receiveValidInternalPacket();
 			if (packet.getFlag() == Flag.FIN){
 				return packet;
 			}
@@ -269,19 +257,25 @@ public class ConnectionImpl extends AbstractConnection {
      * @return true if packet is free of errors, false otherwise.
      */
     protected boolean isValid(KtnDatagram packet) {
+    	System.out.println("**************** TESTING VALIDITY ******************");
     	if(packet == null){
+    		System.out.println("NULL PACKET!");
     		return false;
     	}
         if(packet.getChecksum() != packet.calculateChecksum()){
+        	System.out.println("************** FANT BITFEIL ******************");
         	return false;
         }
         if(!myAddress.equals(packet.getDest_addr())){
+        	System.out.println("************** FANT GHOST *********************");
         	return false;
         }
         KtnDatagram lastPacket = lastValidPacketReceived;
         if(lastPacket != null && lastPacket.getSeq_nr() + 1 != packet.getSeq_nr()){
+        	System.out.println("************** FEIL PAKKE ********************");
         	return false;
         }
+        System.out.println("VALID PACKET!");
         return true;
     }
 

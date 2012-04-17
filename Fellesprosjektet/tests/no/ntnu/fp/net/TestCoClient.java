@@ -4,6 +4,8 @@
  */
 package no.ntnu.fp.net;
 
+import static junit.framework.Assert.assertEquals;
+
 import java.io.IOException;
 import java.net.ConnectException;
 import java.net.InetAddress;
@@ -42,8 +44,15 @@ public class TestCoClient {
       addr = InetAddress.getLocalHost();
       conn.connect(addr, 5555);
       // send two messages to server
-      conn.send("Client: Hello Server! Are you there?");
-      conn.send("Client: Hi again!");
+      String firstMsg = "Client: Hello Server! Are you there?";
+      conn.send(firstMsg);
+      String got = conn.receive();
+      assertEquals("Skal ha fått det samme!", "Got this: " + firstMsg, got);
+      String secMsg = "Client: Hi again!";
+      conn.send(secMsg);
+      String got2 = conn.receive();
+      assertEquals("Skal ha fått det samme!", "Got this: " + secMsg, got2);
+      
       // write a message in the log and close the connection
       Log.writeToLog("Client is now closing the connection!",
 		     "TestApplication");
